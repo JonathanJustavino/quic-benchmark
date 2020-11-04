@@ -4,7 +4,7 @@
   "description": "benchmarking quic",
   "main": "tls-server.js",
   "scripts": {
-    "start": "npm run build && node ./lib/tls-server.js",
+    "start": "npm run build && node --experimental-modules ./lib/quic-server.js",
     "build": "babel src -d lib",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
