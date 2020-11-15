@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  nginx:
+    hostname: nginx
+    #image: nwtgck/nginx-http3
+    image: ymuski/nginx-quic
+    volumes:
+      - ./certs:/opt/nginx/certs/
+      - ./conf/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8443:443/tcp
+      - 8443:443/udp
+      - 8080:80
+
+#  curl:
+#    hostname: curl
+#    image: ymuski/curl-http3
+#    links:
+#      - nginx
