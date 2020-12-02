@@ -7,8 +7,8 @@ const PORT = 1337;
 const HOST = '127.0.0.1'
 
 var options = {
-    key: fs.readFileSync('../certs/tcp-tls/private-key.pem'),
-    cert: fs.readFileSync('../certs/tcp-tls/public-cert.pem')
+    key: fs.readFileSync('certs/tcp-tls/private-key.pem'),
+    cert: fs.readFileSync('certs/tcp-tls/public-cert.pem')
 };
 
 var server = tls.createServer(options, function(socket) {

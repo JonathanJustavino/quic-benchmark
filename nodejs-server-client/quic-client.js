@@ -1,9 +1,9 @@
 const { createQuicSocket } = require('net');
 const fs = require('fs');
 
-const key  = fs.readFileSync('../certs/quic/server.key');
-const cert = fs.readFileSync('../certs/quic/server.crt');
-const ca   = fs.readFileSync('../certs/quic/server.csr');
+const key  = fs.readFileSync('certs/quic/server.key');
+const cert = fs.readFileSync('certs/quic/server.crt');
+const ca   = fs.readFileSync('certs/quic/server.csr');
 
 // Create a QuicSocket associated with localhost and port 2345
 //const socket = createQuicSocket({ endpoint: { port: 2345 } });

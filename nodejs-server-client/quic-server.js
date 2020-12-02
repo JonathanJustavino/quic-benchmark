@@ -2,9 +2,9 @@
 const { createQuicSocket } = require('net');
 const fs = require('fs');
 
-const key  = fs.readFileSync('../certs/quic/server.key');
-const cert = fs.readFileSync('../certs/quic/server.crt');
-const ca   = fs.readFileSync('../certs/quic/server.csr');
+const key  = fs.readFileSync('certs/quic/server.key');
+const cert = fs.readFileSync('certs/quic/server.crt');
+const ca   = fs.readFileSync('certs/quic/server.csr');
 const port = 1234;
 
 // Create the QUIC UDP IPv4 socket bound to local IP port 1234
