@@ -10,11 +10,9 @@ fn main() -> std::io::Result<()> {
     let scid = [0xba; 16];
     let mut conn = quiche::accept(&scid, None, &mut config).unwrap();
     let mut buf = [0; 512];
-    // println!("{:?}", *conn);
-    let mut sth = conn.as_mut();
+
     loop {
         let read = socket.recv(&mut buf).unwrap();
-        
         let read = match conn.recv(&mut buf[..read]) {
             Ok(v) => v,
 
@@ -23,8 +21,22 @@ fn main() -> std::io::Result<()> {
                 break;
             },
         };
-
+        println!("read {} bytes", read);
         println!("{:?}", buf);
+        let reason: &[u8] = &[0];
+        let close = conn.close(false, 0, reason);
+
+        match close {
+            Ok(res) => {
+                println!("{:?}", res);
+                println!("Closing the connection");
+                break;
+            }
+            Err(e) => {
+                eprint!("Error closing the connection: {}", e);
+                break;
+            }
+        }
     }
     Ok(())
 }
