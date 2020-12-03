@@ -4,7 +4,7 @@ var tls = require('tls');
 var fs = require('fs');
 
 const PORT = 1337;
-const HOST = '127.0.0.1'
+const HOST = '192.168.52.36'
 
 var options = {
     key: fs.readFileSync('certs/tcp-tls/private-key.pem'),
@@ -28,5 +28,4 @@ server.listen(PORT, HOST, function() {
 
 server.on('error', function(error) {
     console.error(error);
-    server.destroy();
 });
