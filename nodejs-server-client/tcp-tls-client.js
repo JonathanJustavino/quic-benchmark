@@ -4,7 +4,7 @@ var tls = require('tls');
 var fs = require('fs');
 
 const PORT = 1337;
-const HOST = '127.0.0.1'
+const HOST = '192.168.52.36'
 
 // Pass the certs to the server and let it know to process even unauthorized certs.
 var options = {
