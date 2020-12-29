@@ -24,19 +24,21 @@ const client = client_socket.connect({
 });
 
 client_socket.on('session', (session) => {
-  console.log("a new QuicClientSession has been created");
-  console.log(session.idleTimeout);
+  const currentTime = new Date();
+  console.log("\na new QuicClientSession has been created");
+  console.log(currentTime);
 });
 
 client.on('secure', () => {
-  console.log("TLS handshake has been completed");
-  const stream = client.openStream();
+  const currentTime = new Date();
+  console.log("\nTLS handshake has been completed");
+  console.log(currentTime);
 
+  const stream = client.openStream();
   stream.write("I am the client sending you a message..");
-  stream.write("sending data..");
 
   stream.on('data', function(data) {
-    console.log('Received: %s [it is %d bytes long]',
+    console.log('\nReceived: %s [it is %d bytes long]',
     data.toString().replace(/(\n)/gm,""),
     data.length);
     console.log(stream.session)
@@ -45,22 +47,32 @@ client.on('secure', () => {
 });
 
 client_socket.on('close', () => {
-  console.log("QuicSocket has been destroyed and is no longer usable");
+  const currentTime = new Date();
+  console.log("\nQuicSocket has been destroyed and is no longer usable");
+  console.log(currentTime);
 });
 
 client_socket.on('endpointClose', () => {
-  console.log("QuicEndpoint associated with the QuicSocket closes and has been destroyed");
+  const currentTime = new Date();
+  console.log("\nQuicEndpoint associated with the QuicSocket closes and has been destroyed");
+  console.log(currentTime);
 });
   
 client_socket.on('sessionError', (error, session) => {
-  console.log("Error occurs processing an event related to a specific QuicSession instance");
+  const currentTime = new Date();
+  console.log("\nError occurs processing an event related to a specific QuicSession instance");
   console.log('error:', error.message);
+  console.log(currentTime);
 });
 
 client_socket.on('ready', () => {
-  console.log("QuicSocket has been bound to a local UDP port");
+  const currentTime = new Date();
+  console.log("\nQuicSocket has been bound to a local UDP port");
+  console.log(currentTime);
 });
 
 client_socket.on('error', () => {
-  console.log("QuicSocket was destroyed with an error");
+  const currentTime = new Date();
+  console.log("\nQuicSocket was destroyed with an error");
+  console.log(currentTime);
 });

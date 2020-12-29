@@ -16,12 +16,15 @@ const server_socket = createQuicSocket({ endpoint: { port } });
 server_socket.listen({ key, cert, alpn: 'hello' });
     
 server_socket.on('session', (session) => {
-  console.log("a new QuicServerSession has been created");
+  const currentTime = new Date();
+  console.log("\na new QuicServerSession has been created");
+  console.log(currentTime);
+
   session.on('stream', (stream) => {
     stream.write("I am the server sending you a message.");
 
     stream.on('data', function(data) {
-      console.log('Received: %s [it is %d bytes long]',
+      console.log('\nReceived: %s [it is %d bytes long]',
       data.toString().replace(/(\n)/gm,""),
       data.length);
       console.log(stream.session)
@@ -30,34 +33,48 @@ server_socket.on('session', (session) => {
 });
 
 server_socket.on('listening', () => {
-  console.log("The QuicSocket has started listening for incoming QuicServerSessions");
+  const currentTime = new Date();
+  console.log("\nThe QuicSocket has started listening for incoming QuicServerSessions");
   console.log(`listening on ${port}...`);
+  console.log(currentTime);
 });
 
 server_socket.on('busy', () => {
+  const currentTime = new Date();
   if (server_socket.serverBusy)
-    console.log('Server is busy');
+    console.log('\nServer is busy');
   else
-    console.log('Server is not busy');
+    console.log('\nServer is not busy');
+  console.log(currentTime);
 });
 
 server_socket.on('close', () => {
-  console.log("QuicSocket has been destroyed and is no longer usable");
+  const currentTime = new Date();
+  console.log("\nQuicSocket has been destroyed and is no longer usable");
+  console.log(currentTime);
 });
 
 server_socket.on('endpointClose', () => {
-  console.log("QuicEndpoint associated with the QuicSocket closes and has been destroyed");
+  const currentTime = new Date();
+  console.log("\nQuicEndpoint associated with the QuicSocket closes and has been destroyed");
+  console.log(currentTime);
 });
   
 server_socket.on('sessionError', (error, session) => {
-  console.log("Error occurs processing an event related to a specific QuicSession instance");
+  const currentTime = new Date();
+  console.log("\nError occurs processing an event related to a specific QuicSession instance");
   console.log('error:', error.message);
+  console.log(currentTime);
 });
 
 server_socket.on('ready', () => {
-  console.log("QuicSocket has been bound to a local UDP port");
+  const currentTime = new Date();
+  console.log("\nQuicSocket has been bound to a local UDP port");
+  console.log(currentTime);
 });
 
 server_socket.on('error', () => {
-  console.log("QuicSocket was destroyed with an error");
+  const currentTime = new Date();
+  console.log("\nQuicSocket was destroyed with an error");
+  console.log(currentTime);
 });
