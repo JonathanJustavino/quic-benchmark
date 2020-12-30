@@ -21,6 +21,10 @@ server_socket.on('session', (session) => {
   console.log(currentTime);
 
   session.on('stream', (stream) => {
+    const currentTime = new Date();
+    console.log("\na new QuicStream has been initiated by the connected peer");
+    console.log(currentTime);
+  
     stream.write("I am the server sending you a message.");
 
     stream.on('data', function(data) {
@@ -30,6 +34,31 @@ server_socket.on('session', (session) => {
       console.log(stream.session)
     });
   });
+
+  session.on('close', () => {
+    const currentTime = new Date();
+    console.log("\nQuicSession has been destroyed and is no longer usable");
+    console.log(currentTime);
+  });
+
+  session.on('secure', () => {
+    const currentTime = new Date();
+    console.log("\nTLS handshake has been completed");
+    console.log(currentTime);
+  });
+
+  session.on('pathValidation', () => {
+    const currentTime = new Date();
+    console.log("\na path validation result has been determined");
+    console.log(currentTime);
+  });
+
+  session.on('keylog', () => {
+    const currentTime = new Date();
+    console.log("\nkey material is generated or received by a QuicSession");
+    console.log(currentTime);
+  });
+
 });
 
 server_socket.on('listening', () => {

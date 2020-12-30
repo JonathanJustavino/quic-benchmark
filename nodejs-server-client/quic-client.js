@@ -18,25 +18,19 @@ const client_socket = createQuicSocket({
   }
 });
 
-const client = client_socket.connect({
+const client_session = client_socket.connect({
   address: '192.168.52.38',
   port: 1234,
 });
 
-client_socket.on('session', (session) => {
-  const currentTime = new Date();
-  console.log("\na new QuicClientSession has been created");
-  console.log(currentTime);
-});
-
-client.on('secure', () => {
+client_session.on('secure', () => {
   const currentTime = new Date();
   console.log("\nTLS handshake has been completed");
   console.log(currentTime);
-
-  const stream = client.openStream();
+  
+  const stream = client_session.openStream();
   stream.write("I am the client sending you a message..");
-
+  
   stream.on('data', function(data) {
     console.log('\nReceived: %s [it is %d bytes long]',
     data.toString().replace(/(\n)/gm,""),
@@ -44,6 +38,36 @@ client.on('secure', () => {
     console.log(stream.session)
   });
   stream.on('error', (err) => console.error(err));
+});
+
+client_session.on('stream', (stream) => {
+  const currentTime = new Date();
+  console.log("\na new QuicStream has been initiated by the connected peer");
+  console.log(currentTime);
+});
+
+client_session.on('close', () => {
+  const currentTime = new Date();
+  console.log("\nQuicSession has been destroyed and is no longer usable");
+  console.log(currentTime);
+});
+
+client_session.on('pathValidation', () => {
+  const currentTime = new Date();
+  console.log("\na path validation result has been determined");
+  console.log(currentTime);
+});
+
+client_session.on('keylog', () => {
+  const currentTime = new Date();
+  console.log("\nkey material is generated or received by a QuicSession");
+  console.log(currentTime);
+});
+
+client_socket.on('session', (session) => {
+  const currentTime = new Date();
+  console.log("\na new QuicClientSession has been created");
+  console.log(currentTime);
 });
 
 client_socket.on('close', () => {
