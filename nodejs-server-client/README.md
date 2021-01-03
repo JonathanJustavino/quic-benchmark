@@ -16,5 +16,5 @@ python3 run_server_client.py tcptls
 
 > Warning: building the image takes a very long time (up to 20 min), because nodejs has to be rebuild in experimental mode
 
-If you execute `sudo docker logs {container_name}` after setup, you will see output that looks like this:
+If you execute `sudo docker logs {container_name}` (for example: `sudo docker logs quic_server`) after setup, you will see output that looks like this:
 ![](tcp_tls_server.png)
