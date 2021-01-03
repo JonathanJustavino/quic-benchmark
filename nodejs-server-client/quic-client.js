@@ -1,12 +1,10 @@
 const { createQuicSocket } = require('net');
 const fs = require('fs');
+const hexdump = require('hexdump-nodejs');
 
 const key  = fs.readFileSync('certs/quic/server.key');
 const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
-
-// Create a QuicSocket associated with localhost and port 2345
-//const socket = createQuicSocket({ endpoint: { port: 2345 } });
 
 const client_socket = createQuicSocket({
   client: {
@@ -32,12 +30,26 @@ client_session.on('secure', () => {
   stream.write("I am the client sending you a message..");
   
   stream.on('data', function(data) {
+    const currentTime = new Date();
+    console.log("\nReceived data through QuicStream");
+    console.log(currentTime);
     console.log('\nReceived: %s [it is %d bytes long]',
     data.toString().replace(/(\n)/gm,""),
     data.length);
     console.log(stream.session)
   });
-  stream.on('error', (err) => console.error(err));
+
+  stream.on('blocked', () => {
+    const currentTime = new Date();
+    console.log("\nthe QuicStream has been prevented from sending queued data for the QuicStream due to congestion control");
+    console.log(currentTime);
+  });
+
+  stream.on('close', () => {
+    const currentTime = new Date();
+    console.log("\nQuicStream is completely closed and underlying resources have been freed");
+    console.log(currentTime);
+  });
 });
 
 client_session.on('stream', (stream) => {
@@ -58,9 +70,10 @@ client_session.on('pathValidation', () => {
   console.log(currentTime);
 });
 
-client_session.on('keylog', () => {
+client_session.on('keylog', (line) => {
   const currentTime = new Date();
   console.log("\nkey material is generated or received by a QuicSession");
+  console.log(hexdump(line));
   console.log(currentTime);
 });
 

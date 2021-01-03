@@ -1,6 +1,7 @@
 
 const { createQuicSocket } = require('net');
 const fs = require('fs');
+const hexdump = require('hexdump-nodejs');
 
 const key  = fs.readFileSync('certs/quic/server.key');
 const cert = fs.readFileSync('certs/quic/server.crt');
@@ -28,10 +29,25 @@ server_socket.on('session', (session) => {
     stream.write("I am the server sending you a message.");
 
     stream.on('data', function(data) {
+      const currentTime = new Date();
+      console.log("\nReceived data through QuicStream");
+      console.log(currentTime);
       console.log('\nReceived: %s [it is %d bytes long]',
       data.toString().replace(/(\n)/gm,""),
       data.length);
       console.log(stream.session)
+    });
+
+    stream.on('blocked', () => {
+      const currentTime = new Date();
+      console.log("\nthe QuicStream has been prevented from sending queued data for the QuicStream due to congestion control");
+      console.log(currentTime);
+    });
+
+    stream.on('close', () => {
+      const currentTime = new Date();
+      console.log("\nQuicStream is completely closed and underlying resources have been freed");
+      console.log(currentTime);
     });
   });
 
@@ -53,9 +69,10 @@ server_socket.on('session', (session) => {
     console.log(currentTime);
   });
 
-  session.on('keylog', () => {
+  session.on('keylog', (line) => {
     const currentTime = new Date();
     console.log("\nkey material is generated or received by a QuicSession");
+    console.log(hexdump(line));
     console.log(currentTime);
   });
 
