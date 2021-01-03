@@ -16,3 +16,5 @@ RUN cd quic/ \
     && ./configure --experimental-quic \
     && make -j4 \
     && make install
+
+RUN npm install hexdump-nodejs
