@@ -63,12 +63,6 @@ server_socket.on('session', (session) => {
     console.log(currentTime);
   });
 
-  session.on('pathValidation', () => {
-    const currentTime = new Date();
-    console.log("\na path validation result has been determined");
-    console.log(currentTime);
-  });
-
   session.on('keylog', (line) => {
     const currentTime = new Date();
     console.log("\nkey material is generated or received by a QuicSession");
@@ -103,13 +97,6 @@ server_socket.on('close', () => {
 server_socket.on('endpointClose', () => {
   const currentTime = new Date();
   console.log("\nQuicEndpoint associated with the QuicSocket closes and has been destroyed");
-  console.log(currentTime);
-});
-  
-server_socket.on('sessionError', (error, session) => {
-  const currentTime = new Date();
-  console.log("\nError occurs processing an event related to a specific QuicSession instance");
-  console.log('error:', error.message);
   console.log(currentTime);
 });
 
