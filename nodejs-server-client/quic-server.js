@@ -25,8 +25,6 @@ server_socket.on('session', (session) => {
     const currentTime = new Date();
     console.log("\na new QuicStream has been initiated by the connected peer");
     console.log(currentTime);
-  
-    stream.write("I am the server sending you a message.");
 
     stream.on('data', function(data) {
       const currentTime = new Date();
@@ -35,7 +33,8 @@ server_socket.on('session', (session) => {
       console.log('\nReceived: %s [it is %d bytes long]',
       data.toString().replace(/(\n)/gm,""),
       data.length);
-      console.log(stream.session)
+      console.log(stream.session);
+      server_socket.close();
     });
 
     stream.on('blocked', () => {
@@ -106,8 +105,9 @@ server_socket.on('ready', () => {
   console.log(currentTime);
 });
 
-server_socket.on('error', () => {
+server_socket.on('error', (error) => {
   const currentTime = new Date();
   console.log("\nQuicSocket was destroyed with an error");
+  console.log(error);
   console.log(currentTime);
 });
