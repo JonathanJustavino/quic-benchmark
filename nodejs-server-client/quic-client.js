@@ -22,9 +22,14 @@ client_socket.on('error', () => {
   console.log(currentTime);
 });
 
+client_socket.on('close', () => {
+  const currentTime = new Date();
+  console.log("\nQuicSocket has been destroyed and is no longer usable");
+  console.log(currentTime);
+});
+
 const client_session = client_socket.connect({
-  //address: '192.168.52.38',
-  address: 'localhost',
+  address: '192.168.52.38',
   port: 1234,
 });
 
@@ -34,7 +39,7 @@ client_session.on('secure', () => {
   console.log(currentTime);
   
   const stream = client_session.openStream();
-  console.log("sending message to server..")
+  console.log("\nsending message to server..");
   stream.write("I am the client sending you a message..");
 
   stream.on('blocked', () => {
@@ -45,8 +50,5 @@ client_session.on('secure', () => {
 });
 
 client_session.on('close', () => {
-  const currentTime = new Date();
-  console.log("\nQuicSession has been destroyed and is no longer usable");
-  console.log(currentTime);
   client_socket.close();
 });

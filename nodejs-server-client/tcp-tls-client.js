@@ -14,25 +14,23 @@ var options = {
 };
   
 var client_socket = tls.connect(PORT, HOST, options, function() {
-    // Check if the authorization worked
-    if (client_socket.authorized) {
-        console.log("Connection authorized by a Certificate Authority.");
-    } else {
-        console.log("Connection not authorized: " + client_socket.authorizationError)
-    }
+    // with tls.connect, the handshake is first completed before the socket can write to the server
+    const currentTime = new Date();
+    console.log("\nTLS handshake has been completed");
+    console.log(currentTime);
     
+    console.log("\nsending message to server..");
     client_socket.write("I am the client sending you a message..");
-    client_socket.write("sending data..");
-    
-    client_socket.end();
 });
 
-client_socket.on("data", function(data) {
-    console.log('Received: %s [it is %d bytes long]',
-        data.toString().replace(/(\n)/gm,""),
-        data.length);
+client_socket.on('end', () => {
+    const currentTime = new Date();
+    console.log('\nTLSSocket has been destroyed and is no longer usable');
+    console.log(currentTime);
 });
 
-client_socket.on('close', function() {
-    console.log("Connection closed");
-});
+client_socket.on('error', () => {
+    const currentTime = new Date();
+    console.log("\nTLSSocket was destroyed with an error");
+    console.log(currentTime);
+  });
