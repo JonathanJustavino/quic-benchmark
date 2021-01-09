@@ -16,39 +16,31 @@ const client_socket = createQuicSocket({
   }
 });
 
-client_socket.on('error', () => {
-  const currentTime = new Date();
-  console.log("\nQuicSocket was destroyed with an error");
-  console.log(currentTime);
-});
-
-client_socket.on('close', () => {
-  const currentTime = new Date();
-  console.log("\nQuicSocket has been destroyed and is no longer usable");
-  console.log(currentTime);
-});
-
 const client_session = client_socket.connect({
-  address: '192.168.52.38',
+  // address: '192.168.52.38',
+  address: 'localhost',
   port: 1234,
 });
 
-client_session.on('secure', () => {
+client_socket.on('ready', () => {
   const currentTime = new Date();
-  console.log("\nTLS handshake has been completed");
+  console.log("\nEvent 1: QuicSocket ready");
   console.log(currentTime);
-  
-  const stream = client_session.openStream();
-  console.log("\nsending message to server..");
-  stream.write("I am the client sending you a message..");
-
-  stream.on('blocked', () => {
-    const currentTime = new Date();
-    console.log("\nthe QuicStream has been prevented from sending queued data for the QuicStream due to congestion control");
-    console.log(currentTime);
-  });
 });
 
-client_session.on('close', () => {
+client_session.on('secure', () => {
+  const stream = client_session.openStream();
+
+  const currentTime = new Date();
+  stream.write("I am the client sending you a message..");
+  console.log("\nEvent 6: QuicClient writes to QuicServer");
+  console.log(currentTime);
+  stream.end();
   client_socket.close();
+});
+
+client_socket.on('error', () => {
+  const currentTime = new Date();
+  console.log("\nEvent x: QuicSocket was destroyed with an error");
+  console.log(currentTime);
 });

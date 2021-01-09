@@ -4,41 +4,42 @@
 
 ### QuicSocket - tls.Server
 
-1. 'newSession'
+[x] 1. 'newSession'
 
 ### QuicSocket - tls.Socket
 
-1. 'session'
+[x] 1. 'session'
 
 ### QuicSocket - Net.Server
 
-1. 'listening'
+[x] 1. 'listening'
 
 ### QuicSocket - Net.Socket
 
-1. 'close'
-2. 'ready'
-   1. Vergleich socket setup
-3. 'error' - low priority
-4. bytesReceived() / bytesRead()
-5. bytesWritten() / bytesSend()
+[x] 1. 'close'
+[x] 2. 'ready'
+   [ ] 1. Vergleich socket setup
+[x] 3. 'error' - low priority
+[ ] 4. bytesReceived() / bytesRead() (nicht vergleichbar, für quic ist es die socket und für tls der stream)
+[ ] 5. bytesWritten() / bytesSend()
 
 ## QuicStream
 
 ### QuicStream - Duplex Stream (aber Vergleich auch TLS ebene)
 
-1. 'close'
-2. 'data'
-3. 'end'
-4. 'readable'
+[x] 1. 'close'
+[x] 2. 'data'
+[x] 3. 'end'
+[ ] 4. 'readable' (calling readable stops data event from executing)
 
 ### QuicSession vs TLS?
 
-1. 'secure'
-2. 'keylog'
-3. quicsession.handshakeDuration - Zeit messen keylog - secureConnection
+[x] 1. 'secure'
+[x] 2. 'keylog'
+[x] 3. quicsession.handshakeDuration - Zeit messen keylog - secureConnection
+[ ] 4. setzt session auf stream auf? oder anders rum? (close reihenfolge)
 
 ### QuicStream vs TLSStream
 
-1. quicstream write - data
-2. tlsstream write ( secureConnect - data)
+[x] 1. quicstream write - data
+[ ] 2. tlsstream write ( secureConnect - data)

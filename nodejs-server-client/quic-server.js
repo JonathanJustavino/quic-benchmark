@@ -8,6 +8,10 @@ const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
 const port = 1234;
 
+var timeStamps = {
+  handshakeDurationInNs: '',
+}
+
 // Create the QUIC UDP IPv4 socket bound to local IP port 1234
 const server_socket = createQuicSocket({ endpoint: { port } });
 
@@ -15,99 +19,71 @@ const server_socket = createQuicSocket({ endpoint: { port } });
 // key and certificate to secure new connections, using
 // the fictional 'hello' application protocol.
 server_socket.listen({ key, cert, alpn: 'hello' });
+
+server_socket.on('listening', () => {
+  const currentTime = new Date();
+  console.log("\nEvent 2: QuicSocket listening");
+  console.log(currentTime);
+});
     
 server_socket.on('session', (session) => {
   const currentTime = new Date();
-  console.log("\na new QuicServerSession has been created");
+  console.log("\nEvent 3: QuicSession created");
   console.log(currentTime);
-
-  session.on('stream', (stream) => {
+  
+  session.on('keylog', (line) => {
     const currentTime = new Date();
-    console.log("\na new QuicStream has been initiated by the connected peer");
-    console.log(currentTime);
-
-    stream.on('data', function(data) {
-      const currentTime = new Date();
-      console.log("\nReceived data through QuicStream");
-      console.log(currentTime);
-      console.log('\nReceived: %s [it is %d bytes long]',
-      data.toString().replace(/(\n)/gm,""),
-      data.length);
-      console.log(stream.session);
-      server_socket.close();
-    });
-
-    stream.on('blocked', () => {
-      const currentTime = new Date();
-      console.log("\nthe QuicStream has been prevented from sending queued data for the QuicStream due to congestion control");
-      console.log(currentTime);
-    });
-
-    stream.on('close', () => {
-      const currentTime = new Date();
-      console.log("\nQuicStream is completely closed and underlying resources have been freed");
-      console.log(currentTime);
-    });
-  });
-
-  session.on('close', () => {
-    const currentTime = new Date();
-    console.log("\nQuicSession has been destroyed and is no longer usable");
+    console.log("\nEvent 4: Key material generated or received");
+    //console.log(hexdump(line));
     console.log(currentTime);
   });
 
   session.on('secure', () => {
     const currentTime = new Date();
-    console.log("\nTLS handshake has been completed");
+    console.log("\nEvent 5: TLS handshake completed");
     console.log(currentTime);
   });
 
-  session.on('keylog', (line) => {
+  session.on('stream', (stream) => {
+    stream.on('data', function(data) {
+      const currentTime = new Date();
+      console.log("\nEvent 7: QuicStream received data");
+      console.log(currentTime);
+      console.log('Received: %s [it is %d bytes long]',
+      data.toString().replace(/(\n)/gm,""),
+      data.length);
+
+    });
+    
+    stream.on('end', () => {
+      const currentTime = new Date();
+      console.log("\nEvent 8: End of QUICStream");
+      console.log(currentTime);
+    });
+    
+    stream.on('close', () => {
+      const currentTime = new Date();
+      console.log("\nEvent 9: QUICStream closed");
+      console.log(currentTime);
+      timeStamps.handshakeDurationInNs = session.handshakeDuration;
+      console.log("handshake duration: " + timeStamps.handshakeDurationInNs);
+    });
+  });
+  
+  session.on('close', () => {
     const currentTime = new Date();
-    console.log("\nkey material is generated or received by a QuicSession");
-    console.log(hexdump(line));
+    console.log("\nEvent 10: QuicSession closed");
     console.log(currentTime);
+    console.log("number of bytes received for the socket: " + server_socket.bytesReceived);
+    console.log("number of bytes sent from the socket: " + server_socket.bytesSent);
+    console.log("number of packets received for the socket: " + server_socket.packetsReceived);
+    console.log("number of packets sent from the socket: " + server_socket.packetsSent);
+    server_socket.close();
   });
-
-});
-
-server_socket.on('listening', () => {
-  const currentTime = new Date();
-  console.log("\nThe QuicSocket has started listening for incoming QuicServerSessions");
-  console.log(`listening on ${port}...`);
-  console.log(currentTime);
-});
-
-server_socket.on('busy', () => {
-  const currentTime = new Date();
-  if (server_socket.serverBusy)
-    console.log('\nServer is busy');
-  else
-    console.log('\nServer is not busy');
-  console.log(currentTime);
 });
 
 server_socket.on('close', () => {
   const currentTime = new Date();
-  console.log("\nQuicSocket has been destroyed and is no longer usable");
-  console.log(currentTime);
-});
-
-server_socket.on('endpointClose', () => {
-  const currentTime = new Date();
-  console.log("\nQuicEndpoint associated with the QuicSocket closes and has been destroyed");
-  console.log(currentTime);
-});
-
-server_socket.on('ready', () => {
-  const currentTime = new Date();
-  console.log("\nQuicSocket has been bound to a local UDP port");
-  console.log(currentTime);
-});
-
-server_socket.on('error', (error) => {
-  const currentTime = new Date();
-  console.log("\nQuicSocket was destroyed with an error");
-  console.log(error);
+  console.log("\nEvent 11: QuicSocket closed");
   console.log(currentTime);
 });
