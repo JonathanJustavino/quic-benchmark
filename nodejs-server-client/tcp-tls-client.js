@@ -14,24 +14,34 @@ var options = {
     rejectUnauthorized: false,
 };
 
+var EventTimeStamps = {
+    ready: '',
+    writeToServer: '',
+    error: '',
+}
+
 var client_socket = tls.connect(PORT, HOST, options, function() {});
 
 client_socket.on('ready', () => {
-    const currentTime = new Date();
-    console.log("\nEvent 1: TLSSocket ready");
-    console.log(currentTime);
+    EventTimeStamps.ready = new Date();
 });
 
 client_socket.on('secureConnect', () => {
-    const currentTime = new Date();
+    EventTimeStamps.writeToServer = new Date();
     client_socket.write("I am the client sending you a message..");
-    console.log("\nEvent 6: TLSClient writes to TLSServer");
-    console.log(currentTime);
     client_socket.end();
+
+    const data = JSON.stringify(EventTimeStamps);
+    fs.writeFile('./tcp-benchmark-client.json', data, 'utf8', (err) => {
+        if (err) {
+            console.log(`Error writing file: ${err}`);
+        } else {
+            console.log(`File is written successfully!`);
+        }
+    });
 });
 
 client_socket.on('error', () => {
-    const currentTime = new Date();
-    console.log("\nEvent x: TLSSocket was destroyed with an error");
-    console.log(currentTime);
+    EventTimeStamps.error = new Date();
+    console.log("\nTLSSocket was destroyed with an error");
 });

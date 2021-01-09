@@ -8,7 +8,18 @@ const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
 const port = 1234;
 
-var timeStamps = {
+var EventTimeStamps = {
+  listening: '',
+  session: '',
+  keylog: '',
+  secure: '',
+  data: '',
+  streamEnd: '',
+  streamClose: '',
+  socketClose: '',
+}
+
+var durations = {
   handshakeDurationInNs: '',
 }
 
@@ -21,59 +32,40 @@ const server_socket = createQuicSocket({ endpoint: { port } });
 server_socket.listen({ key, cert, alpn: 'hello' });
 
 server_socket.on('listening', () => {
-  const currentTime = new Date();
-  console.log("\nEvent 2: QuicSocket listening");
-  console.log(currentTime);
+  EventTimeStamps.listening = new Date();
 });
     
 server_socket.on('session', (session) => {
-  const currentTime = new Date();
-  console.log("\nEvent 3: QuicSession created");
-  console.log(currentTime);
+  EventTimeStamps.session = new Date();
   
   session.on('keylog', (line) => {
-    const currentTime = new Date();
-    console.log("\nEvent 4: Key material generated or received");
-    //console.log(hexdump(line));
-    console.log(currentTime);
+    EventTimeStamps.keylog = new Date();
+    console.log(hexdump(line));
   });
 
   session.on('secure', () => {
-    const currentTime = new Date();
-    console.log("\nEvent 5: TLS handshake completed");
-    console.log(currentTime);
+    EventTimeStamps.secure = new Date();
   });
 
   session.on('stream', (stream) => {
     stream.on('data', function(data) {
-      const currentTime = new Date();
-      console.log("\nEvent 7: QuicStream received data");
-      console.log(currentTime);
+      EventTimeStamps.data = new Date();
       console.log('Received: %s [it is %d bytes long]',
       data.toString().replace(/(\n)/gm,""),
       data.length);
-
     });
     
     stream.on('end', () => {
-      const currentTime = new Date();
-      console.log("\nEvent 8: End of QUICStream");
-      console.log(currentTime);
+      EventTimeStamps.streamEnd = new Date();
     });
     
     stream.on('close', () => {
-      const currentTime = new Date();
-      console.log("\nEvent 9: QUICStream closed");
-      console.log(currentTime);
-      timeStamps.handshakeDurationInNs = session.handshakeDuration;
-      console.log("handshake duration: " + timeStamps.handshakeDurationInNs);
+      EventTimeStamps.streamClose = new Date();
+      durations.handshakeDurationInNs = session.handshakeDuration.toString();
     });
   });
   
   session.on('close', () => {
-    const currentTime = new Date();
-    console.log("\nEvent 10: QuicSession closed");
-    console.log(currentTime);
     console.log("number of bytes received for the socket: " + server_socket.bytesReceived);
     console.log("number of bytes sent from the socket: " + server_socket.bytesSent);
     console.log("number of packets received for the socket: " + server_socket.packetsReceived);
@@ -83,7 +75,15 @@ server_socket.on('session', (session) => {
 });
 
 server_socket.on('close', () => {
-  const currentTime = new Date();
-  console.log("\nEvent 11: QuicSocket closed");
-  console.log(currentTime);
+  EventTimeStamps.socketClose = new Date();
+  const eventData = JSON.stringify(EventTimeStamps);
+  const durationData = JSON.stringify(durations);
+  const data = eventData + durationData
+  fs.writeFile('./quic-benchmark-server.json', data, 'utf8', (err) => {
+    if (err) {
+      console.log(`Error writing file: ${err}`);
+    } else {
+      console.log(`File is written successfully!`);
+    }
+  });
 });

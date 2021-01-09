@@ -6,6 +6,12 @@ const key  = fs.readFileSync('certs/quic/server.key');
 const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
 
+var EventTimeStamps = {
+  ready: '',
+  writeToServer: '',
+  error: '',
+}
+
 const client_socket = createQuicSocket({
   client: {
     key,
@@ -23,24 +29,27 @@ const client_session = client_socket.connect({
 });
 
 client_socket.on('ready', () => {
-  const currentTime = new Date();
-  console.log("\nEvent 1: QuicSocket ready");
-  console.log(currentTime);
+  EventTimeStamps.ready = new Date();
 });
 
 client_session.on('secure', () => {
   const stream = client_session.openStream();
 
-  const currentTime = new Date();
+  EventTimeStamps.writeToServer = new Date();
   stream.write("I am the client sending you a message..");
-  console.log("\nEvent 6: QuicClient writes to QuicServer");
-  console.log(currentTime);
   stream.end();
   client_socket.close();
+  const data = JSON.stringify(EventTimeStamps);
+  fs.writeFile('./quic-benchmark-client.json', data, 'utf8', (err) => {
+    if (err) {
+      console.log(`Error writing file: ${err}`);
+    } else {
+      console.log(`File is written successfully!`);
+    }
+  });
 });
 
 client_socket.on('error', () => {
-  const currentTime = new Date();
-  console.log("\nEvent x: QuicSocket was destroyed with an error");
-  console.log(currentTime);
+  EventTimeStamps.error = new Date();
+  console.log("\nQuicSocket was destroyed with an error");
 });

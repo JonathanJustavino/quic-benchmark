@@ -13,77 +13,79 @@ var options = {
     cert: fs.readFileSync('certs/tcp-tls/public-cert.pem')
 };
 
-var timeStamps = {
+var EventTimeStamps = {
+    listening: '',
+    session: '',
+    keylog: '',
+    secure: '',
+    data: '',
+    streamEnd: '',
+    streamClose: '',
+    socketClose: '',
+}
+
+var durations = {
+    handshakeDurationInNs: '',
+}
+
+var hrTimeStamps = {
     beforeHandshake: '',
     afterHandshake: '',
-    handshakeDurationInNs: '',
 }
 
 var server = tls.createServer(options, function(socket) {
     socket.on('data', function(data) {
-        const currentTime = new Date();
-        console.log("Event 7: TLSSocket received data");
-        console.log(currentTime);
+        EventTimeStamps.data = new Date();
         console.log('Received: %s [it is %d bytes long]',
         data.toString().replace(/(\n)/gm,""),
         data.length);
-
     });
 
     socket.on('end', () => {
-        const currentTime = new Date();
-        console.log("\nEvent 8: End of TCPStream");
-        console.log(timeStamps.afterHandshake);
-        console.log(timeStamps.beforeHandshake);
-        timeStamps.handshakeDuration = timeStamps.afterHandshake[1] - timeStamps.beforeHandshake[1];
-        console.log(timeStamps);
+        EventTimeStamps.streamEnd = new Date(); 
     });
     
     socket.on('close', () => {
-        const currentTime = new Date();
-        console.log("\nEvent 9: TCPStream closed");
-        console.log(currentTime);
+        EventTimeStamps.streamClose = new Date();
         server.close();
     });
 });
 
 server.on('connection', () => {
-    const timeBeforeHandshake = new Date();
-    console.log("\nEvent connection: TCP Stream is established");
-    timeStamps.beforeHandshake = process.hrtime();
-    console.log(timeBeforeHandshake);
+    hrTimeStamps.beforeHandshake = process.hrtime();
 });
 
 server.listen(PORT, HOST, function() {});
 
 server.on('listening', function(error) {
-    const currentTime = new Date();
-    console.log("\nEvent 2: TLSServer listening");
-    console.log(currentTime);
+    EventTimeStamps.listening = new Date();
 });
 
 server.on('newSession', (sessionID, sessionData, callback) => {
-    const currentTime = new Date();
-    console.log("\nEvent 3: TLSSession created");
-    console.log(currentTime);
+    EventTimeStamps.session = new Date();
 });
 
 server.on('keylog', (line) => {
-    const currentTime = new Date();
-    console.log("\nEvent 4: Key material generated or received");
-    //console.log(hexdump(line));
-    console.log(currentTime); 
+    EventTimeStamps.keylog = new Date();
+    console.log(hexdump(line));
 });
 
 server.on('secureConnection', (socket) => {
-    const timeAfterHandshake = new Date();
-    console.log("\nEvent 5: TLS handshake completed");
-    timeStamps.afterHandshake = process.hrtime();
-    console.log(timeAfterHandshake);
+    EventTimeStamps.secure = new Date();
+    hrTimeStamps.afterHandshake = process.hrtime();
+    durations.handshakeDurationInNs = hrTimeStamps.afterHandshake[1] - hrTimeStamps.beforeHandshake[1];
 });
 
 server.on('close', () => {
-    const currentTime = new Date();
-    console.log('\nEvent 11: TLSSocket closed');
-    console.log(currentTime);
+    EventTimeStamps.socketClose = new Date();
+    const eventData = JSON.stringify(EventTimeStamps);
+    const durationData = JSON.stringify(durations);
+    const data = eventData + durationData
+    fs.writeFile('./tcp-benchmark-server.json', data, 'utf8', (err) => {
+        if (err) {
+            console.log(`Error writing file: ${err}`);
+        } else {
+            console.log(`File is written successfully!`);
+        }
+    });
 });
