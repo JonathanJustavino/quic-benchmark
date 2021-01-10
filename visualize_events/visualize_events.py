@@ -13,11 +13,12 @@ import matplotlib.pyplot as plt
 # "keylog":"2021-01-09T20:23:21.791Z","secure":"2021-01-09T20:23:21.794Z","data":"2021-01-09T20:23:21.796Z","streamEnd":"2021-01-09T20:23:21.798Z","streamClose":"2021-01-09T20:23:31.805Z","socketClose":"2021-01-09T20:23:31.810Z"}{"handshakeDurationInNs":"6427581"}
 
 # Path to folder "measurements"
-abs_path = Path('/home/amelie/Uni/RNP_Komplexpraktikum/quic-benchmark/measurements/')
+abs_path = Path('../measurements/')
 
 curr_dict_tuple = 0
 events = 0
 events_timeline = 0
+
 
 # split 2021-01-09T20:23:17.230Z -> [2021,01,09] [20, 23, 17.23]
 # expects string -> returns (list[int], list[float])
@@ -80,6 +81,8 @@ if __name__ == '__main__':
         # -> get eventtime in seconds
         events_timeline = [split_timestamp(j)[1][2] for j in events_timeline]
 
+        # normalize the x-axis / timestamps so they all start with zero
+        # (just substract the first timestamp from each timestamp -> removes offset
         plt_x_axis = []
         for time in events_timeline:
             time = time - events_timeline[0]
