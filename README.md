@@ -18,3 +18,7 @@ python3 run_server_client.py tcptls
 
 If you execute `sudo docker logs {container_name}` (for example: `sudo docker logs quic_server`) after setup, you will see output that looks like this:
 ![](tcp_tls_server.png)
+
+## Visualize Events: Plotting the result of the logfiles
+The python script "visualize_events.py" in the folder visualize_events draws all given logfiles in the specified folder into one figure.
+Currently, 4 logfiles are in the "measurements" folder, so it draws the timeline of these 4 logfiles into one figure.
