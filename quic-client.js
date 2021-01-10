@@ -23,8 +23,7 @@ const client_socket = createQuicSocket({
 });
 
 const client_session = client_socket.connect({
-  // address: '192.168.52.38',
-  address: 'localhost',
+  address: '192.168.52.38',
   port: 1234,
 });
 

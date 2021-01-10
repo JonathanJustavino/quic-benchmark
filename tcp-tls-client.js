@@ -5,8 +5,7 @@ var fs = require('fs');
 var net = require('net');
 
 const PORT = 1337;
-// const HOST = '192.168.52.36';
-const HOST = 'localhost';
+const HOST = '192.168.52.36';
 
 var options = {
     key: fs.readFileSync('certs/tcp-tls/private-key.pem'),
