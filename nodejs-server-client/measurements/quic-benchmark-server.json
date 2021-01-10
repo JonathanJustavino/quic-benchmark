@@ -1,6 +1,1 @@
-{
-    "Events":
-        {"listening":"2021-01-09T20:23:17.230Z","session":"2021-01-09T20:23:21.787Z","keylog":"2021-01-09T20:23:21.791Z","secure":"2021-01-09T20:23:21.794Z","data":"2021-01-09T20:23:21.796Z","streamEnd":"2021-01-09T20:23:21.798Z","streamClose":"2021-01-09T20:23:31.805Z","socketClose":"2021-01-09T20:23:31.810Z"},
-    "Handshake":
-        {"handshakeDurationInNs":"6427581"}
-}
+{"events":{"listening":"2021-01-10T15:11:10.453Z","session":"2021-01-10T15:11:19.951Z","keylog":"2021-01-10T15:11:19.954Z","secure":"2021-01-10T15:11:19.956Z","data":"2021-01-10T15:11:19.958Z","streamEnd":"2021-01-10T15:11:19.959Z","streamClose":"2021-01-10T15:11:29.965Z","socketClose":"2021-01-10T15:11:29.966Z"},"durations":{"handshakeDurationInNs":"5392432"}}
