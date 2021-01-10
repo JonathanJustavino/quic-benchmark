@@ -13,74 +13,72 @@ var options = {
     cert: fs.readFileSync('certs/tcp-tls/public-cert.pem')
 };
 
-var EventTimeStamps = {
-    listening: '',
-    session: '',
-    keylog: '',
-    secure: '',
-    data: '',
-    streamEnd: '',
-    streamClose: '',
-    socketClose: '',
-}
-
-var durations = {
-    handshakeDurationInNs: '',
-}
-
-var hrTimeStamps = {
-    beforeHandshake: '',
-    afterHandshake: '',
+var measurements = {
+    events: {
+      listening: '',
+      session: '',
+      keylog: '',
+      secure: '',
+      data: '',
+      streamEnd: '',
+      streamClose: '',
+      socketClose: '',
+    },
+    durations: {
+      handshakeDurationInNs: '',
+    },
+    hrTimeStamps: {
+        beforeHandshake: '',
+        afterHandshake: '',
+    },
 }
 
 var server = tls.createServer(options, function(socket) {
     socket.on('data', function(data) {
-        EventTimeStamps.data = new Date();
+        measurements.events.data = new Date();
         console.log('Received: %s [it is %d bytes long]',
         data.toString().replace(/(\n)/gm,""),
         data.length);
     });
 
     socket.on('end', () => {
-        EventTimeStamps.streamEnd = new Date(); 
+        measurements.events.streamEnd = new Date(); 
     });
     
     socket.on('close', () => {
-        EventTimeStamps.streamClose = new Date();
+        measurements.events.streamClose = new Date();
         server.close();
     });
 });
 
 server.on('connection', () => {
-    hrTimeStamps.beforeHandshake = process.hrtime();
+    measurements.hrTimeStamps.beforeHandshake = process.hrtime();
 });
 
 server.listen(PORT, HOST, function() {});
 
 server.on('listening', function(error) {
-    EventTimeStamps.listening = new Date();
+    measurements.events.listening = new Date();
 });
 
 server.on('newSession', (sessionID, sessionData, callback) => {
-    EventTimeStamps.session = new Date();
+    measurements.events.session = new Date();
 });
 
 server.on('keylog', (line) => {
-    EventTimeStamps.keylog = new Date();
+    measurements.events.keylog = new Date();
     console.log(hexdump(line));
 });
 
 server.on('secureConnection', (socket) => {
-    EventTimeStamps.secure = new Date();
-    hrTimeStamps.afterHandshake = process.hrtime();
-    durations.handshakeDurationInNs = hrTimeStamps.afterHandshake[1] - hrTimeStamps.beforeHandshake[1];
+    measurements.events.secure = new Date();
+    measurements.hrTimeStamps.afterHandshake = process.hrtime();
+    measurements.durations.handshakeDurationInNs = measurements.hrTimeStamps.afterHandshake[1] - measurements.hrTimeStamps.beforeHandshake[1];
 });
 
 server.on('close', () => {
-    EventTimeStamps.socketClose = new Date();
-    const eventData = JSON.stringify(EventTimeStamps);
-    const durationData = JSON.stringify(durations);
-    const data = eventData + durationData
+    measurements.events.socketClose = new Date();
+    const data = JSON.stringify(measurements);
     fs.writeFile('./tcp-benchmark-server.json', data, 'utf8', (err) => {
         if (err) {
             console.log(`Error writing file: ${err}`);

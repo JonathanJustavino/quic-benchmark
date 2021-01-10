@@ -8,19 +8,20 @@ const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
 const port = 1234;
 
-var EventTimeStamps = {
-  listening: '',
-  session: '',
-  keylog: '',
-  secure: '',
-  data: '',
-  streamEnd: '',
-  streamClose: '',
-  socketClose: '',
-}
-
-var durations = {
-  handshakeDurationInNs: '',
+var measurements = {
+  events: {
+    listening: '',
+    session: '',
+    keylog: '',
+    secure: '',
+    data: '',
+    streamEnd: '',
+    streamClose: '',
+    socketClose: '',
+  },
+  durations: {
+    handshakeDurationInNs: '',
+  }
 }
 
 // Create the QUIC UDP IPv4 socket bound to local IP port 1234
@@ -32,36 +33,36 @@ const server_socket = createQuicSocket({ endpoint: { port } });
 server_socket.listen({ key, cert, alpn: 'hello' });
 
 server_socket.on('listening', () => {
-  EventTimeStamps.listening = new Date();
+  measurements.events.listening = new Date();
 });
     
 server_socket.on('session', (session) => {
-  EventTimeStamps.session = new Date();
+  measurements.events.session = new Date();
   
   session.on('keylog', (line) => {
-    EventTimeStamps.keylog = new Date();
+    measurements.events.keylog = new Date();
     console.log(hexdump(line));
   });
 
   session.on('secure', () => {
-    EventTimeStamps.secure = new Date();
+    measurements.events.secure = new Date();
   });
 
   session.on('stream', (stream) => {
     stream.on('data', function(data) {
-      EventTimeStamps.data = new Date();
+      measurements.events.data = new Date();
       console.log('Received: %s [it is %d bytes long]',
       data.toString().replace(/(\n)/gm,""),
       data.length);
     });
     
     stream.on('end', () => {
-      EventTimeStamps.streamEnd = new Date();
+      measurements.events.streamEnd = new Date();
     });
     
     stream.on('close', () => {
-      EventTimeStamps.streamClose = new Date();
-      durations.handshakeDurationInNs = session.handshakeDuration.toString();
+      measurements.events.streamClose = new Date();
+      measurements.durations.handshakeDurationInNs = session.handshakeDuration.toString();
     });
   });
   
@@ -75,10 +76,8 @@ server_socket.on('session', (session) => {
 });
 
 server_socket.on('close', () => {
-  EventTimeStamps.socketClose = new Date();
-  const eventData = JSON.stringify(EventTimeStamps);
-  const durationData = JSON.stringify(durations);
-  const data = eventData + durationData
+  measurements.events.socketClose = new Date();
+  const data = JSON.stringify(measurements);
   fs.writeFile('./quic-benchmark-server.json', data, 'utf8', (err) => {
     if (err) {
       console.log(`Error writing file: ${err}`);
