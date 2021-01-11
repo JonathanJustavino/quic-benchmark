@@ -92,7 +92,7 @@ if __name__ == '__main__':
         # eventnames
         plt_y_axis = list(events.keys())
 
-        ax.plot(plt_x_axis, plt_y_axis, c=colorlist_plot[(n % len(colorlist_plot))], ls='-', fillstyle='none', label=str(file))
+        ax.plot(plt_x_axis, plt_y_axis, c=colorlist_plot[(n % len(colorlist_plot))], marker='o', ls='-', fillstyle='none', label=str(file))
 
     plt.grid(1)
     plt.legend(loc=2)
