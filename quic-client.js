@@ -32,7 +32,7 @@ client_socket.on('ready', () => {
 });
 
 client_session.on('secure', () => {
-  const stream = client_session.openStream();
+  const stream = await client_session.openStream();
 
   EventTimeStamps.writeToServer = new Date();
   stream.write("I am the client sending you a message..");
