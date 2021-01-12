@@ -4,8 +4,31 @@ const tls = require('tls');
 const fs = require('fs');
 const hexdump = require('hexdump-nodejs');
 
+validateIP();
 const PORT = 1337;
-const HOST = '192.168.52.36';
+var HOST = ""
+
+function validateIP() {
+    if (process.argv.length < 3) {
+        console.log("Too few arguments");
+        process.exit();
+    }
+
+    var local = process.argv[2];
+
+    if(local == "true") {
+        HOST = "localhost";
+        return;
+    }
+
+    if (local == "false") {
+        HOST = '192.168.52.36';
+        return;
+    }
+    
+    console.log("Wrong commandline argument");
+    process.exit();
+}
 
 var options = {
     key: fs.readFileSync('certs/tcp-tls/private-key.pem'),
@@ -41,7 +64,7 @@ var server = tls.createServer(options, function(socket) {
     });
 
     socket.on('end', () => {
-        measurements.events.streamEnd = new Date(); 
+        measurements.events.streamEnd = new Date();
     });
     
     socket.on('close', () => {

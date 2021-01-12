@@ -28,32 +28,48 @@ def create_network():
 
 def run_container_and_connect_to_network(network, socket_type):
     if socket_type == "tcptls":
-        print("creating tcp server and client")
-        tcp_tls_server = client.containers.create("nodejs:experimental", command="node tcp-tls-server.js", 
-        name = "tcp_tls_server", ports={'1337/tcp': 1337}, detach=True)
-        tcp_tls_client = client.containers.create("nodejs:experimental", command="node tcp-tls-client.js", 
-        name = "tcp_tls_client", detach=True)
-        network.connect(tcp_tls_server, ipv4_address="192.168.52.36")
-        network.connect(tcp_tls_client, ipv4_address="192.168.52.37")
-        tcp_tls_server.start()
-        tcp_tls_client.start()
-        tcp_tls_server.wait()
-        tcp_tls_client.wait()
-        pull_measurements("tcp_tls_server", "tcp-benchmark-server.json")
-        pull_measurements("tcp_tls_client", "tcp-benchmark-client.json")
+        tcp_tls_server = None
+        tcp_tls_client = None
+        if container_type == "server" or container_type == None:
+            print("creating tcp-tls-server")
+            tcp_tls_server = client.containers.create("nodejs:experimental", command="node tcp-tls-server.js false", 
+            name = "tcp_tls_server", ports={'1337/tcp': 1337}, detach=True)
+            network.connect(tcp_tls_server, ipv4_address="192.168.52.36")
+            tcp_tls_server.start()
+        if container_type == "client" or container_type is None:
+            print("creating tcp-tls-client")
+            tcp_tls_client = client.containers.create("nodejs:experimental", command="node tcp-tls-client.js false {}".format(public_ip), 
+            name = "tcp_tls_client", detach=True)
+            network.connect(tcp_tls_client, ipv4_address="192.168.52.37")
+            tcp_tls_client.start()
+        if tcp_tls_server is not None:
+            tcp_tls_server.wait()
+            pull_measurements("tcp_tls_server", "tcp-benchmark-server.json")
+        if tcp_tls_client is not None:
+            tcp_tls_client.wait()
+            pull_measurements("tcp_tls_client", "tcp-benchmark-client.json")
+
     if socket_type == "quic":
-        quic_server = client.containers.create("nodejs:experimental", command="node quic-server.js", 
-        name = "quic_server", ports={'1234/udp': 1234}, detach=True)
-        quic_client = client.containers.create("nodejs:experimental", command="node quic-client.js", 
-        name = "quic_client", detach=True)
-        network.connect(quic_server, ipv4_address="192.168.52.38")
-        network.connect(quic_client, ipv4_address="192.168.52.39")
-        quic_server.start()
-        quic_client.start()
-        quic_server.wait()
-        quic_client.wait()
-        pull_measurements("quic_server", "quic-benchmark-server.json")
-        pull_measurements("quic_client", "quic-benchmark-client.json")
+        quic_server = None
+        quic_client = None
+        if container_type == "server" or container_type == None:
+            print("creating quic-server")
+            quic_server = client.containers.create("nodejs:experimental", command="node quic-server.js", 
+            name = "quic_server", ports={'1234/udp': 1234}, detach=True)
+            network.connect(quic_server, ipv4_address="192.168.52.38")
+            quic_server.start()
+        if container_type == "client" or container_type == None:
+            print("creating quic-client")
+            quic_client = client.containers.create("nodejs:experimental", command="node quic-client.js", 
+            name = "quic_client", detach=True)
+            network.connect(quic_client, ipv4_address="192.168.52.39")
+            quic_client.start()
+        if quic_client is not None:
+            quic_server.wait()
+            pull_measurements("quic_server", "quic-benchmark-server.json")
+        if quic_client is not None:
+            quic_client.wait()
+            pull_measurements("quic_client", "quic-benchmark-client.json")
 
 
 def pull_measurements(container_name, file_name):
@@ -74,6 +90,9 @@ def pull_measurements(container_name, file_name):
 
 if __name__ == "__main__":
     socket_type = sys.argv[1]
+    container_type = sys.argv[2]
+    if len(sys.argv) > 3:
+        public_ip = sys.argv[3]
     build_image()
     network = create_network()
     run_container_and_connect_to_network(network, socket_type)
