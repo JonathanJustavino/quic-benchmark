@@ -16,8 +16,7 @@ python3 run_server_client.py tcptls
 
 > Warning: building the image takes a very long time (up to 20 min), because nodejs has to be rebuild in experimental mode
 
-If you execute `sudo docker logs {container_name}` (for example: `sudo docker logs quic_server`) after setup, you will see output that looks like this:
-![](tcp_tls_server.png)
+The script generates a json file with timestamps for every comparable event for tcp+tls and quic.
 
 ## Visualize Events: Plotting the result of the logfiles
 The python script "visualize_events.py" in the folder visualize_events draws all given logfiles in the specified folder into one figure.

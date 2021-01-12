@@ -1,6 +1,8 @@
 import docker
 import sys
 import subprocess
+import tarfile
+from io import BytesIO
 
 
 client = docker.from_env()
@@ -26,6 +28,7 @@ def create_network():
 
 def run_container_and_connect_to_network(network, socket_type):
     if socket_type == "tcptls":
+        print("creating tcp server and client")
         tcp_tls_server = client.containers.create("nodejs:experimental", command="node tcp-tls-server.js", 
         name = "tcp_tls_server", ports={'1337/tcp': 1337}, detach=True)
         tcp_tls_client = client.containers.create("nodejs:experimental", command="node tcp-tls-client.js", 
@@ -34,6 +37,10 @@ def run_container_and_connect_to_network(network, socket_type):
         network.connect(tcp_tls_client, ipv4_address="192.168.52.37")
         tcp_tls_server.start()
         tcp_tls_client.start()
+        tcp_tls_server.wait()
+        tcp_tls_client.wait()
+        pull_measurements("tcp_tls_server", "tcp-benchmark-server.json")
+        pull_measurements("tcp_tls_client", "tcp-benchmark-client.json")
     if socket_type == "quic":
         quic_server = client.containers.create("nodejs:experimental", command="node quic-server.js", 
         name = "quic_server", ports={'1234/udp': 1234}, detach=True)
@@ -43,6 +50,26 @@ def run_container_and_connect_to_network(network, socket_type):
         network.connect(quic_client, ipv4_address="192.168.52.39")
         quic_server.start()
         quic_client.start()
+        quic_server.wait()
+        quic_client.wait()
+        pull_measurements("quic_server", "quic-benchmark-server.json")
+        pull_measurements("quic_client", "quic-benchmark-client.json")
+
+
+def pull_measurements(container_name, file_name):
+    container = client.containers.get(container_name)
+    file_json = container.get_archive(file_name)
+    stream, stat = file_json
+    file_obj = BytesIO()
+    for i in stream:
+        file_obj.write(i)
+    file_obj.seek(0)
+    tar = tarfile.open(mode='r', fileobj=file_obj)
+    text = tar.extractfile(file_name)
+    file = open('./{}'.format(file_name), 'wb')
+    for line in text:
+        file.write(line)
+    file.close()
 
 
 if __name__ == "__main__":
