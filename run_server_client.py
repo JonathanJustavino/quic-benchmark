@@ -14,6 +14,9 @@ def build_image():
         client.images.get("nodejs:experimental")
     except docker.errors.ImageNotFound:
         subprocess.run("sudo docker build -t nodejs:experimental .", shell=True, check=True)
+        if sys.platform == 'linux':
+            command = f"sudo {command}"
+        subprocess.run(command, shell=True, check=True)
 
 
 def create_network():
@@ -32,13 +35,13 @@ def run_container_and_connect_to_network(network, socket_type):
         tcp_tls_client = None
         if container_type == "server" or container_type == None:
             print("creating tcp-tls-server")
-            tcp_tls_server = client.containers.create("nodejs:experimental", command="node tcp-tls-server.js false", 
+            tcp_tls_server = client.containers.create("nodejs:experimental", command="node tcp-tls-server.js", 
             name = "tcp_tls_server", ports={'1337/tcp': 1337}, detach=True)
             network.connect(tcp_tls_server, ipv4_address="192.168.52.36")
             tcp_tls_server.start()
         if container_type == "client" or container_type is None:
             print("creating tcp-tls-client")
-            tcp_tls_client = client.containers.create("nodejs:experimental", command="node tcp-tls-client.js false {}".format(public_ip), 
+            tcp_tls_client = client.containers.create("nodejs:experimental", command="node tcp-tls-client.js {}".format(public_ip), 
             name = "tcp_tls_client", detach=True)
             network.connect(tcp_tls_client, ipv4_address="192.168.52.37")
             tcp_tls_client.start()
