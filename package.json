@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "quic": "ttab node quic-client.js && node quic-server.js",
-    "tcp": "ttab node tcp-tls-server.js && ttab node tcp-tls-client.js"
+    "tcp": "ttab node tcp-tls-server.js local && ttab node tcp-tls-client.js local",
+    "tcps": "node tcp-tls-server.js",
+    "tcpc": "node tcp-tls-client.js"
   },
   "repository": {
     "type": "git",
