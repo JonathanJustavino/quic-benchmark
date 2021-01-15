@@ -94,6 +94,7 @@ def pull_measurements(container_name, file_name):
 if __name__ == "__main__":
     socket_type = sys.argv[1]
     container_type = sys.argv[2]
+    public_ip = ""
     if len(sys.argv) > 3:
         public_ip = sys.argv[3]
     build_image()
