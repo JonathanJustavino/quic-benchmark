@@ -35,13 +35,13 @@ def run_container_and_connect_to_network(network, socket_type):
         tcp_tls_client = None
         if container_type == "server" or container_type == None:
             print("creating tcp-tls-server")
-            tcp_tls_server = client.containers.create("ws2018sacc/experimentalnodejs:15.6", command="node tcp-tls-server.js", 
+            tcp_tls_server = client.containers.create("ws2018sacc/experimentalnodejs:15.6", command=f"node tcp-tls-server.js {public_ip}", 
             name = "tcp_tls_server", ports={'1337/tcp': 1337}, detach=True)
             network.connect(tcp_tls_server, ipv4_address="192.168.52.36")
             tcp_tls_server.start()
         if container_type == "client" or container_type is None:
             print("creating tcp-tls-client")
-            tcp_tls_client = client.containers.create("ws2018sacc/experimentalnodejs:15.6", command="node tcp-tls-client.js {}".format(public_ip), 
+            tcp_tls_client = client.containers.create("ws2018sacc/experimentalnodejs:15.6", command=f"node tcp-tls-client.js {public_ip}", 
             name = "tcp_tls_client", detach=True)
             network.connect(tcp_tls_client, ipv4_address="192.168.52.37")
             tcp_tls_client.start()
