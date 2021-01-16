@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "quic": "ttab node quic-client.js && node quic-server.js",
+    "quic": "ttab node quic-server.js && ttab node quic-client.js local",
+    "quics": "node quic-server.js",
+    "quicc": "node quic-client.js",
     "tcp": "ttab node tcp-tls-server.js local && ttab node tcp-tls-client.js local",
     "tcps": "node tcp-tls-server.js",
     "tcpc": "node tcp-tls-client.js"
