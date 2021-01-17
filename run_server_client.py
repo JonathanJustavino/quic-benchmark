@@ -2,10 +2,10 @@ import docker
 import sys
 import subprocess
 import tarfile
+import json
 from threading import Thread
 from io import BytesIO
 from pythonping import ping
-
 
 client = docker.from_env()
 
@@ -100,8 +100,33 @@ def pull_measurements(container_name, file_name):
     remove_container(container_name)
 
 
-def ping_container(target, count=100):
-    ping(target, verbose=True)
+def ping_container(target, count=10):
+    response_list = ping(target, verbose=True, count=count)
+    my_list = list(response_list._responses)
+    f = lambda x: f"{x}"
+
+    ping_response = {
+        "avg rtt(ms)": response_list.rtt_avg_ms, # average round-trip time in miliseconds
+        "min rtt(ms)": response_list.rtt_min_ms, # minimum round-trip time in miliseconds
+        "max rtt(ms)": response_list.rtt_max_ms, # maximum round-trip time in miliseconds
+        "packet loss": response_list.packet_loss, # number of packets lost
+        "responses": list(map(f, my_list)) # list of pings
+    }
+
+    with open('ping.json', 'w') as fp:
+        json.dump(ping_response, fp, indent=2)
+
+
+def start_ping_thread(target, public_ip):
+    t_ping = Thread(target=target, args=(public_ip,))
+    t_ping.start()
+    t_ping.join()
+
+
+def start_container_thread(target, network, socket_type, container_type):
+    t_container = Thread(target=target, args=(network, socket_type, container_type,), group=None)
+    t_container.start()
+    t_container.join()
 
 
 if __name__ == "__main__":
@@ -112,12 +137,5 @@ if __name__ == "__main__":
         public_ip = sys.argv[3]
     build_image()
     network = create_network()
-    t_ping = Thread(target=ping_container, args=(public_ip,))
-    t_container = Thread(target=start_container, args=(network, socket_type, container_type,), group=None)
-    
-    t_ping.start()
-    t_container.start()
-
-    t_container.join()
-    t_ping.join()
-
+    start_ping_thread(ping_container, public_ip)
+    start_container_thread(start_container, network, socket_type, container_type)
