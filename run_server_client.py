@@ -40,15 +40,15 @@ def create_container(command, name, port=None):
     return tcp_tls_server
 
 
-def start_container(network, socket_type):
+def start_container(network, socket_type, container_type):
     server = None
     client = None
     if socket_type == "tcptls":
-        if container_type == "server" or container_type == None:
+        if container_type == "server":
             server = create_container(f"node tcp-tls-server.js {public_ip}", "tcp_tls_server", 1337)
             network.connect(server, ipv4_address="192.168.52.36")
             server.start()
-        if container_type == "client" or container_type is None:
+        if container_type == "client":
             client = create_container(f"node tcp-tls-client.js {public_ip}", "tcp_tls_client")
             network.connect(client, ipv4_address="192.168.52.37")
             client.start()
@@ -60,11 +60,11 @@ def start_container(network, socket_type):
             pull_measurements("tcp_tls_client", "tcp-benchmark-client.json")
 
     if socket_type == "quic":
-        if container_type == "server" or container_type == None:
+        if container_type == "server":
             server = create_container("node quic-server.js", "quic_server", 1234)
             network.connect(server, ipv4_address="192.168.52.38")
             server.start()
-        if container_type == "client" or container_type == None:
+        if container_type == "client":
             client = create_container(f"node quic-client.js {public_ip}", "quic_client")
             network.connect(client, ipv4_address="192.168.52.39")
             client.start()
