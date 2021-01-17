@@ -29,66 +29,66 @@ def create_network():
     return network
 
 
-def run_container_and_connect_to_network(network, socket_type):
+def create_container(command, name, port=None):
+    if port:
+        port = {f"{port}/tcp": port}
+    tcp_tls_server = client.containers.create("ws2018sacc/experimentalnodejs:15.6", 
+        command=command, 
+        name = name, 
+        ports=port, 
+        detach=True)
+    return tcp_tls_server
+
+
+def start_container(network, socket_type):
+    server = None
+    client = None
     if socket_type == "tcptls":
-        tcp_tls_server = None
-        tcp_tls_client = None
         if container_type == "server" or container_type == None:
-            print("creating tcp-tls-server")
-            tcp_tls_server = client.containers.create("ws2018sacc/experimentalnodejs:15.6", command=f"node tcp-tls-server.js {public_ip}", 
-            name = "tcp_tls_server", ports={'1337/tcp': 1337}, detach=True)
-            network.connect(tcp_tls_server, ipv4_address="192.168.52.36")
-            tcp_tls_server.start()
+            server = create_container(f"node tcp-tls-server.js {public_ip}", "tcp_tls_server", 1337)
+            network.connect(server, ipv4_address="192.168.52.36")
+            server.start()
         if container_type == "client" or container_type is None:
-            print("creating tcp-tls-client")
-            tcp_tls_client = client.containers.create("ws2018sacc/experimentalnodejs:15.6", command=f"node tcp-tls-client.js {public_ip}", 
-            name = "tcp_tls_client", detach=True)
-            network.connect(tcp_tls_client, ipv4_address="192.168.52.37")
-            tcp_tls_client.start()
-        if tcp_tls_server is not None:
-            tcp_tls_server.wait()
+            client = create_container(f"node tcp-tls-client.js {public_ip}", "tcp_tls_client")
+            network.connect(client, ipv4_address="192.168.52.37")
+            client.start()
+        if server:
+            server.wait()
             pull_measurements("tcp_tls_server", "tcp-benchmark-server.json")
-        if tcp_tls_client is not None:
-            tcp_tls_client.wait()
+        if client:
+            client.wait()
             pull_measurements("tcp_tls_client", "tcp-benchmark-client.json")
 
     if socket_type == "quic":
-        quic_server = None
-        quic_client = None
         if container_type == "server" or container_type == None:
-            print("creating quic-server")
-            quic_server = client.containers.create("ws2018sacc/experimentalnodejs:15.6", command="node quic-server.js", 
-            name = "quic_server", ports={'1234/udp': 1234}, detach=True)
-            network.connect(quic_server, ipv4_address="192.168.52.38")
-            quic_server.start()
+            server = create_container("node quic-server.js", "quic_server", 1234)
+            network.connect(server, ipv4_address="192.168.52.38")
+            server.start()
         if container_type == "client" or container_type == None:
-            print("creating quic-client")
-            quic_client = client.containers.create("ws2018sacc/experimentalnodejs:15.6", command="node quic-client.js", 
-            name = "quic_client", detach=True)
-            network.connect(quic_client, ipv4_address="192.168.52.39")
-            quic_client.start()
-        if quic_client is not None:
-            quic_server.wait()
+            client = create_container(f"node quic-client.js {public_ip}", "quic_client")
+            network.connect(client, ipv4_address="192.168.52.39")
+            client.start()
+        if server:
+            server.wait()
             pull_measurements("quic_server", "quic-benchmark-server.json")
-        if quic_client is not None:
-            quic_client.wait()
+        if client:
+            client.wait()
             pull_measurements("quic_client", "quic-benchmark-client.json")
 
 
 def pull_measurements(container_name, file_name):
     container = client.containers.get(container_name)
     file_json = container.get_archive(file_name)
-    stream, stat = file_json
+    stream, _ = file_json
     file_obj = BytesIO()
     for i in stream:
         file_obj.write(i)
     file_obj.seek(0)
     tar = tarfile.open(mode='r', fileobj=file_obj)
     text = tar.extractfile(file_name)
-    file = open('./{}'.format(file_name), 'wb')
-    for line in text:
-        file.write(line)
-    file.close()
+    with open('./{}'.format(file_name), 'wb') as file:
+        for line in text:
+            file.write(line)
 
 
 if __name__ == "__main__":
@@ -99,4 +99,4 @@ if __name__ == "__main__":
         public_ip = sys.argv[3]
     build_image()
     network = create_network()
-    run_container_and_connect_to_network(network, socket_type)
+    start_container(network, socket_type)
