@@ -1,0 +1,18 @@
+{
+  "avg rtt(ms)": 53.11,
+  "min rtt(ms)": 30.52,
+  "max rtt(ms)": 74.17,
+  "packet loss": 0.0,
+  "responses": [
+    "Reply from 192.168.178.56, 9 bytes in 53.46ms",
+    "Reply from 192.168.178.56, 9 bytes in 62.01ms",
+    "Reply from 192.168.178.56, 9 bytes in 47.29ms",
+    "Reply from 192.168.178.56, 9 bytes in 63.05ms",
+    "Reply from 192.168.178.56, 9 bytes in 31.31ms",
+    "Reply from 192.168.178.56, 9 bytes in 61.23ms",
+    "Reply from 192.168.178.56, 9 bytes in 42.11ms",
+    "Reply from 192.168.178.56, 9 bytes in 65.91ms",
+    "Reply from 192.168.178.56, 9 bytes in 30.52ms",
+    "Reply from 192.168.178.56, 9 bytes in 74.17ms"
+  ]
+}
