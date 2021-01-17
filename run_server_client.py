@@ -2,7 +2,9 @@ import docker
 import sys
 import subprocess
 import tarfile
+from threading import Thread
 from io import BytesIO
+from pythonping import ping
 
 
 client = docker.from_env()
@@ -76,6 +78,12 @@ def start_container(network, socket_type, container_type):
             pull_measurements("quic_client", "quic-benchmark-client.json")
 
 
+def remove_container(container_name):
+    container = client.containers.get(container_name)
+    container.stop()
+    container.remove()
+
+
 def pull_measurements(container_name, file_name):
     container = client.containers.get(container_name)
     file_json = container.get_archive(file_name)
@@ -89,14 +97,27 @@ def pull_measurements(container_name, file_name):
     with open('./{}'.format(file_name), 'wb') as file:
         for line in text:
             file.write(line)
+    remove_container(container_name)
+
+
+def ping_container(target, count=100):
+    ping(target, verbose=True)
 
 
 if __name__ == "__main__":
     socket_type = sys.argv[1]
     container_type = sys.argv[2]
-    public_ip = ""
+    public_ip = ""  
     if len(sys.argv) > 3:
         public_ip = sys.argv[3]
     build_image()
     network = create_network()
-    start_container(network, socket_type)
+    t_ping = Thread(target=ping_container, args=(public_ip,))
+    t_container = Thread(target=start_container, args=(network, socket_type, container_type,), group=None)
+    
+    t_ping.start()
+    t_container.start()
+
+    t_container.join()
+    t_ping.join()
+
