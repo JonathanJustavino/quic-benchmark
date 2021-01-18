@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 # "keylog":"2021-01-09T20:23:21.791Z","secure":"2021-01-09T20:23:21.794Z","data":"2021-01-09T20:23:21.796Z","streamEnd":"2021-01-09T20:23:21.798Z","streamClose":"2021-01-09T20:23:31.805Z","socketClose":"2021-01-09T20:23:31.810Z"}{"handshakeDurationInNs":"6427581"}
 
 # Path to folder "measurements"
-abs_path = Path('../measurements/')
+abs_path = Path('/home/amelie/Uni/RNP_Komplexpraktikum/measurements_current/run5_network/')
 
 curr_dict_tuple = 0
 events = 0
@@ -84,17 +84,28 @@ if __name__ == '__main__':
         # normalize the x-axis / timestamps so they all start with zero
         # (just substract the first timestamp from each timestamp -> removes offset
         plt_x_axis = []
-        for time in events_timeline:
+        for time in events_timeline:  # time = zB ([2021, 01, 09], [20, 23, 21.786])
             time = time - events_timeline[0]
+            # round to 5 decimal places (Nachkommastellen)
             time = round(time, 5)
             plt_x_axis.append(time)
 
         # eventnames
         plt_y_axis = list(events.keys())
 
-        ax.plot(plt_x_axis, plt_y_axis, c=colorlist_plot[(n % len(colorlist_plot))], marker='o', ls='-', fillstyle='none', label=str(file))
+        # current color for current graph
+        curr_color = colorlist_plot[(n % len(colorlist_plot))]
+        ax.plot(plt_x_axis, plt_y_axis, c=curr_color, marker='o', ls='', fillstyle='none', label=str(file))
+
+        # annotate each point on each graph
+        for (x, y) in zip(plt_x_axis, plt_y_axis):
+            if 'quic' in file:
+                ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', color=curr_color)
+            else:
+                ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, -15), ha='center', color=curr_color)
 
     plt.grid(1)
-    plt.legend(loc=2)
+    plt.legend(bbox_to_anchor=(0, 0), loc="upper left")
+    # plt.figtext(1, 0, "This is a sample example explaining figtext", fontsize=100)
     plt.show()
 
