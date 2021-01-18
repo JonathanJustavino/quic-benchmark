@@ -2,9 +2,9 @@ const { createQuicSocket } = require('net');
 const fs = require('fs');
 const hexdump = require('hexdump-nodejs');
 
-const key  = fs.readFileSync('certs/quic/server.key');
-const cert = fs.readFileSync('certs/quic/server.crt');
-const ca   = fs.readFileSync('certs/quic/server.csr');
+const key  = fs.readFileSync('../certs/quic/server.key');
+const cert = fs.readFileSync('../certs/quic/server.crt');
+const ca   = fs.readFileSync('../certs/quic/server.csr');
 var HOST;
 
 var EventTimeStamps = {
