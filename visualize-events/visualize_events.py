@@ -13,11 +13,11 @@ import matplotlib.pyplot as plt
 # "keylog":"2021-01-09T20:23:21.791Z","secure":"2021-01-09T20:23:21.794Z","data":"2021-01-09T20:23:21.796Z","streamEnd":"2021-01-09T20:23:21.798Z","streamClose":"2021-01-09T20:23:31.805Z","socketClose":"2021-01-09T20:23:31.810Z"}{"handshakeDurationInNs":"6427581"}
 
 # Path to folder "measurements"
-abs_path = Path('/home/amelie/Uni/RNP_Komplexpraktikum/measurements_current/run5_network/')
+abs_path = Path('/home/amelie/Uni/RNP_Komplexpraktikum/measurements_current/run1_local/')
 
 curr_dict_tuple = 0
 events = 0
-events_timeline = 0
+events_timeline_seconds = 0
 
 
 # split 2021-01-09T20:23:17.230Z -> [2021,01,09] [20, 23, 17.23]
@@ -59,6 +59,11 @@ def dataloader(filename):
     return eventsdict, float(handshakedur)
 
 
+def merge_min_sec(minute, sec):
+    sec += minute * 60
+    return sec
+
+
 if __name__ == '__main__':
 
     # get all logfiles of directory
@@ -79,13 +84,18 @@ if __name__ == '__main__':
         # time of events unformatted
         events_timeline = list(events.values())
         # -> get eventtime in seconds
-        events_timeline = [split_timestamp(j)[1][2] for j in events_timeline]
+        # j = zB ([2021, 01, 09], [20, 23, 21.786] -> 21,786 (seconds))
+        events_timeline_seconds = [split_timestamp(j)[1][2] for j in events_timeline]
+        # j = zB ([2021, 01, 09], [20, 23, 21.786] -> 23 (min))
+        events_timeline_minutes = [split_timestamp(j)[1][1] for j in events_timeline]
 
         # normalize the x-axis / timestamps so they all start with zero
         # (just substract the first timestamp from each timestamp -> removes offset
         plt_x_axis = []
-        for time in events_timeline:  # time = zB ([2021, 01, 09], [20, 23, 21.786])
-            time = time - events_timeline[0]
+        for time in events_timeline_seconds:
+            print('time: ', time, " - 1st timestamp", events_timeline_seconds[0])
+            # substract 1st timestamp from each other timestamp
+            time = time - events_timeline_seconds[0]
             # round to 5 decimal places (Nachkommastellen)
             time = round(time, 5)
             plt_x_axis.append(time)
@@ -105,7 +115,8 @@ if __name__ == '__main__':
                 ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, -15), ha='center', color=curr_color)
 
     plt.grid(1)
+    # ToDo: position von text korrigieren -> am besten neben legende
+    # plt.text(1, -1, "RTT:", fontsize=10)
     plt.legend(bbox_to_anchor=(0, 0), loc="upper left")
-    # plt.figtext(1, 0, "This is a sample example explaining figtext", fontsize=100)
     plt.show()
 
