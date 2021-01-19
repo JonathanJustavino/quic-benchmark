@@ -23,8 +23,10 @@ def build_image():
 
 def create_network():
     print("creating network")
-    network = client.networks.get("nodejs_net")
-    if not network:
+    network = None
+    try:
+        network = client.networks.get("nodejs_net")
+    except:
         ipam_pool = docker.types.IPAMPool(subnet='192.168.52.0/24', gateway='192.168.52.254')
         ipam_config = docker.types.IPAMConfig(pool_configs=[ipam_pool])
         network = client.networks.create("nodejs_net", driver="bridge", ipam=ipam_config)
