@@ -6,6 +6,8 @@ import json
 from threading import Thread
 from io import BytesIO
 from pythonping import ping
+from traffic.pshark import capture_packets
+
 
 client = docker.from_env()
 
@@ -119,16 +121,14 @@ def ping_container(target, count=10):
         json.dump(ping_response, fp, indent=2)
 
 
-def start_ping_thread(target, public_ip):
-    t_ping = Thread(target=target, args=(public_ip,))
-    t_ping.start()
-    t_ping.join()
-
-
-def start_container_thread(target, network, socket_type, container_type):
-    t_container = Thread(target=target, args=(network, socket_type, container_type,), group=None)
-    t_container.start()
-    t_container.join()
+def start_thread(**kwargs):
+    if 'target' not in kwargs.keys():
+        print("No target function set")
+        return
+    parameter = list(kwargs.values())
+    thread = Thread(target=kwargs['target'], args=(parameter[1:]))
+    thread.start()
+    thread.join()
 
 
 if __name__ == "__main__":
@@ -137,7 +137,22 @@ if __name__ == "__main__":
     public_ip = ""  
     if len(sys.argv) > 3:
         public_ip = sys.argv[3]
+
+    interface_lo = 'lo'
+    interface_docker = 'br-bbd147c17183'
+    interface = interface_docker
+    filter = ''
+    filter_tcp = 'tcp port 1337'
+    filter_udp = 'udp port 1234'
+    filter = filter_tcp
+
+    port_type = "tcp"
+
     build_image()
     network = create_network()
-    start_ping_thread(ping_container, public_ip)
-    start_container_thread(start_container, network, socket_type, container_type)
+
+    if container_type == 'shark':
+        start_thread(target=capture_packets, interface=interface, filter=filter)
+
+    start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type)
+    start_thread(target=ping_container, public_ip=public_ip)
