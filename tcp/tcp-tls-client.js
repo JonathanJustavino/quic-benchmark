@@ -8,8 +8,8 @@ const PORT = 1337;
 var HOST = "";
 
 var options = {
-    key: fs.readFileSync('../certs/tcp-tls/private-key.pem'),
-    cert: fs.readFileSync('../certs/tcp-tls/public-cert.pem'),
+    key: fs.readFileSync('certs/tcp-tls/private-key.pem'),
+    cert: fs.readFileSync('certs/tcp-tls/public-cert.pem'),
     rejectUnauthorized: false,
 };
 
