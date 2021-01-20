@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # Gesamte Paketlänge, die gecaptured wurde
     capt_pack_lenght = vars_packet['captured_length']
-    print('Total captured packet length: ', capt_pack_lenght)
+    print('Total packetlength (captured) = ', capt_pack_lenght)
 
     # ----  Get different layers: ------
     # vars_packet['layers'] == [<ETH Layer>, <IP Layer>, <UDP Layer>, <DATA Layer>]
@@ -38,9 +38,10 @@ if __name__ == '__main__':
 
     # PAYLOAD / Data
     payload = vars_packet['layers'][3]
-    print('payload länge: ', payload.len)
+    print('payload length =', payload.len)
 
     # ---- overhead berechnen ----
     # Overhead = (gesamtpaket länge) - (payload länge)
     overhead = int(capt_pack_lenght) - int(payload.len)
-    print("overhead: ", overhead)
+    print("overhead = (total packetlength) - payloadlength = ", overhead)
+
