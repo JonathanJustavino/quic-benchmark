@@ -3,7 +3,7 @@ import pyshark
 # packet.layer.field_names: alle möglichen Attribute einer Layer zB destination adresse usw.
 
 if __name__ == '__main__':
-    cap = pyshark.FileCapture('tcp.cap')
+    cap = pyshark.FileCapture('udp.cap')
 
     # pyshark.packet.packet.Packet
     packet = cap[5]
