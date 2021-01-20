@@ -14,16 +14,17 @@ if __name__ == '__main__':
     vars_packet = vars(packet)
 
     # alle keys in packet-dict
-    print(vars_packet.keys())
+    # print(vars_packet.keys())
 
     # alle Attribute in pyshark.packet.packet.Packet
-    print("Attribute in pyshark.packet.packet.Packet:", packet.__dict__)
+    # print("Attribute in pyshark.packet.packet.Packet:", packet.__dict__)
 
     # Gesamte Paketlänge, die gecaptured wurde
     capt_pack_lenght = vars_packet['captured_length']
     print('Total captured packet length: ', capt_pack_lenght)
 
     # ----  Get different layers: ------
+    # vars_packet['layers'] == [<ETH Layer>, <IP Layer>, <UDP Layer>, <DATA Layer>]
 
     # Ethernet layer -> kp wie das Attribut im "pyshark.packet.packet.Packet" heißt,
     # deshalb hole ich die aus dem dict
