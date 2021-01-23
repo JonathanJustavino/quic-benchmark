@@ -34,7 +34,7 @@ function validateIP() {
   }
 
   if (ip == null) {
-      HOST = '192.168.52.36';
+      HOST = '192.168.52.38';
       return;
   }
   
