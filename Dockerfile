@@ -1,6 +1,7 @@
 FROM ubuntu:20.04
 
-COPY quic-client.js quic-server.js tcp-tls-client.js tcp-tls-server.js ./
+COPY quic/quic-client.js quic/quic-server.js \
+    tcp/tcp-tls-client.js tcp/tcp-tls-server.js ./scripts/
 COPY certs/ certs/
 
 RUN apt-get update && apt-get install -y \
