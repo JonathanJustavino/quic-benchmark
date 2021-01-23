@@ -35,7 +35,7 @@ function registerEventHandlers(client_socket) {
         client_socket.end();
         
         const data = JSON.stringify(EventTimeStamps);
-        fs.writeFile('./tcp-benchmark-client.json', data, 'utf8', (err) => {
+        fs.writeFile('./tcp-tls-benchmark-client.json', data, 'utf8', (err) => {
             if (err) {
                 console.log(`Error writing file: ${err}`);
             } else {

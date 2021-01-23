@@ -46,40 +46,14 @@ def create_container(command, name, port=None):
     return tcp_tls_server
 
 
-def start_container(network, socket_type, container_type):
-    server = None
-    client = None
-    if socket_type == "tcptls":
-        if container_type == "server":
-            server = create_container(f"node tcp-tls-server.js {public_ip}", "tcp_tls_server", 1337)
-            network.connect(server, ipv4_address="192.168.52.36")
-            server.start()
-        if container_type == "client":
-            client = create_container(f"node tcp-tls-client.js {public_ip}", "tcp_tls_client")
-            network.connect(client, ipv4_address="192.168.52.37")
-            client.start()
-        if server:
-            server.wait()
-            pull_measurements("tcp_tls_server", "tcp-benchmark-server.json")
-        if client:
-            client.wait()
-            pull_measurements("tcp_tls_client", "tcp-benchmark-client.json")
-
-    if socket_type == "quic":
-        if container_type == "server":
-            server = create_container("node quic-server.js", "quic_server", 1234)
-            network.connect(server, ipv4_address="192.168.52.38")
-            server.start()
-        if container_type == "client":
-            client = create_container(f"node quic-client.js {public_ip}", "quic_client")
-            network.connect(client, ipv4_address="192.168.52.39")
-            client.start()
-        if server:
-            server.wait()
-            pull_measurements("quic_server", "quic-benchmark-server.json")
-        if client:
-            client.wait()
-            pull_measurements("quic_client", "quic-benchmark-client.json")
+def start_container(network, socket_type, container_type, port, ip):
+    start_cmd = f"node scripts/{socket_type}-{container_type}.js"
+    con_name = f"{socket_type}-{container_type}"
+    container = create_container(start_cmd, con_name, port)
+    network.connect(container, ipv4_address=ip)
+    container.start()
+    container.wait()
+    pull_measurements(con_name, f"{socket_type}-benchmark-{container_type}.json")
 
 
 def remove_container(container_name):
@@ -138,21 +112,30 @@ if __name__ == "__main__":
     if len(sys.argv) > 3:
         public_ip = sys.argv[3]
 
-    interface_lo = 'lo'
-    interface_docker = 'br-bbd147c17183'
-    interface = interface_docker
-    filter = ''
-    filter_tcp = 'tcp port 1337'
-    filter_udp = 'udp port 1234'
-    filter = filter_tcp
+    port = ""
 
-    port_type = "tcp"
+    if socket_type == "quic":
+        interface = "br-bbd147c17183"
+        cap_filter = "udp port 1234"
+        if container_type == "server":
+            ip = "192.168.52.38"
+            port = 1234
+        elif container_type == "client":
+            ip = "192.168.52.39"
+    elif socket_type == "tcp-tls":
+        interface = "lo"
+        cap_filter = "tcp port 1337"
+        if container_type == "server":
+            port = 1337
+            ip = "192.168.52.36"
+        elif container_type == "client":
+            ip = "192.168.52.37"
 
     build_image()
     network = create_network()
 
     if container_type == 'shark':
-        start_thread(target=capture_packets, interface=interface, filter=filter)
+        start_thread(target=capture_packets, interface=interface, filter=cap_filter)
 
-    start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type)
+    start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
     start_thread(target=ping_container, public_ip=public_ip)

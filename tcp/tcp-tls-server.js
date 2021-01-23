@@ -109,7 +109,7 @@ function registerEventHandler(server, keylogFlag) {
     server.on('close', () => {
         measurements.events.socketClose = new Date();
         const data = JSON.stringify(measurements);
-        fs.writeFile('./tcp-benchmark-server.json', data, 'utf8', (err) => {
+        fs.writeFile('./tcp-tls-benchmark-server.json', data, 'utf8', (err) => {
             if (err) {
                 console.log(`Error writing file: ${err}`);
             } else {
