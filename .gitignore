@@ -8,8 +8,8 @@ ping.json
 quic-benchmark-client.json
 quic-benchmark-server.json
 
-tcp-benchmark-client.json
-tcp-benchmark-server.json
+tcp-tls-benchmark-client.json
+tcp-tls-benchmark-server.json
 
 # Python-specific
 
