@@ -62,10 +62,18 @@ def dataloader(filename):
     with open(filename, 'r') as json_file:
         data = json_file.read()
 
+    # --- Location of the testrun ---
+    # LOCAL testrun (on localhost)
+    if '-local' in filename:
+        location = 'local'
+    # NETWORK / LAN testrun
+    else:
+        location = 'network'
+
     # delete rest of the path from filename (if not, "quic" filter of filname string doesn't work)
     filename = os.path.basename(filename)
 
-    # --- Client ---
+    # --- Participant: Client ---
     # have to dump server-logfile because contains 2 top-level json-objects
     if 'client' in filename:
         eventsdict = json.loads(data)
@@ -73,7 +81,7 @@ def dataloader(filename):
         del eventsdict['error']
         handshakedur_ns = -1
         participant = 'client'
-    # --- Server ---
+    # --- Participant: Server ---
     else:
         # split json dict -> events, handshakeDurationInNs
         pydict = json.loads(data)
@@ -101,7 +109,7 @@ def dataloader(filename):
     # location: local (on localhost) or network
     # events: eventsdict, so that events can be accessed zB via "eventsdict['session'] == timestamp"
     # handshakeduration in ns: (== -1 bei client)
-    return {'testrun_nr': testrun_num, 'protocol': protocol, 'participant': participant,
+    return {'testrun_nr': testrun_num, 'protocol': protocol, 'participant': participant, 'location': location,
             'events': eventsdict, 'handshakeduration_ns': handshakedur_ns}
 
 
