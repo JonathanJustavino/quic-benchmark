@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import os
 import matplotlib.pyplot as plt
+import re
 
 # Client events:
 # ready, writeToServer, error
@@ -12,14 +13,22 @@ import matplotlib.pyplot as plt
 # zB {"listening":"2021-01-09T20:23:17.230Z","session":"2021-01-09T20:23:21.787Z",
 # "keylog":"2021-01-09T20:23:21.791Z","secure":"2021-01-09T20:23:21.794Z","data":"2021-01-09T20:23:21.796Z","streamEnd":"2021-01-09T20:23:21.798Z","streamClose":"2021-01-09T20:23:31.805Z","socketClose":"2021-01-09T20:23:31.810Z"}{"handshakeDurationInNs":"6427581"}
 
-# Path to folder "measurements"
-abs_path = Path('/home/amelie/Uni/RNP_Komplexpraktikum/measurements_current/run3_local/')
+# OLD Path to folder "measurements"
+#abs_path = Path('../tcp/measurements/tcp-local/')
 
+# Path-dict
+all_pathes = [Path('../tcp/measurements/tcp-local/timestamps/'),
+              Path('../tcp/measurements/tcp-same-network/timestamps/'),
+              Path('../quic/measurements/quic-local/timestamps/'),
+              Path('../quic/measurements/quic-same-network/timestamps/')]
 
 curr_dict_tuple = 0
 events = 0
 events_timeline_seconds = 0
 
+# get all numbers [0-9]
+# \d: Matches any decimal digit; this is equivalent to the class [0-9].
+regex = re.compile(r'\d+')
 
 # split 2021-01-09T20:23:17.230Z -> [2021,01,09] [20, 23, 17.23]
 # expects string -> returns (list[int], list[float])
@@ -40,24 +49,55 @@ def split_timestamp(timestamp):
 
 
 # loads json file and converts it to python dictionary
+# Bekommt absoluten Pfad zu file
 def dataloader(filename):
-    with open(abs_path / filename, 'r') as quicclient_file:
-        data = quicclient_file.read()
 
+    testrun_num = 0
+    protocol = ''
+    participant = ''
+    eventsdict = {}
+    handshakedur_ns = 0
+
+    with open(filename, 'r') as json_file:
+        data = json_file.read()
+
+    # --- Client ---
     # have to dump server-logfile because contains 2 top-level json-objects
     if 'client' in filename:
         eventsdict = json.loads(data)
         # delete empty error message
         del eventsdict['error']
-        handshakedur = -1
+        handshakedur_ns = -1
+        participant = 'client'
+    # --- Server ---
     else:
+        # split json dict -> events, handshakeDurationInNs
         pydict = json.loads(data)
         eventsdict = pydict['events']
-        handshakedur = pydict['durations']['handshakeDurationInNs']
+        handshakedur_ns = pydict['durations']['handshakeDurationInNs']
+        participant = 'server'
 
-    # returns eventsdict, handshakeduration (== 0 bei client)
-    # so that it can be accessed via "dict['keyword'] == value"
-    return eventsdict, float(handshakedur)
+    # --- QUIC - protocol ---
+    if 'quic' in filename:
+        protocol = 'quic'
+    # --- TCP/TLS - protocol ---
+    else:
+        protocol = 'tcp'
+
+    # --- get test-round: ----
+    # -> aus filname auslesen mit regex
+    testrun_num = [int(nr_string) for nr_string in regex.findall(filename)]
+    # Liste entfernen TODO: was ist wenn testrun-anzahl > 9 also 2stellig? sind das dann 2 Listenenel?
+    testrun_num = testrun_num[0]
+
+    # --- returns: ---
+    # testrun_nr: which testrun (1,2, ..)
+    # protocol: 'quic' or 'tcp'
+    # participant: 'server' or 'client'
+    # events: eventsdict, so that events can be accessed zB via "eventsdict['session'] == timestamp"
+    # handshakeduration in ns: (== -1 bei client)
+    return {'testrun_nr': testrun_num, 'protocol': protocol, 'participant': participant,
+            'events': eventsdict, 'handshakeduration_ns': handshakedur_ns}
 
 
 def merge_min_sec(minute, sec):
@@ -73,6 +113,22 @@ def split_sec_in_min(sec):
 
 if __name__ == '__main__':
 
+    # list that contains all dicts from all testruns + participants
+    # of the form: {'testrun_nr': testrun_num, 'protocol': protocol, 'participant': participant,
+    #             'events': eventsdict, 'handshakeduration_ns': handshakedur_ns}
+    data_all_runs = []
+
+    for path in all_pathes:
+        # get all json filenames at given path
+        all_filenames = os.listdir(path)
+        # get infos for each file,
+        # append infos to list "data_all_runs"
+        for file in all_filenames:
+            # get dict with testrun_nr, participant (server/client) etc from dataloader
+            file_info = dataloader(str(path / file))
+            data_all_runs.append(file_info)
+
+
     # static colors for graphs
     quic_serv_col = 'b'
     quic_client_col = 'c'
@@ -80,16 +136,13 @@ if __name__ == '__main__':
     col_tcp_client = 'm'
 
     # get all logfiles of directory
-    logfiles = os.listdir(abs_path)
-
-    #
+    #logfiles = os.listdir(abs_path)
 
     # init figure
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    # possible colors for graphs/axis in figure
-    colorlist_plot = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 
+    # über jeden file iterieren -> man weiß nicht welcher
     for n, file in enumerate(logfiles):
         curr_dict_tuple = dataloader(file)
 
@@ -119,7 +172,7 @@ if __name__ == '__main__':
         plt_y_axis = list(events.keys())
 
         # current color for current graph
-        curr_color = colorlist_plot[(n % len(colorlist_plot))]
+        # curr_color = colorlist_plot[(n % len(colorlist_plot))]
         ax.plot(plt_x_axis, plt_y_axis, c=curr_color, marker='o', ls='', fillstyle='none', label=str(file))
 
         # annotate each point on each graph
