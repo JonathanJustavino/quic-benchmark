@@ -3,10 +3,10 @@ import sys
 import subprocess
 import tarfile
 import json
+import argparse
 from threading import Thread
 from io import BytesIO
 from pythonping import ping
-from traffic.pshark import capture_packets
 
 
 client = docker.from_env()
@@ -38,28 +38,38 @@ def create_network():
 def create_container(command, name, port=None):
     if port:
         port = {f"{port}/tcp": port}
-    tcp_tls_server = client.containers.create("ws2018sacc/experimentalnodejs:15.6", 
+    container = client.containers.create("ws2018sacc/experimentalnodejs:15.6", 
         command=command, 
         name = name, 
         ports=port, 
         detach=True)
-    return tcp_tls_server
+    return container
 
 
 def start_container(network, socket_type, container_type, port, ip):
-    start_cmd = f"node scripts/{socket_type}-{container_type}.js"
-    con_name = f"{socket_type}-{container_type}"
-    container = create_container(start_cmd, con_name, port)
+    container_name = get_container_name(socket_type, container_type)
+    start_cmd = f"node scripts/{container_name}.js"
+    try:
+        container = create_container(start_cmd, container_name, port)
+    except: 
+        print(f"An error occured, deleting containers:\n{container_name}")
+        remove_container(container_name)
+        return
     network.connect(container, ipv4_address=ip)
     container.start()
     container.wait()
-    pull_measurements(con_name, f"{socket_type}-benchmark-{container_type}.json")
+    pull_measurements(container_name, f"{socket_type}-benchmark-{container_type}.json")
 
 
 def remove_container(container_name):
-    container = client.containers.get(container_name)
-    container.stop()
-    container.remove()
+    if not args.debug:
+        container = client.containers.get(container_name)
+        container.stop()
+        container.remove()
+
+
+def get_container_name(socket_type, container_type):
+    return f"{socket_type}-{container_type}"
 
 
 def pull_measurements(container_name, file_name):
@@ -106,36 +116,49 @@ def start_thread(**kwargs):
 
 
 if __name__ == "__main__":
-    socket_type = sys.argv[1]
-    container_type = sys.argv[2]
-    public_ip = ""  
-    if len(sys.argv) > 3:
-        public_ip = sys.argv[3]
+    parser = argparse.ArgumentParser(description='Choose to run with socket \
+    type tcp-tls or quic and service type client or server')
+    parser.add_argument('-t', '--tcp', action='store_true', help='Use tcp-tls socket')
+    parser.add_argument('-q', '--quic', action='store_true', help='Use quic socket')
+    parser.add_argument('-d', '--debug', action='store_true', default=False,  
+                        help='Do not remove container for inspect purposes')
+    parser.add_argument('-s', '--server', action='store_true', help='Run server')
+    parser.add_argument('-c', '--client', action='store_true', help='Run client')
+    parser.add_argument('-ip', '--ipaddress', action='store_const', 
+                        const="", default="", 
+                        help='Define a remote ip to the machine where server is running')
+
+    parser.print_help()
+    args = parser.parse_args()
 
     port = ""
+    if args.server:
+        container_type = "server"
+    if args.client:
+        container_type = "client"
 
-    if socket_type == "quic":
-        interface = "br-bbd147c17183"
+    public_ip = args.ipaddress
+    interface = "br-bbd147c17183"
+
+    if args.quic:
+        socket_type = "quic"
         cap_filter = "udp port 1234"
-        if container_type == "server":
+        if args.server:
             ip = "192.168.52.38"
             port = 1234
-        elif container_type == "client":
+        elif args.client:
             ip = "192.168.52.39"
-    elif socket_type == "tcp-tls":
-        interface = "lo"
+    elif args.tcp:
+        socket_type = "tcp-tls"
         cap_filter = "tcp port 1337"
-        if container_type == "server":
+        if args.server:
             port = 1337
             ip = "192.168.52.36"
-        elif container_type == "client":
+        elif args.client:
             ip = "192.168.52.37"
 
     build_image()
     network = create_network()
-
-    if container_type == 'shark':
-        start_thread(target=capture_packets, interface=interface, filter=cap_filter)
-
+    container_thread = None
     start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
     start_thread(target=ping_container, public_ip=public_ip)
