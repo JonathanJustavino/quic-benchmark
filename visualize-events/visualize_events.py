@@ -57,9 +57,13 @@ def dataloader(filename):
     participant = ''
     eventsdict = {}
     handshakedur_ns = 0
+    location = ''
 
     with open(filename, 'r') as json_file:
         data = json_file.read()
+
+    # delete rest of the path from filename (if not, "quic" filter of filname string doesn't work)
+    filename = os.path.basename(filename)
 
     # --- Client ---
     # have to dump server-logfile because contains 2 top-level json-objects
@@ -94,6 +98,7 @@ def dataloader(filename):
     # testrun_nr: which testrun (1,2, ..)
     # protocol: 'quic' or 'tcp'
     # participant: 'server' or 'client'
+    # location: local (on localhost) or network
     # events: eventsdict, so that events can be accessed zB via "eventsdict['session'] == timestamp"
     # handshakeduration in ns: (== -1 bei client)
     return {'testrun_nr': testrun_num, 'protocol': protocol, 'participant': participant,
@@ -109,6 +114,11 @@ def split_sec_in_min(sec):
     minute = sec // 60
     sec = sec % 60
     return minute, sec
+
+# get only elements out of list that are from the same "run" (== curr_run)
+def filter_list(data_dict, curr_run):
+    if data_dict['testrun_nr'] == curr_run:
+        return data_dict
 
 
 if __name__ == '__main__':
@@ -128,15 +138,25 @@ if __name__ == '__main__':
             file_info = dataloader(str(path / file))
             data_all_runs.append(file_info)
 
-
-    # static colors for graphs
+    # static colors for graphs -> quic == blue, tcp == red
     quic_serv_col = 'b'
     quic_client_col = 'c'
     col_tcp_serv = 'r'
     col_tcp_client = 'm'
 
-    # get all logfiles of directory
-    #logfiles = os.listdir(abs_path)
+    runs_in_total = int(len(data_all_runs) / 4)
+    print("runs in total: ", runs_in_total)
+
+    quit()
+
+# TODO: Separate local and network runs
+
+    for element in data_all_runs:
+        for run in range(runs_in_total):
+            filter()
+
+
+
 
     # init figure
     fig = plt.figure()
