@@ -13,8 +13,7 @@ import matplotlib.pyplot as plt
 # "keylog":"2021-01-09T20:23:21.791Z","secure":"2021-01-09T20:23:21.794Z","data":"2021-01-09T20:23:21.796Z","streamEnd":"2021-01-09T20:23:21.798Z","streamClose":"2021-01-09T20:23:31.805Z","socketClose":"2021-01-09T20:23:31.810Z"}{"handshakeDurationInNs":"6427581"}
 
 # Path to folder "measurements"
-abs_path = Path('/home/amelie/Uni/RNP_Komplexpraktikum/measurements_current/run3_local/')
-
+abs_path = Path('/home/amelie/Uni/RNP_Komplexpraktikum/measurements_current/run1_local/')
 
 curr_dict_tuple = 0
 events = 0
@@ -65,24 +64,10 @@ def merge_min_sec(minute, sec):
     return sec
 
 
-def split_sec_in_min(sec):
-    minute = sec // 60
-    sec = sec % 60
-    return minute, sec
-
-
 if __name__ == '__main__':
-
-    # static colors for graphs
-    quic_serv_col = 'b'
-    quic_client_col = 'c'
-    col_tcp_serv = 'r'
-    col_tcp_client = 'm'
 
     # get all logfiles of directory
     logfiles = os.listdir(abs_path)
-
-    #
 
     # init figure
     fig = plt.figure()
