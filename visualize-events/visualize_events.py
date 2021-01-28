@@ -113,6 +113,19 @@ def dataloader(filename):
             'events': eventsdict, 'handshakeduration_ns': handshakedur_ns}
 
 
+def sort_runs_by_number(unsorted_runs_list):
+    runs_in_total = int(len(unsorted_runs_list) / 4)
+    sorted_list = []
+
+    for run_nr in range(1, runs_in_total):  # testrun_num begins at 1
+        temp_list = []
+        for run in unsorted_runs_list:
+            if run['testrun_nr'] == run_nr:
+                temp_list.append(run)
+        sorted_list.append(temp_list)
+    return sorted_list
+
+
 def merge_min_sec(minute, sec):
     sec += minute * 60
     return sec
@@ -125,8 +138,8 @@ def split_sec_in_min(sec):
 
 
 # get only elements out of list that are from the same "run" (== curr_run)
-def filter_list(data_dict, curr_run):
-    if data_dict['testrun_nr'] == curr_run:
+def filter_list(data_dict, current_run):
+    if data_dict['testrun_nr'] == current_run:
         return data_dict
 
 
@@ -137,6 +150,9 @@ if __name__ == '__main__':
     #             'events': eventsdict, 'handshakeduration_ns': handshakedur_ns}
     all_runs = []
 
+    network_runs_unsorted = []
+    local_runs_unsorted = []
+
     for path in all_pathes:
         # get all json filenames at given path
         all_filenames = os.listdir(path)
@@ -145,7 +161,12 @@ if __name__ == '__main__':
         for file in all_filenames:
             # get dict with testrun_nr, participant (server/client) etc from dataloader
             file_info = dataloader(str(path / file))
-            all_runs.append(file_info)
+
+            # separate in local and network
+            if file_info['location'] == 'local':
+                local_runs_unsorted.append(file_info)
+            else:
+                network_runs_unsorted.append(file_info)
 
     # static colors for graphs -> quic == blue, tcp == red
     quic_serv_col = 'b'
@@ -153,19 +174,10 @@ if __name__ == '__main__':
     col_tcp_serv = 'r'
     col_tcp_client = 'm'
 
-    # Separate local and network runs
-    network_runs = []
-    local_runs = []
-    for element in all_runs:
-        if element['location'] == 'local':
-            local_runs.append(element)
-        else:
-            network_runs.append(element)
-
     # number of testruns network -> / 4 because 4 participants in every run
-    num_nw_runs = int(len(network_runs) / 4)
+    num_nw_runs = int(len(network_runs_unsorted) / 4)
     # number of testruns local
-    num_local_runs = int(len(local_runs) / 4)
+    num_local_runs = int(len(local_runs_unsorted) / 4)
 
     # init figure
     fig = plt.figure()
@@ -173,24 +185,11 @@ if __name__ == '__main__':
 
     # TODO: sort all runs into run1, run2, etc.
     # TODO: do this also for network runs -> currently only local
-    for run_num in range(num_local_runs):
-        # fill list new for every run
-        curr_run_list = []
-        for curr_run in local_runs:
-            if curr_run['testrun_nr'] == run_num:
 
-                curr_events = curr_run['events']
-
-                # time of events unformatted
-                events_timeline = list(curr_events.values())
-
-
+    nwrun_list = sort_runs_by_number(network_runs_unsorted)
+    localrun_list = sort_runs_by_number(local_runs_unsorted)
 
     quit()
-
-
-
-
 
     # über jeden file iterieren -> man weiß nicht welcher
     for n, file in enumerate(logfiles):
