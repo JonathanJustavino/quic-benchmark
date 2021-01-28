@@ -180,6 +180,7 @@ if __name__ == '__main__':
         all_participants = nwrun_list[run_nr_index]
 
         for participant in all_participants:
+
             # time of events unformatted
             events_time = list(participant['events'].values())  # i.e. ['2021-01-17T23:14:45.560Z', '2021-01-17T23:14:59.390Z',.]
 
@@ -200,8 +201,40 @@ if __name__ == '__main__':
             print('without minutes: ', events_time)
 
             # TODO: append events_time to x-axis, add keys (events) to y-axis -> then: plot
+            # TODO: !!! following code does not work correct
+            # generating plot
+            plt_x_axis = events_time
+            plt_y_axis = list(participant['events'].values())
+            color = ''
+            # get plot color -> not the best, maybe move to dataloader and make color part of dict
+            if participant['protocol'] == 'quic':
+                if participant['participant'] == 'server':
+                    color = quic_serv_col
+                else:
+                    color = quic_client_col
+            else:
+                if participant['participant'] == 'server':
+                    color = col_tcp_serv
+                else:
+                    color = col_tcp_client
 
-    quit()
+            ax.plot(plt_x_axis, plt_y_axis, c=color, marker='o', ls='', fillstyle='none',
+                    label=str(participant['protocol'] + "_" + participant['participant']))
+
+            # annotate each point on each graph
+            for (x, y) in zip(plt_x_axis, plt_y_axis):
+                if participant['protocol'] == 'quic':
+                    ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', color=color)
+                else:
+                    ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, -15), ha='center', color=color)
+
+            plt.grid(1)
+            # ToDo: position von text korrigieren -> am besten neben legende
+            # plt.text(1, -1, "RTT:", fontsize=10)
+            plt.legend(bbox_to_anchor=(0, 0), loc="upper left")
+            plt.show()
+
+        quit()
 
 
 
