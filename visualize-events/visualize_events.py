@@ -163,17 +163,33 @@ if __name__ == '__main__':
             network_runs.append(element)
 
     # number of testruns network -> / 4 because 4 participants in every run
-    num_nw_runs = len(network_runs) / 4
+    num_nw_runs = int(len(network_runs) / 4)
     # number of testruns local
-    num_local_runs = len(local_runs) / 4
-
-    quit()
-
-    # TODO: sort all runs into run1, run2, etc.
+    num_local_runs = int(len(local_runs) / 4)
 
     # init figure
     fig = plt.figure()
     ax = fig.add_subplot(111)
+
+    # TODO: sort all runs into run1, run2, etc.
+    # TODO: do this also for network runs -> currently only local
+    for run_num in range(num_local_runs):
+        # fill list new for every run
+        curr_run_list = []
+        for curr_run in local_runs:
+            if curr_run['testrun_nr'] == run_num:
+
+                curr_events = curr_run['events']
+
+                # time of events unformatted
+                events_timeline = list(curr_events.values())
+
+
+
+    quit()
+
+
+
 
 
     # über jeden file iterieren -> man weiß nicht welcher
