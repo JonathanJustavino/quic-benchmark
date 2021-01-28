@@ -13,23 +13,15 @@ import re
 # zB {"listening":"2021-01-09T20:23:17.230Z","session":"2021-01-09T20:23:21.787Z",
 # "keylog":"2021-01-09T20:23:21.791Z","secure":"2021-01-09T20:23:21.794Z","data":"2021-01-09T20:23:21.796Z","streamEnd":"2021-01-09T20:23:21.798Z","streamClose":"2021-01-09T20:23:31.805Z","socketClose":"2021-01-09T20:23:31.810Z"}{"handshakeDurationInNs":"6427581"}
 
-# OLD Path to folder "measurements"
-# abs_path = Path('../tcp/measurements/tcp-local/')
-
-# Path-dict
+# List with all paths
 all_pathes = [Path('../tcp/measurements/tcp-local/timestamps/'),
               Path('../tcp/measurements/tcp-same-network/timestamps/'),
               Path('../quic/measurements/quic-local/timestamps/'),
               Path('../quic/measurements/quic-same-network/timestamps/')]
 
-curr_dict_tuple = 0
-events = 0
-events_timeline_seconds = 0
-
 # get all numbers [0-9]
 # \d: Matches any decimal digit; this is equivalent to the class [0-9].
 regex = re.compile(r'\d+')
-
 
 # split 2021-01-09T20:23:17.230Z -> [2021,01,09] [20, 23, 17.23]
 # expects string -> returns (list[int], list[float])
@@ -97,9 +89,10 @@ def dataloader(filename):
         protocol = 'tcp'
 
     # --- get test-round: ----
-    # -> aus filname auslesen mit regex
+    # -> read test-run-nr from filname with regex
     testrun_num = [int(nr_string) for nr_string in regex.findall(filename)]
-    # Liste entfernen TODO: was ist wenn testrun-anzahl > 9 also 2stellig? regex checkt bisher nur 1 element
+    # TODO: was ist wenn testrun-anzahl > 9 ? regex checkt bisher nur 1 element
+    # delete list wrapping
     testrun_num = testrun_num[0]
 
     # --- returns: ---
@@ -183,7 +176,8 @@ if __name__ == '__main__':
 
     quit()
 
-
+    # 1 graph per run_nr
+    for run_nr in nwrun_list:
 
 
 
