@@ -7,6 +7,7 @@ import argparse
 from threading import Thread
 from io import BytesIO
 from pythonping import ping
+from traffic.shark import monitor_network
 
 
 client = docker.from_env()
@@ -112,7 +113,6 @@ def start_thread(**kwargs):
     parameter = list(kwargs.values())
     thread = Thread(target=kwargs['target'], args=(parameter[1:]))
     thread.start()
-    thread.join()
 
 
 if __name__ == "__main__":
@@ -157,8 +157,11 @@ if __name__ == "__main__":
         elif args.client:
             ip = "192.168.52.37"
 
+
     build_image()
     network = create_network()
     container_thread = None
     start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
+    if args.client:
+        start_thread(target=monitor_network, socket_type=socket_type, continuously=False)
     start_thread(target=ping_container, public_ip=public_ip)
