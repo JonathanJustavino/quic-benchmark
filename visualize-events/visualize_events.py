@@ -23,10 +23,11 @@ all_pathes = [Path('../tcp/measurements/tcp-local/timestamps/'),
 # \d: Matches any decimal digit; this is equivalent to the class [0-9].
 regex = re.compile(r'\d+')
 
+
 # split 2021-01-09T20:23:17.230Z -> [2021,01,09] [20, 23, 17.23]
 # expects string -> returns (list[int], list[float])
-def split_timestamp(timestamp):
-    lists = timestamp.split('T')
+def split_timestamp(timestamp_):
+    lists = timestamp_.split('T')
 
     datelist = lists[0].split('-')
     # convert to int
@@ -46,7 +47,7 @@ def split_timestamp(timestamp):
 def dataloader(filename):
     testrun_num = 0
     protocol = ''
-    participant = ''
+    participant_ = ''
     eventsdict = {}
     handshakedur_ns = 0
     location = ''
@@ -72,14 +73,14 @@ def dataloader(filename):
         # delete empty error message
         del eventsdict['error']
         handshakedur_ns = -1
-        participant = 'client'
+        participant_ = 'client'
     # --- Participant: Server ---
     else:
         # split json dict -> events, handshakeDurationInNs
         pydict = json.loads(data)
         eventsdict = pydict['events']
         handshakedur_ns = pydict['durations']['handshakeDurationInNs']
-        participant = 'server'
+        participant_ = 'server'
 
     # --- QUIC - protocol ---
     if 'quic' in filename:
@@ -102,7 +103,7 @@ def dataloader(filename):
     # location: local (on localhost) or network
     # events: eventsdict, so that events can be accessed zB via "eventsdict['session'] == timestamp"
     # handshakeduration in ns: (== -1 bei client)
-    return {'testrun_nr': testrun_num, 'protocol': protocol, 'participant': participant, 'location': location,
+    return {'testrun_nr': testrun_num, 'protocol': protocol, 'participant': participant_, 'location': location,
             'events': eventsdict, 'handshakeduration_ns': handshakedur_ns}
 
 
@@ -110,7 +111,7 @@ def sort_runs_by_number(unsorted_runs_list):
     runs_in_total = int(len(unsorted_runs_list) / 4)
     sorted_list = []
 
-    for run_nr in range(1, runs_in_total):  # testrun_num begins at 1
+    for run_nr in range(1, runs_in_total+1):  # testrun_num begins at 1
         temp_list = []
         for run in unsorted_runs_list:
             if run['testrun_nr'] == run_nr:
@@ -174,12 +175,33 @@ if __name__ == '__main__':
     nwrun_list = sort_runs_by_number(network_runs_unsorted)
     localrun_list = sort_runs_by_number(local_runs_unsorted)
 
+    # 1 graph per run
+    for run_nr_index in range(0, len(nwrun_list)):
+        all_participants = nwrun_list[run_nr_index]
+
+        for participant in all_participants:
+            # time of events unformatted
+            events_time = list(participant['events'].values())  # i.e. ['2021-01-17T23:14:45.560Z', '2021-01-17T23:14:59.390Z',.]
+
+            # convert timestamps into seconds
+            for index, timestamp in enumerate(events_time):
+                global_sec = split_timestamp(timestamp)[1][2]  # return datelist=[year,..], timelist=[h, min, sec]
+                global_min = split_timestamp(timestamp)[1][1]
+                seconds = merge_min_sec(global_min, global_sec)
+                events_time[index] = seconds  # seconds as absolute number
+
+            # normalize timeline so it starts from zero + round time(float) to 5 decimal places
+            events_time = [round((abs_time_sec - events_time[0]), 5) for abs_time_sec in events_time]
+            print('with minutes: ', events_time)
+
+            # TODO: why doesnt removing minutes make a difference? lol
+            # remove full minutes -> show only seconds
+            events_time = [split_sec_in_min(seconds)[1] for seconds in events_time]
+            print('without minutes: ', events_time)
+
+            # TODO: append events_time to x-axis, add keys (events) to y-axis -> then: plot
+
     quit()
-
-    # 1 graph per run_nr
-    for run_nr in nwrun_list:
-
-
 
 
 
@@ -192,6 +214,7 @@ if __name__ == '__main__':
 
         # time of events unformatted
         events_timeline = list(events.values())
+
         # -> get eventtime in seconds
         # j = zB ([2021, 01, 09], [20, 23, 21.786] -> 21,786 (seconds))
         events_timeline_seconds = [split_timestamp(j)[1][2] for j in events_timeline]
