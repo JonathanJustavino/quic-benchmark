@@ -150,9 +150,9 @@ if __name__ == '__main__':
     #             'events': eventsdict, 'handshakeduration_ns': handshakedur_ns}
     all_runs = []
 
+    # Get all runs (local and network) into 2 unsorted lists:
     network_runs_unsorted = []
     local_runs_unsorted = []
-
     for path in all_pathes:
         # get all json filenames at given path
         all_filenames = os.listdir(path)
@@ -174,22 +174,20 @@ if __name__ == '__main__':
     col_tcp_serv = 'r'
     col_tcp_client = 'm'
 
-    # number of testruns network -> / 4 because 4 participants in every run
-    num_nw_runs = int(len(network_runs_unsorted) / 4)
-    # number of testruns local
-    num_local_runs = int(len(local_runs_unsorted) / 4)
-
     # init figure
     fig = plt.figure()
     ax = fig.add_subplot(111)
-
-    # TODO: sort all runs into run1, run2, etc.
-    # TODO: do this also for network runs -> currently only local
 
     nwrun_list = sort_runs_by_number(network_runs_unsorted)
     localrun_list = sort_runs_by_number(local_runs_unsorted)
 
     quit()
+
+
+
+
+
+
 
     # über jeden file iterieren -> man weiß nicht welcher
     for n, file in enumerate(logfiles):
