@@ -135,7 +135,7 @@ if __name__ == '__main__':
     # list that contains all dicts from all testruns + participants
     # of the form: {'testrun_nr': testrun_num, 'protocol': protocol, 'participant': participant,
     #             'events': eventsdict, 'handshakeduration_ns': handshakedur_ns}
-    data_all_runs = []
+    all_runs = []
 
     for path in all_pathes:
         # get all json filenames at given path
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         for file in all_filenames:
             # get dict with testrun_nr, participant (server/client) etc from dataloader
             file_info = dataloader(str(path / file))
-            data_all_runs.append(file_info)
+            all_runs.append(file_info)
 
     # static colors for graphs -> quic == blue, tcp == red
     quic_serv_col = 'b'
@@ -153,22 +153,20 @@ if __name__ == '__main__':
     col_tcp_serv = 'r'
     col_tcp_client = 'm'
 
-    runs_in_total = int(len(data_all_runs) / 4)
-    print("runs in total (network + local): ", runs_in_total)
-
-    # TODO: Separate local and network runs
+    # Separate local and network runs
     network_runs = []
     local_runs = []
-
-    for element in data_all_runs:
+    for element in all_runs:
         if element['location'] == 'local':
             local_runs.append(element)
         else:
             network_runs.append(element)
-    print('elemente in local runs: ', local_runs)
-    print('# elemente in local runs: ', len(local_runs))
-    print('elemente in nw runs: ', network_runs)
-    print('# elemente in nw runs: ', len(network_runs))
+
+    # number of testruns network -> / 4 because 4 participants in every run
+    num_nw_runs = len(network_runs) / 4
+    # number of testruns local
+    num_local_runs = len(local_runs) / 4
+
     quit()
 
     # TODO: sort all runs into run1, run2, etc.
@@ -176,6 +174,7 @@ if __name__ == '__main__':
     # init figure
     fig = plt.figure()
     ax = fig.add_subplot(111)
+
 
     # über jeden file iterieren -> man weiß nicht welcher
     for n, file in enumerate(logfiles):
