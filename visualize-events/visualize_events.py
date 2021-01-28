@@ -14,7 +14,7 @@ import re
 # "keylog":"2021-01-09T20:23:21.791Z","secure":"2021-01-09T20:23:21.794Z","data":"2021-01-09T20:23:21.796Z","streamEnd":"2021-01-09T20:23:21.798Z","streamClose":"2021-01-09T20:23:31.805Z","socketClose":"2021-01-09T20:23:31.810Z"}{"handshakeDurationInNs":"6427581"}
 
 # OLD Path to folder "measurements"
-#abs_path = Path('../tcp/measurements/tcp-local/')
+# abs_path = Path('../tcp/measurements/tcp-local/')
 
 # Path-dict
 all_pathes = [Path('../tcp/measurements/tcp-local/timestamps/'),
@@ -29,6 +29,7 @@ events_timeline_seconds = 0
 # get all numbers [0-9]
 # \d: Matches any decimal digit; this is equivalent to the class [0-9].
 regex = re.compile(r'\d+')
+
 
 # split 2021-01-09T20:23:17.230Z -> [2021,01,09] [20, 23, 17.23]
 # expects string -> returns (list[int], list[float])
@@ -51,7 +52,6 @@ def split_timestamp(timestamp):
 # loads json file and converts it to python dictionary
 # Bekommt absoluten Pfad zu file
 def dataloader(filename):
-
     testrun_num = 0
     protocol = ''
     participant = ''
@@ -99,7 +99,7 @@ def dataloader(filename):
     # --- get test-round: ----
     # -> aus filname auslesen mit regex
     testrun_num = [int(nr_string) for nr_string in regex.findall(filename)]
-    # Liste entfernen TODO: was ist wenn testrun-anzahl > 9 also 2stellig? sind das dann 2 Listenenel?
+    # Liste entfernen TODO: was ist wenn testrun-anzahl > 9 also 2stellig? regex checkt bisher nur 1 element
     testrun_num = testrun_num[0]
 
     # --- returns: ---
@@ -122,6 +122,7 @@ def split_sec_in_min(sec):
     minute = sec // 60
     sec = sec % 60
     return minute, sec
+
 
 # get only elements out of list that are from the same "run" (== curr_run)
 def filter_list(data_dict, curr_run):
@@ -153,18 +154,24 @@ if __name__ == '__main__':
     col_tcp_client = 'm'
 
     runs_in_total = int(len(data_all_runs) / 4)
-    print("runs in total: ", runs_in_total)
+    print("runs in total (network + local): ", runs_in_total)
 
-    quit()
-
-# TODO: Separate local and network runs
+    # TODO: Separate local and network runs
+    network_runs = []
+    local_runs = []
 
     for element in data_all_runs:
-        for run in range(runs_in_total):
-            filter()
+        if element['location'] == 'local':
+            local_runs.append(element)
+        else:
+            network_runs.append(element)
+    print('elemente in local runs: ', local_runs)
+    print('# elemente in local runs: ', len(local_runs))
+    print('elemente in nw runs: ', network_runs)
+    print('# elemente in nw runs: ', len(network_runs))
+    quit()
 
-
-
+    # TODO: sort all runs into run1, run2, etc.
 
     # init figure
     fig = plt.figure()
@@ -215,4 +222,3 @@ if __name__ == '__main__':
     # plt.text(1, -1, "RTT:", fontsize=10)
     plt.legend(bbox_to_anchor=(0, 0), loc="upper left")
     plt.show()
-
