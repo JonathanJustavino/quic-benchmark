@@ -168,18 +168,19 @@ if __name__ == '__main__':
     col_tcp_serv = 'r'
     col_tcp_client = 'm'
 
-    # init figure
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-
     nwrun_list = sort_runs_by_number(network_runs_unsorted)
     localrun_list = sort_runs_by_number(local_runs_unsorted)
 
     # 1 graph per run
     for run_nr_index in range(0, len(nwrun_list)):
+
+        # init figure
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
         all_participants = nwrun_list[run_nr_index]
 
-        for participant in all_participants:
+        for n, participant in enumerate(all_participants):
 
             # time of events unformatted
             events_time = list(participant['events'].values())  # i.e. ['2021-01-17T23:14:45.560Z', '2021-01-17T23:14:59.390Z',.]
@@ -193,18 +194,19 @@ if __name__ == '__main__':
 
             # normalize timeline so it starts from zero + round time(float) to 5 decimal places
             events_time = [round((abs_time_sec - events_time[0]), 5) for abs_time_sec in events_time]
-            print('with minutes: ', events_time)
+            # print('with minutes: ', events_time)
 
             # TODO: why doesnt removing minutes make a difference? lol
             # remove full minutes -> show only seconds
             events_time = [split_sec_in_min(seconds)[1] for seconds in events_time]
-            print('without minutes: ', events_time)
+            # print('without minutes: ', events_time)
 
             # TODO: append events_time to x-axis, add keys (events) to y-axis -> then: plot
             # TODO: !!! following code does not work correct
             # generating plot
             plt_x_axis = events_time
             plt_y_axis = list(participant['events'].keys())
+            print("y- axis in round: ", n, plt_y_axis)
             color = ''
             # get plot color -> not the best, maybe move to dataloader and make color part of dict
             if participant['protocol'] == 'quic':
@@ -221,20 +223,27 @@ if __name__ == '__main__':
             ax.plot(plt_x_axis, plt_y_axis, c=color, marker='o', ls='', fillstyle='none',
                     label=str(participant['protocol'] + "_" + participant['participant']))
 
+            print("Teilnehmer: ", n, "in aktuellem Durchlauf: ", run_nr_index)
+            print('das wird an ax.plot hinzugefügt: x-achse: ', plt_x_axis)
+            print('y-achse: ', plt_y_axis)
+
             # annotate each point on each graph
             for (x, y) in zip(plt_x_axis, plt_y_axis):
                 if participant['protocol'] == 'quic':
                     ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', color=color)
                 else:
                     ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, -15), ha='center', color=color)
+            # participant changes
+        # run number changes
+    # after all runs & participants
 
         plt.grid(1)
         # ToDo: position von text korrigieren -> am besten neben legende
         # plt.text(1, -1, "RTT:", fontsize=10)
-        plt.legend(bbox_to_anchor=(0, 0), loc="upper left")
+        plt.legend(bbox_to_anchor=(0, 0), loc="upper left")  # No handles with labels found to put in legend.
         plt.show()
 
-    quit()
+    exit()
 
 
 
