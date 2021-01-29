@@ -115,6 +115,11 @@ def start_thread(**kwargs):
     thread.start()
 
 
+def get_network_interface():
+    nets = client.networks.get("nodejs_net")
+    return nets.attrs['Id']
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Choose to run with socket \
     type tcp-tls or quic and service type client or server')
@@ -138,7 +143,9 @@ if __name__ == "__main__":
         container_type = "client"
 
     public_ip = args.ipaddress
+
     interface = "br-bbd147c17183"
+    interface = get_network_interface()
 
     if args.quic:
         socket_type = "quic"
