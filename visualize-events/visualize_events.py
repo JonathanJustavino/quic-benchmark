@@ -201,8 +201,6 @@ if __name__ == '__main__':
             events_time = [split_sec_in_min(seconds)[1] for seconds in events_time]
             # print('without minutes: ', events_time)
 
-            # TODO: append events_time to x-axis, add keys (events) to y-axis -> then: plot
-            # TODO: !!! following code does not work correct
             # generating plot
             plt_x_axis = events_time
             plt_y_axis = list(participant['events'].keys())
@@ -233,6 +231,7 @@ if __name__ == '__main__':
                     ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, 10), ha='center', color=color)
                 else:
                     ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, -15), ha='center', color=color)
+
             # participant changes
         # run number changes
     # after all runs & participants
