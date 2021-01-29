@@ -3,6 +3,7 @@ from pathlib import Path
 import os
 import matplotlib.pyplot as plt
 import re
+import sys
 
 # Client events:
 # ready, writeToServer, error
@@ -137,6 +138,21 @@ def filter_list(data_dict, current_run):
         return data_dict
 
 
+def parse_argv(nwruns_list, localruns_list):
+
+    # default: localrun_list
+    list_runs = localrun_list
+
+    if sys.argv[1] == 'local' or 'network':
+        # change to network only if said so in argv
+        if sys.argv[1] == 'network':
+            list_runs = nwruns_list
+    else:
+        print("Wrong argument for run location: Has to be 'local' or 'network'.")
+
+    return list_runs
+
+
 if __name__ == '__main__':
 
     # list that contains all dicts from all testruns + participants
@@ -171,14 +187,21 @@ if __name__ == '__main__':
     nwrun_list = sort_runs_by_number(network_runs_unsorted)
     localrun_list = sort_runs_by_number(local_runs_unsorted)
 
+    # standard value list_all_runs:
+    list_all_runs = nwrun_list
+
+    if len(sys.argv) > 1:
+        parse_argv(nwrun_list, localrun_list)
+
     # 1 graph per run
-    for run_nr_index in range(0, len(nwrun_list)):
+    for run_nr_index in range(0, len(list_all_runs)):
 
         # init figure
         fig = plt.figure()
+        fig.suptitle("")
         ax = fig.add_subplot(111)
 
-        all_participants = nwrun_list[run_nr_index]
+        all_participants = list_all_runs[run_nr_index]
 
         for n, participant in enumerate(all_participants):
 
@@ -194,12 +217,10 @@ if __name__ == '__main__':
 
             # normalize timeline so it starts from zero + round time(float) to 5 decimal places
             events_time = [round((abs_time_sec - events_time[0]), 5) for abs_time_sec in events_time]
-            # print('with minutes: ', events_time)
 
-            # TODO: why doesnt removing minutes make a difference? lol
+            # TODO: why doesnt removing minutes make a difference? lol -> maybe unnecessary
             # remove full minutes -> show only seconds
             events_time = [split_sec_in_min(seconds)[1] for seconds in events_time]
-            # print('without minutes: ', events_time)
 
             # generating plot
             plt_x_axis = events_time
