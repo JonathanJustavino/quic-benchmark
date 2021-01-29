@@ -198,7 +198,7 @@ if __name__ == '__main__':
 
         # init figure
         fig = plt.figure()
-        fig.suptitle("")
+        fig.suptitle(list_runs_selected_location[0][0]['location'] + "_run_" + str(run_nr_index))
         ax = fig.add_subplot(111)
 
         all_participants = list_runs_selected_location[run_nr_index]
@@ -262,3 +262,4 @@ if __name__ == '__main__':
         # plt.text(1, -1, "RTT:", fontsize=10)
         plt.legend(bbox_to_anchor=(0, 0), loc="upper left")  # No handles with labels found to put in legend.
         plt.show()
+        #fig.savefig('')
