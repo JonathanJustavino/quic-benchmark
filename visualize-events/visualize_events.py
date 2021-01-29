@@ -187,11 +187,11 @@ if __name__ == '__main__':
     nwrun_list = sort_runs_by_number(network_runs_unsorted)
     localrun_list = sort_runs_by_number(local_runs_unsorted)
 
-    # standard value list_all_runs:
-    list_runs_selected_location = nwrun_list
-
     if len(sys.argv) > 1:
-        parse_argv(nwrun_list, localrun_list)
+        list_runs_selected_location = parse_argv(nwrun_list, localrun_list)
+    else:
+        # standard value list_all_runs:
+        list_runs_selected_location = localrun_list
 
     # 1 graph per run
     for run_nr_index in range(0, len(list_runs_selected_location)):
