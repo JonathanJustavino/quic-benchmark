@@ -198,6 +198,7 @@ if __name__ == '__main__':
 
         # init figure
         fig = plt.figure()
+        # set title of figure to location(network/local) + testrun number
         fig.suptitle(list_runs_selected_location[0][0]['location'] + "_run_" + str(run_nr_index))
         ax = fig.add_subplot(111)
 
@@ -242,10 +243,6 @@ if __name__ == '__main__':
             ax.plot(plt_x_axis, plt_y_axis, c=color, marker='o', ls='', fillstyle='none',
                     label=str(participant['protocol'] + "_" + participant['participant']))
 
-            print("Teilnehmer: ", n, "in aktuellem Durchlauf: ", run_nr_index)
-            print('das wird an ax.plot hinzugefügt: x-achse: ', plt_x_axis)
-            print('y-achse: ', plt_y_axis)
-
             # annotate each point on each graph
             for (x, y) in zip(plt_x_axis, plt_y_axis):
                 if participant['protocol'] == 'quic':
@@ -253,14 +250,14 @@ if __name__ == '__main__':
                 else:
                     ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, -15), ha='center', color=color)
 
-            # participant changes
-        # run number changes
-    # after all runs & participants
-
+        # show grid in figure
         plt.grid(1)
+
+        # set labels for x- and y-axis
         plt.xlabel('Timeline of connection in seconds')
         plt.ylabel('Events of connection')
-        # ToDo: position von text korrigieren -> am besten neben legende
+
+        # ToDo: position von RTT -text korrigieren -> am besten neben legende
         # plt.text(1, -1, "RTT:", fontsize=10)
         plt.legend(bbox_to_anchor=(0, 0), loc="upper left")  # No handles with labels found to put in legend.
         plt.show()
