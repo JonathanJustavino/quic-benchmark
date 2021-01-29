@@ -187,7 +187,7 @@ if __name__ == '__main__':
     nwrun_list = sort_runs_by_number(network_runs_unsorted)
     localrun_list = sort_runs_by_number(local_runs_unsorted)
 
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 2:
         list_runs_selected_location = parse_argv(nwrun_list, localrun_list)
     else:
         # standard value list_all_runs:
@@ -199,7 +199,8 @@ if __name__ == '__main__':
         # init figure
         fig = plt.figure()
         # set title of figure to location(network/local) + testrun number
-        fig.suptitle(list_runs_selected_location[0][0]['location'] + "_run_" + str(run_nr_index))
+        fig_title = list_runs_selected_location[0][0]['location'] + "_run_" + str(run_nr_index)
+        fig.suptitle(fig_title)
         ax = fig.add_subplot(111)
 
         all_participants = list_runs_selected_location[run_nr_index]
@@ -226,8 +227,8 @@ if __name__ == '__main__':
             # generating plot
             plt_x_axis = events_time
             plt_y_axis = list(participant['events'].keys())
-            print("y- axis in round: ", n, plt_y_axis)
             color = ''
+
             # get plot color -> not the best, maybe move to dataloader and make color part of dict
             if participant['protocol'] == 'quic':
                 if participant['participant'] == 'server':
@@ -260,5 +261,5 @@ if __name__ == '__main__':
         # ToDo: position von RTT -text korrigieren -> am besten neben legende
         # plt.text(1, -1, "RTT:", fontsize=10)
         plt.legend(bbox_to_anchor=(0, 0), loc="upper left")  # No handles with labels found to put in legend.
-        plt.show()
-        #fig.savefig('')
+        # plt.show()
+        fig.savefig('figures/' + fig_title + '.png')
