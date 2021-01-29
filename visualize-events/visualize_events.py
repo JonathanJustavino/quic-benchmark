@@ -204,7 +204,7 @@ if __name__ == '__main__':
             # TODO: !!! following code does not work correct
             # generating plot
             plt_x_axis = events_time
-            plt_y_axis = list(participant['events'].values())
+            plt_y_axis = list(participant['events'].keys())
             color = ''
             # get plot color -> not the best, maybe move to dataloader and make color part of dict
             if participant['protocol'] == 'quic':
@@ -228,13 +228,13 @@ if __name__ == '__main__':
                 else:
                     ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, -15), ha='center', color=color)
 
-            plt.grid(1)
-            # ToDo: position von text korrigieren -> am besten neben legende
-            # plt.text(1, -1, "RTT:", fontsize=10)
-            plt.legend(bbox_to_anchor=(0, 0), loc="upper left")
-            plt.show()
+        plt.grid(1)
+        # ToDo: position von text korrigieren -> am besten neben legende
+        # plt.text(1, -1, "RTT:", fontsize=10)
+        plt.legend(bbox_to_anchor=(0, 0), loc="upper left")
+        plt.show()
 
-        quit()
+    quit()
 
 
 
