@@ -258,6 +258,8 @@ if __name__ == '__main__':
     # after all runs & participants
 
         plt.grid(1)
+        plt.xlabel('Timeline of connection in seconds')
+        plt.ylabel('Events of connection')
         # ToDo: position von text korrigieren -> am besten neben legende
         # plt.text(1, -1, "RTT:", fontsize=10)
         plt.legend(bbox_to_anchor=(0, 0), loc="upper left")  # No handles with labels found to put in legend.
