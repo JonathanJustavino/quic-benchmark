@@ -188,20 +188,20 @@ if __name__ == '__main__':
     localrun_list = sort_runs_by_number(local_runs_unsorted)
 
     # standard value list_all_runs:
-    list_all_runs = nwrun_list
+    list_runs_selected_location = nwrun_list
 
     if len(sys.argv) > 1:
         parse_argv(nwrun_list, localrun_list)
 
     # 1 graph per run
-    for run_nr_index in range(0, len(list_all_runs)):
+    for run_nr_index in range(0, len(list_runs_selected_location)):
 
         # init figure
         fig = plt.figure()
         fig.suptitle("")
         ax = fig.add_subplot(111)
 
-        all_participants = list_all_runs[run_nr_index]
+        all_participants = list_runs_selected_location[run_nr_index]
 
         for n, participant in enumerate(all_participants):
 
