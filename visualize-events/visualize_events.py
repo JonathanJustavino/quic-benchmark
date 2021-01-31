@@ -199,7 +199,7 @@ if __name__ == '__main__':
         # init figure
         fig = plt.figure()
         # set title of figure to location(network/local) + testrun number
-        fig_title = list_runs_selected_location[0][0]['location'] + "_run_" + str(run_nr_index)
+        fig_title = list_runs_selected_location[0][0]['location'] + "_run_" + str(run_nr_index + 1)
         fig.suptitle(fig_title)
         ax = fig.add_subplot(111)
 
@@ -271,6 +271,6 @@ if __name__ == '__main__':
         # Legend on the right:
         # plt.legend(bbox_to_anchor=(1.135, 0.5), loc="center right")
 
-        plt.show()
-        quit()
-        #fig.savefig('figures/' + fig_title + '.png')
+        # plt.show()
+
+        fig.savefig('figures/' + fig_title + '.png')
