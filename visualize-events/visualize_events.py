@@ -241,7 +241,7 @@ if __name__ == '__main__':
                 else:
                     color = col_tcp_client
 
-            ax.plot(plt_x_axis, plt_y_axis, c=color, marker='o', ls='', fillstyle='none',
+            ax.plot(plt_x_axis, plt_y_axis, c=color, marker='o', ls='',
                     label=str(participant['protocol'] + "_" + participant['participant']))
 
             # annotate each point on each graph
@@ -271,6 +271,6 @@ if __name__ == '__main__':
         # Legend on the right:
         # plt.legend(bbox_to_anchor=(1.135, 0.5), loc="center right")
 
-        # plt.show()
-
-        fig.savefig('figures/' + fig_title + '.png')
+        plt.show()
+        quit()
+        #fig.savefig('figures/' + fig_title + '.png')
