@@ -251,6 +251,10 @@ if __name__ == '__main__':
                 else:
                     ax.annotate(x, (x, y), textcoords="offset points", xytext=(0, -15), ha='center', color=color)
 
+        # resize figure -> if not, stuff gets cut off
+        plt.rcParams["figure.figsize"] = (14, 10)
+        print("figsize for run ", run_nr_index, "is ", plt.rcParams["figure.figsize"])
+
         # show grid in figure
         plt.grid(1)
 
@@ -260,6 +264,13 @@ if __name__ == '__main__':
 
         # ToDo: position von RTT -text korrigieren -> am besten neben legende
         # plt.text(1, -1, "RTT:", fontsize=10)
-        plt.legend(bbox_to_anchor=(0, 0), loc="upper left")  # No handles with labels found to put in legend.
+
+        # Legend on the bottom:
+        plt.legend(bbox_to_anchor=(0, 0, 1, 0), loc="upper left", mode="expand", borderaxespad=3.5, ncol=4)  # No handles with labels found to put in legend.
+
+        # Legend on the right:
+        # plt.legend(bbox_to_anchor=(1.135, 0.5), loc="center right")
+
         # plt.show()
+
         fig.savefig('figures/' + fig_title + '.png')
