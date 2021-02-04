@@ -6,8 +6,8 @@ import json
 import argparse
 from threading import Thread
 from io import BytesIO
-from pythonping import ping
 from traffic.shark import monitor_network
+from traffic.ping import check_network_usage, ping_service, clone_ping_to_json
 
 
 client = docker.from_env()
@@ -89,23 +89,6 @@ def pull_measurements(container_name, file_name):
     remove_container(container_name)
 
 
-def ping_container(target, count=10):
-    response_list = ping(target, verbose=True, count=count)
-    my_list = list(response_list._responses)
-    f = lambda x: f"{x}"
-
-    ping_response = {
-        "avg rtt(ms)": response_list.rtt_avg_ms, # average round-trip time in miliseconds
-        "min rtt(ms)": response_list.rtt_min_ms, # minimum round-trip time in miliseconds
-        "max rtt(ms)": response_list.rtt_max_ms, # maximum round-trip time in miliseconds
-        "packet loss": response_list.packet_loss, # number of packets lost
-        "responses": list(map(f, my_list)) # list of pings
-    }
-
-    with open('ping.json', 'w') as fp:
-        json.dump(ping_response, fp, indent=2)
-
-
 def start_thread(**kwargs):
     if 'target' not in kwargs.keys():
         print("No target function set")
@@ -133,7 +116,6 @@ if __name__ == "__main__":
                         const="", default="", 
                         help='Define a remote ip to the machine where server is running')
 
-    parser.print_help()
     args = parser.parse_args()
 
     port = ""
@@ -141,8 +123,6 @@ if __name__ == "__main__":
         container_type = "server"
     if args.client:
         container_type = "client"
-
-    public_ip = args.ipaddress
 
     interface = "br-bbd147c17183"
     interface = get_network_interface()
@@ -155,6 +135,7 @@ if __name__ == "__main__":
             port = 1234
         elif args.client:
             ip = "192.168.52.39"
+            server_ip = "192.168.52.38"
     elif args.tcp:
         socket_type = "tcp-tls"
         cap_filter = "tcp port 1337"
@@ -163,12 +144,21 @@ if __name__ == "__main__":
             ip = "192.168.52.36"
         elif args.client:
             ip = "192.168.52.37"
+            server_ip = "192.168.52.36"
 
+    if args.ipaddress:
+        server_ip = args.ipaddress
 
     build_image()
     network = create_network()
     container_thread = None
-    start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
+    if args.server:
+        start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
     if args.client:
+        clone_ping_to_json()
+        low_network_usage = check_network_usage(server_ip)
+        if not low_network_usage:
+            exit()
+        start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
         start_thread(target=monitor_network, socket_type=socket_type, continuously=False)
-    start_thread(target=ping_container, public_ip=public_ip)
+        start_thread(target=ping_service, public_ip=server_ip)

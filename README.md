@@ -8,18 +8,10 @@
 pip3 install docker
 ```
 
-[pythonping](https://pypi.org/project/pythonping/):
+[tshark](https://tshark.dev/setup/install/):
 
 ```[bash]
-pip3 install pythonping
-```
-
-[pyshark](https://github.com/KimiNewt/pyshark): we recommend installing from repository
-
-```[bash]
-git clone https://github.com/KimiNewt/pyshark.git
-cd pyshark/src
-python setup.py install
+sudo apt-get install tshark
 ```
 
 [ttab](https://www.npmjs.com/package/ttab):
@@ -49,15 +41,15 @@ npm run quic
 To run the setup in docker you do not have to have nodejs installed. instead the image, which is built from the [Dockerfile](Dockerfile) is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
 
 ```[bash]
-sudo python3 run_server_client.py quic server
-sudo python3 run_server_client.py quic client
+sudo python3 run_server_client.py -q -s
+sudo python3 run_server_client.py -q -c
 ```
 
 or
 
 ```[bash]
-sudo python3 run_server_client.py tcptls server
-sudo python3 run_server_client.py tcptls client
+sudo python3 run_server_client.py -t -s
+sudo python3 run_server_client.py -t -c
 ```
 
 > Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
