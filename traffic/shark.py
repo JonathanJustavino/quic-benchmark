@@ -22,8 +22,7 @@ def capture_packets_continuously(interface, filter="", output_file="", amount_of
     subprocess.run(command, shell=True, check=True)
 
 
-def monitor_network(socket_type, continuously=False):
-    interface = 'br-bbd147c17183'
+def monitor_network(socket_type, interface, continuously=False):
     pkt_filter = ''
 
     if socket_type == 'quic':

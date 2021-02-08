@@ -100,7 +100,8 @@ def start_thread(**kwargs):
 
 def get_network_interface():
     nets = client.networks.get("nodejs_net")
-    return nets.attrs['Id']
+    interface = f"br-{nets.attrs['Id'][:12]}"
+    return interface
 
 
 if __name__ == "__main__":
@@ -160,5 +161,5 @@ if __name__ == "__main__":
         if not low_network_usage:
             exit()
         start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
-        start_thread(target=monitor_network, socket_type=socket_type, continuously=False)
+        start_thread(target=monitor_network, socket_type=socket_type, interface=interface, continuously=False)
         start_thread(target=ping_service, public_ip=server_ip)
