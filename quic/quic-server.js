@@ -8,6 +8,8 @@ const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
 const port = 1234;
 
+const logFile = fs.createWriteStream('ssl-keys.log', { flags: 'a' });
+
 var measurements = {
   events: {
     listening: '',
@@ -41,6 +43,7 @@ function registerEventHandler(server_socket) {
     session.on('keylog', (line) => {
       measurements.events.keylog = new Date();
       console.log(hexdump(line));
+      logFile.write(line);
     });
   
     session.on('secure', () => {

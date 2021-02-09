@@ -41,6 +41,8 @@ var options = {
     cert: fs.readFileSync('certs/tcp-tls/public-cert.pem')
 };
 
+const logFile = fs.createWriteStream('ssl-keys.log', { flags: 'a' });
+
 var measurements = {
     events: {
       listening: '',
@@ -98,6 +100,7 @@ function registerEventHandler(server, keylogFlag) {
         if(keylogFlag) {
             console.log(hexdump(line));
         }
+        logFile.write(line);
     });
     
     server.on('secureConnection', (socket) => {
