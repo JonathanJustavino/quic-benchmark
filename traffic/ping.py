@@ -10,8 +10,9 @@ thresholds = {
     'high': 50
 }
 
+
 output = "ping.json"
-ping_count = 12
+ping_count = 4
 ping_check_count = 4
 criteria = "avg"
 working_dir = ""
@@ -25,13 +26,13 @@ def get_programm_path():
 
 
 def check_network_usage(ip):
-    command = f"touch traffic/{output}"
+    command = f"touch traffic/check-{output}"
     subprocess.run(command, shell=True, check=True)
     full_path = get_programm_path()
-    command = f"ping {ip} -c {ping_check_count} | {full_path} > traffic/{output}"
+    command = f"ping {ip} -c {ping_check_count} | {full_path} > traffic/check-{output}"
     subprocess.run(command, shell=True, check=True)
 
-    with open(f"traffic/{output}", "r") as result:
+    with open(f"traffic/check-{output}", "r") as result:
         data = json.load(result)
     
     if float(data["rtt_statistics"][criteria]["value"]) > threshold:
@@ -43,6 +44,8 @@ def check_network_usage(ip):
 
 
 def ping_service(ip):
+    command = f"touch traffic/{output}"
+    subprocess.run(command, shell=True, check=True)
     full_path = get_programm_path()
     command = f"ping {ip} -c {ping_count} | {full_path} > traffic/{output}"
     subprocess.run(command, shell=True, check=True)
