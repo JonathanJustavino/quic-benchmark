@@ -155,11 +155,11 @@ if __name__ == "__main__":
     container_thread = None
     if args.server:
         start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
+        start_thread(target=monitor_network, socket_type=socket_type, interface=interface, continuously=False)
     if args.client:
         clone_ping_to_json()
         low_network_usage = check_network_usage(server_ip)
         if not low_network_usage:
             exit()
-        start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip)
-        start_thread(target=monitor_network, socket_type=socket_type, interface=interface, continuously=False)
+        start_thread(target=start_container, network=network, socket_type=socket_type, container_type=container_type, port=port, ip=ip, server_ip=server_ip)
         start_thread(target=ping_service, public_ip=server_ip)
