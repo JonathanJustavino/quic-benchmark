@@ -5,7 +5,8 @@ services:
     container_name: qnode
     image: node:staging
     ports:
-      - "1234:1234"
+      - "1234:1234/udp"
+      - "1234:1234/tcp"
     stdin_open: true
     tty: true
     entrypoint: /bin/sh
@@ -19,7 +20,7 @@ services:
     container_name: qnode2
     image: node:staging
     ports:
-      - "1337:1337"
+      - "1337:1337/tcp"
     stdin_open: true
     tty: true
     entrypoint: /bin/sh
