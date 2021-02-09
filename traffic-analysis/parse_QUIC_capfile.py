@@ -6,6 +6,9 @@ import pyshark
 
 if __name__ == '__main__':
     cap = pyshark.FileCapture('/home/amelie/Uni/RNP_Komplexpraktikum/correct_measurements/quic.pcap')
+
+    # handshake overhead: long header packets
+    
     packet = cap[1]
     layer_quic = packet['QUIC']
     # print(layer_quic)
