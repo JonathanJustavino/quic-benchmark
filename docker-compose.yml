@@ -11,11 +11,11 @@ services:
     tty: true
     entrypoint: /bin/sh
     volumes:
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/package.json:/package.json
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/run_server_client.py:/run_server_client.py
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/traffic/:/traffic/
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/quic/:/quic/
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/tcp/:/tcp/
+      - ./package.json:/package.json
+      - ./run_server_client.py:/run_server_client.py
+      - ./traffic/:/traffic/
+      - ./quic/:/quic/
+      - ./tcp/:/tcp/
   quic-client:
     container_name: qnode2
     image: node:staging
@@ -25,11 +25,11 @@ services:
     tty: true
     entrypoint: /bin/sh
     volumes:
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/package.json:/package.json
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/run_server_client.py:/run_server_client.py
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/traffic/:/traffic/
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/quic/:/quic/
-      - /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/tcp/:/tcp/
+      - ./package.json:/package.json
+      - ./run_server_client.py:/run_server_client.py
+      - ./traffic/:/traffic/
+      - ./quic/:/quic/
+      - ./tcp/:/tcp/
 
 
 
