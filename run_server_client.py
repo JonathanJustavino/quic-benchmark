@@ -128,6 +128,7 @@ if __name__ == "__main__":
     interface = "br-bbd147c17183"
     interface = get_network_interface()
 
+    #TODO set ip to public ip if public ip is set
     if args.quic:
         socket_type = "quic"
         cap_filter = "udp port 1234"

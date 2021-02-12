@@ -57,5 +57,6 @@ sudo python3 run_server_client.py -t -c
 The script generates a json file with timestamps for every comparable event for tcp+tls and quic.
 
 ## Visualize Events: Plotting the result of the logfiles
+
 The python script "visualize_events.py" in the folder visualize_events draws all given logfiles in the specified folder into one figure.
 Currently, 4 logfiles are in the "measurements" folder, so it draws the timeline of these 4 logfiles into one figure.
