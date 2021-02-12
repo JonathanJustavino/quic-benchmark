@@ -1,7 +1,7 @@
 version: '3.3'
 
 services:
-  quic-server:
+  docker-server:
     container_name: qnode
     image: node:staging
     ports:
@@ -16,7 +16,7 @@ services:
       - ./traffic/:/traffic/
       - ./quic/:/quic/
       - ./tcp/:/tcp/
-  quic-client:
+  docker-client:
     container_name: qnode2
     image: node:staging
     ports:

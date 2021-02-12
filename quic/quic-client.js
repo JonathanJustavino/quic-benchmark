@@ -5,6 +5,7 @@ const hexdump = require('hexdump-nodejs');
 const key  = fs.readFileSync('certs/quic/server.key');
 const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
+const local_server = 'docker-server';
 var HOST;
 
 var EventTimeStamps = {
@@ -23,18 +24,13 @@ function validateIP() {
   var ipRegex = /\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
   var localIpRegex = /local/;
 
-  if(localIpRegex.test(ip)) {
-      HOST = "localhost";
-      return;
-  }
-
   if (ipRegex.test(ip)) {
       HOST = ip;
       return;
   }
 
   if (ip == null) {
-      HOST = '192.168.52.38';
+      HOST = local_server;
       return;
   }
   

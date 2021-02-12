@@ -6,6 +6,7 @@ var net = require('net');
 
 const PORT = 1337;
 var HOST = "";
+const local_server = 'docker-server';
 
 var options = {
     key: fs.readFileSync('certs/tcp-tls/private-key.pem'),
@@ -60,18 +61,13 @@ function validateIP() {
     var ipRegex = /\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
     var localIpRegex = /local/;
 
-    if(localIpRegex.test(ip)) {
-        HOST = "localhost";
-        return;
-    }
-
     if (ipRegex.test(ip)) {
         HOST = ip;
         return;
     }
 
     if (ip == null) {
-        HOST = '192.168.52.36';
+        HOST = local_server;
         return;
     }
     

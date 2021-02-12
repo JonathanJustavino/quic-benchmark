@@ -6,6 +6,7 @@ const hexdump = require('hexdump-nodejs');
 
 const PORT = 1337;
 var HOST = ""
+const LOCALHOST = '0.0.0.0';
 
 function validateIP() {
     if (process.argv.length < 2) {
@@ -17,18 +18,13 @@ function validateIP() {
     var ipRegex = /\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
     var localIpRegex = /local/;
 
-    if(localIpRegex.test(ip)) {
-        HOST = "localhost";
-        return;
-    }
-
     if (ipRegex.test(ip)) {
         HOST = ip;
         return;
     }
 
     if (ip == null) {
-        HOST = '192.168.52.36';
+        HOST = LOCALHOST
         return;
     }
     
