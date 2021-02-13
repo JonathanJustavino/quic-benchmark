@@ -6,7 +6,7 @@ var net = require('net');
 
 const PORT = 1337;
 var HOST = "";
-const local_server = 'docker-server';
+const local_server = 'tcp-server';
 
 var options = {
     key: fs.readFileSync('certs/tcp-tls/private-key.pem'),
@@ -45,9 +45,10 @@ function registerEventHandlers(client_socket) {
         });
     });
 
-    client_socket.on('error', () => {
+    client_socket.on('error', (error) => {
         EventTimeStamps.error = new Date();
         console.log("\nTLSSocket was destroyed with an error");
+        console.log(error)
     });
 }
 

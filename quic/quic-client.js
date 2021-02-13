@@ -5,7 +5,7 @@ const hexdump = require('hexdump-nodejs');
 const key  = fs.readFileSync('certs/quic/server.key');
 const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
-const local_server = 'docker-server';
+const local_server = 'quic-server';
 var HOST;
 
 var EventTimeStamps = {
