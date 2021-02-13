@@ -1,8 +1,8 @@
 version: '3.3'
 
 services:
-  docker-server:
-    container_name: qnode
+  quic-server:
+    container_name: quic
     image: node:staging
     ports:
       - "1234:1234/udp"
@@ -12,12 +12,11 @@ services:
     entrypoint: /bin/sh
     volumes:
       - ./package.json:/package.json
-      - ./run_server_client.py:/run_server_client.py
       - ./traffic/:/traffic/
       - ./quic/:/quic/
       - ./tcp/:/tcp/
-  docker-client:
-    container_name: qnode2
+  tcp-server:
+    container_name: tcp
     image: node:staging
     ports:
       - "1337:1337/tcp"
@@ -26,26 +25,6 @@ services:
     entrypoint: /bin/sh
     volumes:
       - ./package.json:/package.json
-      - ./run_server_client.py:/run_server_client.py
       - ./traffic/:/traffic/
       - ./quic/:/quic/
       - ./tcp/:/tcp/
-
-
-
-
-  #   image: ws2018sacc/experimentalnodejs
-  #   network_mode: host
-  #   build:
-  #     context: ../quic-benchmark
-  #     dockerfile: /Users/jonathanl./Documents/Studium/Master/Semester05/KP-RN/quic-benchmark/Dockerfile
-  #   ports:
-  #     - 7788:7788
-  # quic-client:
-  #   network_mode: host
-  #   image: ws2018sacc/experimentalnodejs
-  #   build:
-  #     context: ../quic-benchmark
-  #     dockerfile: ./Dockerfile
-  #   ports:
-  #     - 7789:7789
