@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "quic": "ttab node ./quic/quic-server.js && ttab node ./quic/quic-client.js local",
+    "quic": "ttab node ./quic/quic-server.js && ttab node ./quic/quic-client.js",
     "quics": "node ./quic/quic-server.js",
     "quicc": "node ./quic/quic-client.js",
-    "tcp": "ttab node ./tcp/tcp-tls-server.js local && ttab node ./tcp/tcp-tls-client.js local",
+    "tcp": "ttab node ./tcp/tcp-tls-server.js && ttab node ./tcp/tcp-tls-client.js",
     "tcps": "node ./tcp/tcp-tls-server.js",
     "tcpc": "node ./tcp/tcp-tls-client.js"
   },
