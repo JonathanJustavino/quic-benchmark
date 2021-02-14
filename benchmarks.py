@@ -50,9 +50,10 @@ def remote_benchmark(socket_type, ip="", server=False, client=False):
             stream = boot_container(tcp_benchmark[1], client_cmd)
         else:
             stream = boot_container(tcp_benchmark[0], tcp_server_cmd)
-    if client:
-        client_cmd = f"{quic_client_cmd} {ip}"
-        stream = boot_container(quic_benchmark[1], client_cmd)
     else:
-        stream = boot_container(quic_benchmark[0], quic_server_cmd)
+        if client:
+            client_cmd = f"{quic_client_cmd} {ip}"
+            stream = boot_container(quic_benchmark[1], client_cmd)
+        else:
+            stream = boot_container(quic_benchmark[0], quic_server_cmd)
     log_output(stream)
