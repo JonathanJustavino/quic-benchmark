@@ -4,7 +4,7 @@ from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_be
 from parser import dockerParser
 
 
-log_helper = "-----------------------------------------"
+log_helper = "-" * 80
 
 
 async def compose_up():
@@ -15,8 +15,20 @@ async def compose_down():
     subprocess.run("docker-compose down", shell=True)
 
 
+def log_arguments(arguments):
+    if arguments.__dict__['ipaddress'] == '':
+        print("Local")
+    else:
+        print("Remote")
+    for arg in arguments.__dict__:
+        if arg == "ipaddress" and arguments.__dict__[arg]:
+            print(f"Remote address: {arguments.__dict__[arg]}")
+            continue
+        if arguments.__dict__[arg]:
+            print(arg.capitalize())
+
+
 def run_benchmark(arguments):
-    print(arguments)
     if arguments.quic:
         benchmark = quic_benchmark
     elif arguments.tcp:
@@ -33,6 +45,7 @@ def run_benchmark(arguments):
 
 async def main():
     arguments = dockerParser.parse_args()
+    log_arguments(arguments)
     print("Docker Compose Up")
     await compose_up()
     print("Container Setup Finished")

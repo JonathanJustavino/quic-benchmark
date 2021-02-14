@@ -15,7 +15,7 @@ tcp_benchmark = ("tcp", "quic")
 
 def log_output(stream):
     for output in stream:
-        print(str(output))
+        print(output.decode('utf-8'))
         if "File is written successfully!" in str(output):
             print("shutting down...")
 
