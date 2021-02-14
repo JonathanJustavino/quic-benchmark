@@ -15,8 +15,7 @@ async def compose_down():
     subprocess.run("docker-compose down", shell=True)
 
 
-def run_benchmark():
-    arguments = dockerParser.parse_args()
+def run_benchmark(arguments):
     print(arguments)
     if arguments.quic:
         benchmark = quic_benchmark
@@ -33,12 +32,13 @@ def run_benchmark():
     
 
 async def main():
+    arguments = dockerParser.parse_args()
     print("Docker Compose Up")
     await compose_up()
     print("Container Setup Finished")
     print(log_helper)
     print("Container Output:")
-    run_benchmark()
+    run_benchmark(arguments)
     print(log_helper)
     print("Docker Compose Down")
     await compose_down()
