@@ -1,12 +1,9 @@
 import asyncio
 import subprocess
-from benchmarks import local_benchmark
+from benchmarks import local_benchmark, quic_benchmark, tcp_benchmark
 
 
-container_1 = "qnode"
-container_2 = "qnode2"
-tcp_socket = "tcp"
-quic_socket = "quic"
+log_helper = "-----------------------------------------"
 
 
 async def compose_up():
@@ -18,10 +15,14 @@ async def compose_down():
 
 
 async def main():
-    print("compose up")
+    print("Docker Compose Up")
     await compose_up()
-    print("container setup finished")
-    local_benchmark(container_1, container_2, tcp_socket)
+    print("Container Setup Finished")
+    print(log_helper)
+    print("Container Output:")
+    local_benchmark(*tcp_benchmark)
+    print(log_helper)
+    print("Docker Compose Down")
     await compose_down()
 
 
