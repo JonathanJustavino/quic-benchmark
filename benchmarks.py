@@ -13,6 +13,13 @@ quic_benchmark = ("quic", "tcp")
 tcp_benchmark = ("tcp", "quic")
 
 
+def log_output(stream):
+    for output in stream:
+        print(str(output))
+        if "File is written successfully!" in str(output):
+            print("shutting down...")
+
+
 def local_benchmark(server_name, client_name):
     server = docker_client.containers.get(server_name)
     client = docker_client.containers.get(client_name)
@@ -25,15 +32,27 @@ def local_benchmark(server_name, client_name):
     else:
         server.exec_run(quic_server_cmd, detach=True)
         _, stream =  client.exec_run(quic_client_cmd, stream=True)
-    for output in stream:
-        print(str(output))
-        if "File is written successfully!" in str(output):
-            print("shutting down...")
+    log_output(stream)
 
 
-def remote_benchmark(container_name, server=True, client=False):
-    print("needs to be implemented")
-    pass
+def boot_container(benchmark, command):
+    container = docker_client.containers.get(benchmark)
+    container.exec_run(install_cmd)
+    _, stream =  container.exec_run(command, stream=True)
+    return stream
 
-# local_benchmark("tcp", "quic", "tcp")
-# local_benchmark("quic", "tcp", "quic")
+
+def remote_benchmark(socket_type, ip="", server=False, client=False):
+    stream = None
+    if socket_type == tcp_socket:
+        if client:
+            client_cmd = f"{tcp_client_cmd} {ip}"
+            stream = boot_container(tcp_benchmark[1], client_cmd)
+        else:
+            stream = boot_container(tcp_benchmark[0], tcp_server_cmd)
+    if client:
+        client_cmd = f"{quic_client_cmd} {ip}"
+        stream = boot_container(quic_benchmark[1], client_cmd)
+    else:
+        stream = boot_container(quic_benchmark[0], quic_server_cmd)
+    log_output(stream)
