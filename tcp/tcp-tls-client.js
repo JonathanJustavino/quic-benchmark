@@ -21,7 +21,6 @@ var EventTimeStamps = {
 }
 
 function createClient(host, port, options) {
-    console.log(`HOST: ${HOST} PORT: ${PORT}`);
     return tls.connect(PORT, HOST, options, function() {});
 }
 
@@ -78,4 +77,7 @@ function validateIP() {
 
 validateIP();
 var clientSocket = createClient(HOST, PORT, options);
+
+console.log(`connecting to host: ${HOST}, port: ${PORT}`)
+
 registerEventHandlers(clientSocket);

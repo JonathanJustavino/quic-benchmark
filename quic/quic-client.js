@@ -6,6 +6,7 @@ const key  = fs.readFileSync('certs/quic/server.key');
 const cert = fs.readFileSync('certs/quic/server.crt');
 const ca   = fs.readFileSync('certs/quic/server.csr');
 const local_server = 'quic-server';
+const PORT = 1234;
 var HOST;
 
 var EventTimeStamps = {
@@ -51,7 +52,6 @@ function createClient() {
 }
 
 function createClientSession(client_socket, host) {
-  console.log(host);
   return client_socket.connect({
     address: host,
     port: 1234,
@@ -92,4 +92,7 @@ validateIP();
 var client = createClient();
 registerSocketEventHandler(client);
 var client_session = createClientSession(client, HOST);
+
+console.log(`connecting to host: ${HOST}, port: ${PORT}`)
+
 registerSessionEventHandler(client, client_session);

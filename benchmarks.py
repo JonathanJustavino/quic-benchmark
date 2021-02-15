@@ -1,3 +1,4 @@
+import re
 import docker
 
 
@@ -13,9 +14,14 @@ quic_benchmark = ("quic", "tcp")
 tcp_benchmark = ("tcp", "quic")
 
 
-def log_output(stream):
-    for output in stream:
-        print(output.decode('utf-8'))
+def log_output(stream, supress_deprecation=True):
+    for byte_stream in stream:
+        output = byte_stream.decode('utf-8')
+        if supress_deprecation:
+            match = re.search("deprecation", output)
+            if match:
+                continue
+        print(output)
         if "File is written successfully!" in str(output):
             print("shutting down...")
 
