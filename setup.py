@@ -1,6 +1,6 @@
 import asyncio
 import subprocess
-from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark
+from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results
 from parser import dockerParser
 
 
@@ -38,9 +38,9 @@ def run_benchmark(arguments):
         local_benchmark(*benchmark)
     else:
         if arguments.server:
-            remote_benchmark(benchmark[0] , server=True)
+            remote_benchmark(benchmark[0])
         elif arguments.client:
-            remote_benchmark(benchmark[0], arguments.ipaddress, client=True)
+            remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True)
     
 
 async def main():
