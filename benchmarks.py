@@ -1,17 +1,36 @@
+import os
 import re
+import datetime
 import docker
+import tarfile
+from os import path as os_path
+from io import BytesIO
 
 
 docker_client = docker.from_env()
 install_cmd = "npm install"
-tcp_server_cmd = "npm run tcps"
-tcp_client_cmd = "npm run tcpc"
-quic_server_cmd = "npm run quics"
-quic_client_cmd = "npm run quicc"
+
+container_commands = {
+    "tcp": {
+        "server_cmd": "npm run tcps",
+        "client_cmd": "npm run tcpc",
+    },
+    "quic": {
+        "server_cmd": "npm run quics",
+        "client_cmd": "npm run quicc"
+    }
+}
+
 tcp_socket = "tcp"
 
 quic_benchmark = ("quic", "tcp")
 tcp_benchmark = ("tcp", "quic")
+
+
+def get_measurement_path(socket_type, network):
+    working_dir = os.getcwd()
+    date = datetime.datetime.now()
+    return f"{working_dir}/measurements/{socket_type}/{network}/{date}"
 
 
 def log_output(stream, supress_deprecation=True):
@@ -26,40 +45,78 @@ def log_output(stream, supress_deprecation=True):
             print("shutting down...")
 
 
-def local_benchmark(server_name, client_name):
+def local_benchmark(server_name, client_name, stream=None, benchmark=None):
+    network = 'local'
     server = docker_client.containers.get(server_name)
     client = docker_client.containers.get(client_name)
     server.exec_run(install_cmd)
     client.exec_run(install_cmd)
-    stream = None
     if server_name == tcp_socket:
-        server.exec_run(tcp_server_cmd, detach=True)
-        _, stream =  client.exec_run(tcp_client_cmd, stream=True)
+        benchmark = tcp_benchmark
+        server.exec_run(container_commands['tcp']['server_cmd'], detach=True)
+        _, stream =  client.exec_run(container_commands['tcp']['client_cmd'], stream=True)
     else:
-        server.exec_run(quic_server_cmd, detach=True)
-        _, stream =  client.exec_run(quic_client_cmd, stream=True)
+        benchmark = quic_benchmark
+        server.exec_run(container_commands['quic']['server_cmd'], detach=True)
+        _, stream =  client.exec_run(container_commands['quic']['client_cmd'], stream=True)
     log_output(stream)
+    path = get_measurement_path(benchmark[0], network)
+    dump_results(benchmark, network, path=path, benchmark=benchmark)
+    dump_results(benchmark, network, is_client=True, path=path, benchmark=benchmark)
 
 
-def boot_container(benchmark, command):
-    container = docker_client.containers.get(benchmark)
+def boot_container(container_name, command):
+    print(f"\n{container_name}\n{command}\n")
+    container = docker_client.containers.get(container_name)
     container.exec_run(install_cmd)
     _, stream =  container.exec_run(command, stream=True)
     return stream
 
 
-def remote_benchmark(socket_type, ip="", server=False, client=False):
-    stream = None
+def choose_container_type(container_cmd, is_client, benchmark, ip=''):
+    if is_client:
+        return boot_container(benchmark[1], f"{container_cmd['client_cmd']} {ip}")
+    return boot_container(benchmark[0], container_cmd['server_cmd'])
+
+
+def remote_benchmark(socket_type, ip="", is_client=False, stream=None, benchmark=None):
     if socket_type == tcp_socket:
-        if client:
-            client_cmd = f"{tcp_client_cmd} {ip}"
-            stream = boot_container(tcp_benchmark[1], client_cmd)
-        else:
-            stream = boot_container(tcp_benchmark[0], tcp_server_cmd)
+        benchmark = tcp_benchmark
+        stream = choose_container_type(container_commands['tcp'], is_client, tcp_benchmark, ip=ip)
     else:
-        if client:
-            client_cmd = f"{quic_client_cmd} {ip}"
-            stream = boot_container(quic_benchmark[1], client_cmd)
-        else:
-            stream = boot_container(quic_benchmark[0], quic_server_cmd)
+        benchmark = quic_benchmark
+        stream = choose_container_type(container_commands['quic'], is_client, quic_benchmark, ip=ip)
     log_output(stream)
+    dump_results(benchmark, 'remote', is_client=is_client)
+
+
+def dump_results(container_name, network, is_client=False, path=None, benchmark=None):
+    socket_type = container_name[0]
+    ssl_log = 'ssl-keys.log'
+    container_type = "client" if is_client else "server"
+    file_name = f"{socket_type}-benchmark-{container_type}.json"
+    if not path:
+        path = get_measurement_path(socket_type, network)
+    print(f"\n{path}\n")
+    if not os_path.exists(path):
+        os.mkdir(path)
+    if is_client:
+        container = docker_client.containers.get(container_name[1])
+    else:
+        container = docker_client.containers.get(socket_type)
+        extract_file(container, path, ssl_log)
+    extract_file(container, path, file_name)
+
+        
+def extract_file(container, path, file_name):
+    stream, _ = container.get_archive(file_name)
+    file_obj = BytesIO()
+    for i in stream:
+        file_obj.write(i)
+    file_obj.seek(0)
+    tar = tarfile.open(mode='r', fileobj=file_obj)
+    text = tar.extractfile(file_name)
+
+    with open(f'{path}/{file_name}', 'wb') as file:
+        for line in text:
+            file.write(line)
