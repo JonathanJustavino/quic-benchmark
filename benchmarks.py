@@ -42,7 +42,7 @@ def log_output(stream, supress_deprecation=True):
                 continue
         print(output)
         if "File is written successfully!" in str(output):
-            print("shutting down...")
+            print("Shutting down...")
 
 
 def local_benchmark(server_name, client_name, stream=None, benchmark=None):
@@ -97,7 +97,6 @@ def dump_results(container_name, network, is_client=False, path=None, benchmark=
     file_name = f"{socket_type}-benchmark-{container_type}.json"
     if not path:
         path = get_measurement_path(socket_type, network)
-    print(f"\n{path}\n")
     if not os_path.exists(path):
         os.mkdir(path)
     if is_client:

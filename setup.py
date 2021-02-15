@@ -1,10 +1,17 @@
 import asyncio
 import subprocess
-from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results
 from parser import dockerParser
+from traffic.ping import check_network_usage, ping_service, clone_ping_to_json
+from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results
 
 
-log_helper = "-" * 80
+def log_helper(func):
+    def wrapper(*args, **kwargs):
+        print("-" * 88)
+        print("Container Output:")
+        func(*args, **kwargs)
+        print("-" * 88)
+    return wrapper
 
 
 async def compose_up():
@@ -27,7 +34,7 @@ def log_arguments(arguments):
         if arguments.__dict__[arg]:
             print(arg.capitalize())
 
-
+@log_helper
 def run_benchmark(arguments):
     if arguments.quic:
         benchmark = quic_benchmark
@@ -49,10 +56,7 @@ async def main():
     print("Docker Compose Up")
     await compose_up()
     print("Container Setup Finished")
-    print(log_helper)
-    print("Container Output:")
     run_benchmark(arguments)
-    print(log_helper)
     print("Docker Compose Down")
     await compose_down()
 
