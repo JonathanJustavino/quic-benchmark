@@ -19,6 +19,4 @@ RUN cd quic/ \
     && make -j4 \
     && make install
 
-RUN echo 'alias l="ls -alhS"' >> ~/.bashrc
-
-RUN npm install hexdump-nodejs
+RUN npm install
