@@ -11,7 +11,8 @@ thresholds = {
 }
 
 
-output = "ping.json"
+output = "./utils/ping.json"
+output_check = "./utils/check-ping.json"
 ping_count = 4
 ping_check_count = 4
 criteria = "avg"
@@ -20,12 +21,12 @@ programm_path = "../ping-to-json/ping_to_json.sh"
 
 
 def check_network_usage(ip):
-    command = f"touch check-{output}"
+    command = f"touch {output_check}"
     subprocess.run(command, shell=True, check=True)
-    command = f"ping {ip} -c {ping_check_count} | {programm_path} > check-{output}"
+    command = f"ping {ip} -c {ping_check_count} | {programm_path} > {output_check}"
     subprocess.run(command, shell=True, check=True)
 
-    with open(f"check-{output}", "r") as result:
+    with open(f"{output_check}", "r") as result:
         data = json.load(result)
 
     if float(data["rtt_statistics"][criteria]["value"]) > threshold:
@@ -49,6 +50,6 @@ if __name__ == "__main__":
     if arguments.check:
         print("checking network usage...")
         check_network_usage(arguments.ipaddress)
-    if arguments.ping:
+    else:
         print("ping service...")
         ping_service(arguments.ipaddress)
