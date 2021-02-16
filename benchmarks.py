@@ -33,11 +33,11 @@ def get_measurement_path(socket_type, network):
     return f"{working_dir}/measurements/{socket_type}/{network}/{date}"
 
 
-def log_output(stream, supress_deprecation=True):
+def log_output(stream, supress_warnings=True):
     for byte_stream in stream:
         output = byte_stream.decode('utf-8')
-        if supress_deprecation:
-            match = re.search("deprecation", output)
+        if supress_warnings:
+            match = re.search("(deprecation|awk)", output)
             if match:
                 continue
         print(output)
@@ -119,3 +119,12 @@ def extract_file(container, path, file_name):
     with open(f'{path}/{file_name}', 'wb') as file:
         for line in text:
             file.write(line)
+
+
+def docker_ping(container, ip, threshold=1, check=False):
+    command = f"python3 ./utils/ping.py -ip {ip} -t {threshold}"
+    if check:
+        command = f"{command} -c"
+    container = docker_client.containers.get(container)
+    _, stream = container.exec_run(command, stream=True)
+    log_output(stream)
