@@ -1,7 +1,6 @@
 import asyncio
 import subprocess
-from parser import dockerParser
-from traffic.ping import check_network_usage, ping_service, clone_ping_to_json
+from utils.parser import dockerParser
 from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results
 
 
@@ -33,6 +32,7 @@ def log_arguments(arguments):
             continue
         if arguments.__dict__[arg]:
             print(arg.capitalize())
+
 
 @log_helper
 def run_benchmark(arguments):
