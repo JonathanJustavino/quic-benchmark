@@ -12,10 +12,10 @@ services:
     entrypoint: /bin/sh
     volumes:
       - ./package.json:/package.json
-      - ./traffic/:/traffic/
       - ./quic/:/quic/
       - ./tcp/:/tcp/
       - ./certs/:/certs/
+      - ./utils/:/utils/
   tcp-server:
     container_name: tcp
     image: ws2018sacc/experimentalnodejs:1.1
@@ -26,7 +26,7 @@ services:
     entrypoint: /bin/sh
     volumes:
       - ./package.json:/package.json
-      - ./traffic/:/traffic/
       - ./quic/:/quic/
       - ./tcp/:/tcp/
       - ./certs/:/certs/
+      - ./utils/:/utils/
