@@ -13,7 +13,6 @@ dockerParser.add_argument('-ip', '--ipaddress', action='store', default="",
 pingParser = argparse.ArgumentParser(description='Run ping with or without network usage check')
 pingParser.add_argument('-c', '--check', action='store_true', help='Run ping and check if the \
     network usage is below threshold')
-pingParser.add_argument('-p', '--ping', action='store_true', help='Run ping and document output')
 pingParser.add_argument('-ip', '--ipaddress', action='store', default="", 
                     help='Define a remote ip to the machine where server is running')
 pingParser.add_argument('-t', '--threshold', action='store', default=1, 
