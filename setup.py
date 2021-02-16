@@ -1,15 +1,18 @@
+import os
 import asyncio
 import subprocess
 from utils.parser import dockerParser
-from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results
+from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping
 
 
 def log_helper(func):
     def wrapper(*args, **kwargs):
-        print("-" * 88)
+        _, columns = os.popen('stty size', 'r').read().split()
+        count = int(columns)
+        print("-" * count)
         print("Container Output:")
         func(*args, **kwargs)
-        print("-" * 88)
+        print("-" * count)
     return wrapper
 
 
@@ -47,6 +50,7 @@ def run_benchmark(arguments):
         if arguments.server:
             remote_benchmark(benchmark[0])
         elif arguments.client:
+            docker_ping(benchmark[1], arguments.ipaddress, check=True)
             remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True)
     
 
