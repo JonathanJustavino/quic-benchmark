@@ -1,8 +1,15 @@
 import os
+import shutil
+from colored import fg, stylize
 import asyncio
 import subprocess
 from utils.parser import dockerParser
 from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping
+
+
+network = ("local", "remote")
+socket_type = ("quic", "tcp")
+measurements_folder = "measurements"
 
 
 def log_helper(func):
@@ -52,16 +59,36 @@ def run_benchmark(arguments):
         elif arguments.client:
             docker_ping(benchmark[1], arguments.ipaddress, check=True)
             remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True)
-    
+
+
+def create_measurements():
+    if not os.path.isdir(measurements_folder):
+        for s_type in socket_type:
+            for net_type in network:
+                os.makedirs(f"{measurements_folder}/{s_type}/{net_type}", exist_ok=True)
+
+
+def clean_measurements():
+    print("Removing measurements")
+    path = f"{os.getcwd()}/measurements"
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    exit()
+
 
 async def main():
     arguments = dockerParser.parse_args()
+    if not os.path.isdir(measurements_folder):
+        create_measurements()
+    if arguments.clean:
+        clean_measurements()
+    
     log_arguments(arguments)
-    print("Docker Compose Up")
+    print("Docker Compose", stylize("Up", fg("yellow")))
     await compose_up()
-    print("Container Setup Finished")
+    print("Container Setup", stylize("Finished", fg("green")))
     run_benchmark(arguments)
-    print("Docker Compose Down")
+    print("Docker Compose", stylize("Down", fg("yellow")))
     await compose_down()
 
 
