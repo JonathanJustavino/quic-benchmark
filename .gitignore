@@ -4,6 +4,7 @@ lib/
 .vscode/
 
 ping.json
+check-ping.json
 ping-to-json
 quic.pcap
 tcp-tls.pcap
