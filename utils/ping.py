@@ -13,7 +13,7 @@ thresholds = {
 
 output = "./utils/ping.json"
 output_check = "./utils/check-ping.json"
-ping_count = 4
+ping_count = 8
 ping_check_count = 4
 criteria = "avg"
 working_dir = ""
