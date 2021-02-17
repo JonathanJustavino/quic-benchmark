@@ -128,3 +128,7 @@ def docker_ping(container, ip, threshold=1, check=False):
     container = docker_client.containers.get(container)
     _, stream = container.exec_run(command, stream=True)
     log_output(stream)
+    for line in stream:
+        if "ping is too high" in line:
+            return False
+    return True
