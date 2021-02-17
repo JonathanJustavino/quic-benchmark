@@ -48,7 +48,7 @@ async def compose_down():
 
 
 def log_arguments(arguments):
-    if arguments.__dict__['ipaddress'] == '':
+    if arguments.__dict__['ipaddress'] == '' and not arguments.server:
         print("Local")
     else:
         print("Remote")
