@@ -1,10 +1,11 @@
 import os
 import re
-import datetime
+import shutil
 import docker
 import tarfile
-from os import path as os_path
+import datetime
 from io import BytesIO
+from os import path as os_path
 
 
 docker_client = docker.from_env()
@@ -45,7 +46,7 @@ def log_output(stream, supress_warnings=True):
             print("Shutting down...")
 
 
-def local_benchmark(server_name, client_name, stream=None, benchmark=None):
+def local_benchmark(server_name, client_name, stream=None, benchmark=None, results_path=None):
     network = 'local'
     server = docker_client.containers.get(server_name)
     client = docker_client.containers.get(client_name)
@@ -60,13 +61,13 @@ def local_benchmark(server_name, client_name, stream=None, benchmark=None):
         server.exec_run(container_commands['quic']['server_cmd'], detach=True)
         _, stream =  client.exec_run(container_commands['quic']['client_cmd'], stream=True)
     log_output(stream)
-    path = get_measurement_path(benchmark[0], network)
-    dump_results(benchmark, network, path=path, benchmark=benchmark)
-    dump_results(benchmark, network, is_client=True, path=path, benchmark=benchmark)
+    # path = get_measurement_path(benchmark[0], network)
+    dump_results(benchmark, network, path=results_path, benchmark=benchmark)
+    dump_results(benchmark, network, is_client=True, path=results_path, benchmark=benchmark)
 
 
 def boot_container(container_name, command):
-    print(f"\n{container_name}\n{command}\n")
+    print(f"\nContainer name: {container_name}\nExecuting: {command}\n")
     container = docker_client.containers.get(container_name)
     container.exec_run(install_cmd)
     _, stream =  container.exec_run(command, stream=True)
@@ -79,7 +80,7 @@ def choose_container_type(container_cmd, is_client, benchmark, ip=''):
     return boot_container(benchmark[0], container_cmd['server_cmd'])
 
 
-def remote_benchmark(socket_type, ip="", is_client=False, stream=None, benchmark=None):
+def remote_benchmark(socket_type, ip="", is_client=False, stream=None, benchmark=None, results_path=None):
     if socket_type == tcp_socket:
         benchmark = tcp_benchmark
         stream = choose_container_type(container_commands['tcp'], is_client, tcp_benchmark, ip=ip)
@@ -87,7 +88,7 @@ def remote_benchmark(socket_type, ip="", is_client=False, stream=None, benchmark
         benchmark = quic_benchmark
         stream = choose_container_type(container_commands['quic'], is_client, quic_benchmark, ip=ip)
     log_output(stream)
-    dump_results(benchmark, 'remote', is_client=is_client)
+    dump_results(benchmark, 'remote', is_client=is_client, path=results_path)
 
 
 def dump_results(container_name, network, is_client=False, path=None, benchmark=None):
@@ -96,7 +97,7 @@ def dump_results(container_name, network, is_client=False, path=None, benchmark=
     container_type = "client" if is_client else "server"
     file_name = f"{socket_type}-benchmark-{container_type}.json"
     if not path:
-        path = get_measurement_path(socket_type, network)
+        raise ValueError("No result path was given for dump results")
     if not os_path.exists(path):
         os.mkdir(path)
     if is_client:
@@ -121,14 +122,18 @@ def extract_file(container, path, file_name):
             file.write(line)
 
 
-def docker_ping(container, ip, threshold=1, check=False):
+def docker_ping(container, ip, threshold=1, check=False, results_path=None):
     command = f"python3 ./utils/ping.py -ip {ip} -t {threshold}"
     if check:
         command = f"{command} -c"
     container = docker_client.containers.get(container)
     _, stream = container.exec_run(command, stream=True)
-    log_output(stream)
     for line in stream:
-        if "ping is too high" in line:
+        output = line.decode('utf-8')
+        if "ping is too high" in output:
             return False
+    if not check:
+        if not results_path:
+            raise ValueError("No result path was given for docker ping")
+        shutil.move("./utils/ping.json", results_path)
     return True
