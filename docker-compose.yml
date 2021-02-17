@@ -11,9 +11,9 @@ services:
     tty: true
     entrypoint: /bin/sh
     volumes:
-      - ./package.json:/package.json
-      - ./quic/:/quic/
-      - ./tcp/:/tcp/
+      - ./node/package.json:/package.json
+      - ./node/quic/:/quic/
+      - ./node/tcp/:/tcp/
       - ./certs/:/certs/
       - ./utils/:/utils/
   tcp-server:
@@ -25,8 +25,8 @@ services:
     tty: true
     entrypoint: /bin/sh
     volumes:
-      - ./package.json:/package.json
-      - ./quic/:/quic/
-      - ./tcp/:/tcp/
+      - ./node/package.json:/package.json
+      - ./node/quic/:/quic/
+      - ./node/tcp/:/tcp/
       - ./certs/:/certs/
       - ./utils/:/utils/
