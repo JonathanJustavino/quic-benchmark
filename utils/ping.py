@@ -51,5 +51,5 @@ if __name__ == "__main__":
         print("checking network usage...")
         check_network_usage(arguments.ipaddress)
     else:
-        print("ping service...")
         ping_service(arguments.ipaddress)
+        print("ping finished")

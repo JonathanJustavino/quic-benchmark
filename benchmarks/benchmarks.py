@@ -61,7 +61,6 @@ def local_benchmark(server_name, client_name, stream=None, benchmark=None, resul
         server.exec_run(container_commands['quic']['server_cmd'], detach=True)
         _, stream =  client.exec_run(container_commands['quic']['client_cmd'], stream=True)
     log_output(stream)
-    # path = get_measurement_path(benchmark[0], network)
     dump_results(benchmark, network, path=results_path, benchmark=benchmark)
     dump_results(benchmark, network, is_client=True, path=results_path, benchmark=benchmark)
 
@@ -122,7 +121,7 @@ def extract_file(container, path, file_name):
             file.write(line)
 
 
-def docker_ping(container, ip, threshold=1, check=False, results_path=None):
+def docker_ping(container, ip, threshold=1, check=False):
     command = f"python3 ./utils/ping.py -ip {ip} -t {threshold}"
     if check:
         command = f"{command} -c"
@@ -130,10 +129,16 @@ def docker_ping(container, ip, threshold=1, check=False, results_path=None):
     _, stream = container.exec_run(command, stream=True)
     for line in stream:
         output = line.decode('utf-8')
+        match = re.search("(deprecation|awk|warning)", output)
+        if match:
+            continue
+        print(output)
         if "ping is too high" in output:
             return False
-    if not check:
-        if not results_path:
-            raise ValueError("No result path was given for docker ping")
-        shutil.move("./utils/ping.json", results_path)
     return True
+
+
+def move_results(results_path, socket_type):
+    results_path = f"{results_path}/"
+    shutil.move("./utils/ping.json", results_path)
+    shutil.move(f"./traffic/{socket_type}.pcap", results_path)

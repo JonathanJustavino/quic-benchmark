@@ -6,7 +6,7 @@ import subprocess
 from threading import Thread
 from colored import fg, stylize
 from utils.parser import dockerParser
-from benchmarks.benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path
+from benchmarks.benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path, move_results
 
 
 network = ("local", "remote")
@@ -80,10 +80,11 @@ def run_benchmark(arguments):
             if not low_network_usage:
                 return
             path = get_measurement_path(socket_type, network[1])
-            t1 = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress, results_path=path)
+            t1 = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress)
             time.sleep(3)
             remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True, results_path=path)
             t1.join()
+            move_results(path, socket_type)
 
 
 def create_measurements():
