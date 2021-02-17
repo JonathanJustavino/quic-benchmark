@@ -1,21 +1,24 @@
 FROM ubuntu:20.04
 
-COPY quic/quic-client.js quic/quic-server.js \
-    tcp/tcp-tls-client.js tcp/tcp-tls-server.js ./scripts/
-COPY certs/ certs/
+COPY package.json package.json
 
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-distutils \
     g++ \
     make \
-    git
+    git \
+    iputils-ping \
+    sed \
+    gawk \
+    vim
 
 RUN git clone https://github.com/nodejs/quic.git
+RUN git clone https://github.com/richardimaoka/ping-to-json.git
 
 RUN cd quic/ \
     && ./configure --experimental-quic \
     && make -j4 \
     && make install
 
-RUN npm install hexdump-nodejs
+RUN npm install

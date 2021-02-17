@@ -4,6 +4,7 @@ lib/
 .vscode/
 
 ping.json
+check-ping.json
 ping-to-json
 quic.pcap
 tcp-tls.pcap
@@ -239,3 +240,6 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+
+# Benchmark measurements
+measurements/*
