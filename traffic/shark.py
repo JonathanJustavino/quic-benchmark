@@ -1,4 +1,8 @@
 import subprocess
+import docker
+
+
+network = "quic-benchmark_default"
 
 
 def create_output_file(func):
@@ -13,24 +17,27 @@ def create_output_file(func):
 @create_output_file
 def capture_packets(interface, filter="", output_file="", time=20):
     command = f"sudo tshark -i {interface} -w './traffic/{output_file}.pcap' -f '{filter}' -a 'duration: {time}'"
-    subprocess.run(command, shell=True, check=True)
+    output = subprocess.run(command, shell=True, check=True, capture_output=True)
+    output = output.stderr.decode('utf-8').split("\n")
+    for line in output:
+        if "packets captured" in line:
+            print(f"Tshark: {line}")
 
 
-@create_output_file
-def capture_packets_continuously(interface, filter="", output_file="", amount_of_packets=10):
-    command = f"sudo tshark -i {interface} -w {output_file} -f '{filter}' -a 'packets: {amount_of_packets}'"
-    subprocess.run(command, shell=True, check=True)
+def get_network_interface():
+    client = docker.from_env()
+    nets = client.networks.get(network)
+    interface = f"br-{nets.attrs['Id'][:12]}"
+    return interface
 
 
-def monitor_network(socket_type, interface, continuously=False):
+def monitor_network(socket_type):
     pkt_filter = ''
+    interface = get_network_interface()
 
     if socket_type == 'quic':
         pkt_filter = 'udp port 1234'
-    elif socket_type == 'tcp-tls':
+    elif socket_type == 'tcp':
         pkt_filter = 'tcp port 1337'
 
-    if continuously:
-        capture_packets_continuously(interface, filter=pkt_filter, output_file=f"{socket_type}")
-    else:
-        capture_packets(interface, filter=pkt_filter, output_file=f"{socket_type}")
+    capture_packets(interface, filter=pkt_filter, output_file=f"{socket_type}")

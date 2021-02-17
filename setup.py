@@ -6,6 +6,7 @@ import subprocess
 from threading import Thread
 from colored import fg, stylize
 from utils.parser import dockerParser
+from traffic.shark import monitor_network
 from benchmarks.benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path, move_results
 
 
@@ -80,10 +81,12 @@ def run_benchmark(arguments):
             if not low_network_usage:
                 return
             path = get_measurement_path(socket_type, network[1])
-            t1 = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress)
+            ping_thread = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress)
+            shark_thread = start_thread(target=monitor_network, socket_type=socket_type)
             time.sleep(3)
             remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True, results_path=path)
-            t1.join()
+            ping_thread.join()
+            shark_thread.join()
             move_results(path, socket_type)
 
 
