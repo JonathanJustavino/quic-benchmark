@@ -1,12 +1,12 @@
 import os
+import time
 import shutil
 import asyncio
 import subprocess
-import time
 from threading import Thread
 from colored import fg, stylize
 from utils.parser import dockerParser
-from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping
+from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path
 
 
 network = ("local", "remote")
@@ -25,12 +25,15 @@ def log_helper(func):
     return wrapper
 
 
-def start_thread(**kwargs):
+def start_thread(*args, **kwargs):
     if 'target' not in kwargs.keys():
         print("No target function set")
         return
     parameter = list(kwargs.values())
-    thread = Thread(target=kwargs['target'], args=(parameter[1:]))
+    target = kwargs['target']
+    del kwargs['target']
+    thread = Thread(target=target, kwargs=kwargs)
+
     thread.start()
     return thread
 
@@ -62,20 +65,24 @@ def run_benchmark(arguments):
         benchmark = quic_benchmark
     elif arguments.tcp:
         benchmark = tcp_benchmark
+    socket_type = benchmark[0]
 
     if not arguments.ipaddress and not arguments.server:
-        local_benchmark(*benchmark)
+        path = get_measurement_path(socket_type, network[0])
+        local_benchmark(*benchmark, results_path=path)
     else:
         if arguments.server:
-            remote_benchmark(benchmark[0])
+            path = get_measurement_path(socket_type, network[1])
+            remote_benchmark(benchmark[0], results_path=path)
             return
         if arguments.client:
             low_network_usage = docker_ping(benchmark[1], arguments.ipaddress, threshold=200, check=True)
             if not low_network_usage:
                 return
-            t1 = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress)
+            path = get_measurement_path(socket_type, network[1])
+            t1 = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress, results_path=path)
             time.sleep(3)
-            remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True)
+            remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True, results_path=path)
             t1.join()
 
 
@@ -102,11 +109,11 @@ async def main():
         clean_measurements()
     
     log_arguments(arguments)
-    print("Docker Compose", stylize("Up", fg("yellow")))
+    print("Docker Compose", stylize("Up...", fg("yellow")))
     await compose_up()
     print("Container Setup", stylize("Finished", fg("green")))
     run_benchmark(arguments)
-    print("Docker Compose", stylize("Down", fg("yellow")))
+    print("Docker Compose", stylize("Down...", fg("yellow")))
     await compose_down()
 
 
