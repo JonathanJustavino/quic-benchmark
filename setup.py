@@ -6,7 +6,7 @@ import subprocess
 from threading import Thread
 from colored import fg, stylize
 from utils.parser import dockerParser
-from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path
+from benchmarks.benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path
 
 
 network = ("local", "remote")
