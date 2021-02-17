@@ -1,8 +1,10 @@
 import os
 import shutil
-from colored import fg, stylize
 import asyncio
 import subprocess
+import time
+from threading import Thread
+from colored import fg, stylize
 from utils.parser import dockerParser
 from benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping
 
@@ -21,6 +23,16 @@ def log_helper(func):
         func(*args, **kwargs)
         print("-" * count)
     return wrapper
+
+
+def start_thread(**kwargs):
+    if 'target' not in kwargs.keys():
+        print("No target function set")
+        return
+    parameter = list(kwargs.values())
+    thread = Thread(target=kwargs['target'], args=(parameter[1:]))
+    thread.start()
+    return thread
 
 
 async def compose_up():
@@ -56,9 +68,15 @@ def run_benchmark(arguments):
     else:
         if arguments.server:
             remote_benchmark(benchmark[0])
-        elif arguments.client:
-            docker_ping(benchmark[1], arguments.ipaddress, check=True)
+            return
+        if arguments.client:
+            low_network_usage = docker_ping(benchmark[1], arguments.ipaddress, threshold=200, check=True)
+            if not low_network_usage:
+                return
+            t1 = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress)
+            time.sleep(3)
             remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True)
+            t1.join()
 
 
 def create_measurements():
