@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+  quic-server:
+    container_name: quic
+    image: ws2018sacc/experimentalnodejs:15.6.2
+    ports:
+      - "1234:1234/udp"
+      - "1234:1234/tcp"
+    stdin_open: true
+    tty: true
+    cap_add:
+      - NET_ADMIN
+    entrypoint: /bin/sh
+    volumes:
+      - ./node/package.json:/package.json
+      - ./node/quic/:/quic/
+      - ./node/tcp/:/tcp/
+      - ./certs/:/certs/
+      - ./utils/:/utils/
+  tcp-server:
+    container_name: tcp
+    image: ws2018sacc/experimentalnodejs:15.6.2
+    ports:
+      - "1337:1337/tcp"
+    stdin_open: true
+    tty: true
+    cap_add:
+      - NET_ADMIN
+    entrypoint: /bin/sh
+    volumes:
+      - ./node/package.json:/package.json
+      - ./node/quic/:/quic/
+      - ./node/tcp/:/tcp/
+      - ./certs/:/certs/
+      - ./utils/:/utils/

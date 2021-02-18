@@ -1,0 +1,29 @@
+{
+  "name": "quic-benchmark",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "quic": "ttab node --no-warnings ./quic/quic-server.js && ttab node --no-warnings ./quic/quic-client.js",
+    "quics": "node --no-warnings ./quic/quic-server.js",
+    "quicc": "node --no-warnings ./quic/quic-client.js",
+    "tcp": "ttab node --no-warnings ./tcp/tcp-tls-server.js && ttab node --no-warnings ./tcp/tcp-tls-client.js",
+    "tcps": "node --no-warnings ./tcp/tcp-tls-server.js",
+    "tcpc": "node --no-warnings ./tcp/tcp-tls-client.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JonathanJustavino/quic-benchmark.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JonathanJustavino/quic-benchmark/issues"
+  },
+  "homepage": "https://github.com/JonathanJustavino/quic-benchmark#readme",
+  "dependencies": {
+    "hexdump-nodejs": "^0.1.0"
+  }
+}
