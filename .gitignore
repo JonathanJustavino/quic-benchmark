@@ -2,6 +2,7 @@ node_modules/
 .DS_Store
 lib/
 .vscode/
+results/
 
 ping.json
 check-ping.json
