@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-COPY package.json package.json
+COPY ./node/package.json package.json
 
 RUN apt-get update && apt-get install -y \
     python3 \
@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     sed \
     gawk \
-    vim
+    vim \
+    iproute2
 
 RUN git clone https://github.com/nodejs/quic.git
 RUN git clone https://github.com/richardimaoka/ping-to-json.git

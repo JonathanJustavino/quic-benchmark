@@ -5,6 +5,7 @@ import asyncio
 import subprocess
 from threading import Thread
 from colored import fg, stylize
+from traffic.delay import add_delay
 from utils.parser import dockerParser
 from traffic.shark import monitor_network
 from benchmarks.benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path, move_results
@@ -77,7 +78,10 @@ def run_benchmark(arguments):
             remote_benchmark(benchmark[0], results_path=path)
             return
         if arguments.client:
-            low_network_usage = docker_ping(benchmark[1], arguments.ipaddress, threshold=200, check=True)
+            delay = float(arguments.delay)
+            add_delay(benchmark[1], delay)
+            threshold = float(arguments.threshold) + delay
+            low_network_usage = docker_ping(benchmark[1], arguments.ipaddress, threshold=threshold, check=True)
             if not low_network_usage:
                 return
             path = get_measurement_path(socket_type, network[1])
