@@ -29,6 +29,8 @@ def check_network_usage(ip):
     with open(f"{output_check}", "r") as result:
         data = json.load(result)
 
+    print(f"Threshold: {threshold}")
+    print(f"Current RTT: {data['rtt_statistics'][criteria]['value']}")
     if float(data["rtt_statistics"][criteria]["value"]) > threshold:
         print("ping is too high")
         return False
