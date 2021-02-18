@@ -23,3 +23,5 @@ pingParser.add_argument('-ip', '--ipaddress', action='store', default="",
                     help='Define a remote ip to the machine where server is running')
 pingParser.add_argument('-t', '--threshold', action='store', default=1, 
                     help='Define a threshold for network  usage')
+pingParser.add_argument('-d', '--delay', action='store', default=0, 
+                    help='Simulate network delay in ms')
