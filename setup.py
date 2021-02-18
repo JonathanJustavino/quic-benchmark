@@ -81,17 +81,19 @@ def run_benchmark(arguments):
             delay = float(arguments.delay)
             add_delay(benchmark[1], delay)
             threshold = float(arguments.threshold) + delay
+            # Warmup ping
+            docker_ping(benchmark[1], arguments.ipaddress, threshold=threshold, check=True)
             low_network_usage = docker_ping(benchmark[1], arguments.ipaddress, threshold=threshold, check=True)
             if not low_network_usage:
                 return
             path = get_measurement_path(socket_type, network[1])
-            ping_thread = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress)
+            ping_thread = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress, threshold=threshold)
             shark_thread = start_thread(target=monitor_network, socket_type=socket_type)
             time.sleep(3)
             remote_benchmark(benchmark[0], arguments.ipaddress, is_client=True, results_path=path)
             ping_thread.join()
             shark_thread.join()
-            move_results(path, socket_type)
+            move_results(path, socket_type, threshold=threshold, delay=delay)
 
 
 def create_measurements():
