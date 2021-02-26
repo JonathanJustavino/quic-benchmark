@@ -96,17 +96,28 @@ The QUIC protocol uses two types of headers: Long Header for the handshake and S
 The Long Header contains the following headerfields:
 | Field Type | Size in Byte |
 | --- | --- |
-| Header Form | 1B |
-| Fixed Bit | 1B |
-| Packet Type | 1B |
-| Reserved Bits | 1B |
-| Packet Nr. field length | 1B |
-| Version | 4B |
-| DCID (destination connection ID) length | 1B |
-| DCIC | 20B |
-| SCID (source connection ID) length | 1B |
-| SCID | 20B |
-| Token length | 1B |
-| Length of Packet Nr. + payload fields | 2B |
-| Packet Nr. | 1B |
+| Header Form | 1 |
+| Fixed Bit | 1 |
+| Packet Type | 1 |
+| Reserved Bits | 1 |
+| Packet Nr. field length | 1 |
+| Version | 4 |
+| DCID (destination connection ID) length | 1 |
+| DCIC | 20 |
+| SCID (source connection ID) length | 1 |
+| SCID | 20 |
+| Token length | 1 |
+| Length of Packet Nr. + payload fields | 2 |
+| Packet Nr. | 1 |
 
+The Short Header contains the following headerfields:
+| Field Type | Size in Byte |
+| --- | --- |
+| Header Form | 1 |
+| Fixed Bit | 1 |
+| Spin Bit | 1 |
+| Reserved Bit | 1 |
+| Key Phase Bit | 1 |
+| Packet Nr. length | 1 |
+| DCID | 20 |
+| Packet Nr. | 1 |
