@@ -95,6 +95,7 @@ The QUIC protocol uses two types of headers: Long Header for the handshake and S
 
 The Long Header contains the following headerfields:
 | Field Type | Size in Byte |
+| --- | --- |
 | Header Form | 1B |
 | Fixed Bit | 1B |
 | Packet Type | 1B |
