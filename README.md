@@ -83,3 +83,29 @@ The script generates a json file with timestamps for every comparable event for 
 
 The python script "visualize_events.py" in the folder visualize_events draws all given logfiles in the specified folder into one figure.
 Currently, 4 logfiles are in the "measurements" folder, so it draws the timeline of these 4 logfiles into one figure.
+
+## Evaluation
+
+### Flowchart TCP+TLS
+The communication between TCP+TLS Server and TCP+TLS Client is depicted in the following flowchart.
+
+### Flowchart QUIC
+The communication between QUIC Server and QUIC Client is depicted in the following flowchart.
+The QUIC protocol uses two types of headers: Long Header for the handshake and Short Header after the connection is established.
+
+The Long Header contains the following headerfields:
+| Field Type | Size in Byte |
+| Header Form | 1B |
+| Fixed Bit | 1B |
+| Packet Type | 1B |
+| Reserved Bits | 1B |
+| Packet Nr. field length | 1B |
+| Version | 4B |
+| DCID (destination connection ID) length | 1B |
+| DCIC | 20B |
+| SCID (source connection ID) length | 1B |
+| SCID | 20B |
+| Token length | 1B |
+| Length of Packet Nr. + payload fields | 2B |
+| Packet Nr. | 1B |
+
