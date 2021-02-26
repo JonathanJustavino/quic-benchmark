@@ -109,6 +109,7 @@ The Long Header contains the following headerfields:
 | Token length | 1 |
 | Length of Packet Nr. + payload fields | 2 |
 | Packet Nr. | 1 |
+| | Σ = 55 |
 
 The Short Header contains the following headerfields:
 | Field Type | Size in Byte |
@@ -121,3 +122,4 @@ The Short Header contains the following headerfields:
 | Packet Nr. length | 1 |
 | DCID | 20 |
 | Packet Nr. | 1 |
+| | Σ = 27 |
