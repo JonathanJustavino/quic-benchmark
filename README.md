@@ -16,6 +16,10 @@ We decided to go with nodejs for the rest of the experiment, because it is possi
 Also the documentation in nodejs is more detailed.
 Server and Client are currently running in a docker environment on one machine and communicate via localhost.
 
+## Topology
+
+![topology](./documentation/topology.png)
+
 ## Prerequisites
 
 [dockerpy](https://docker-py.readthedocs.io/en/stable/):
