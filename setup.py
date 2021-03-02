@@ -8,7 +8,7 @@ from colored import fg, stylize
 from traffic.delay import add_delay
 from utils.parser import dockerParser
 from traffic.shark import monitor_network
-from utils.measurements import extract_measurements
+from utils.measurements import extract_measurements, match_benchmark_folders
 from benchmarks.benchmarks import local_benchmark, remote_benchmark, quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path, move_results
 
 
@@ -120,8 +120,9 @@ async def main():
         clean_measurements()
 
     if arguments.extract:
-        print("Extracting")
-        extract_measurements(threshold=7)
+        # print("Extracting")
+        # extract_measurements(threshold=7)
+        match_benchmark_folders()
         exit()
     
     log_arguments(arguments)
