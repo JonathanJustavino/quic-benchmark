@@ -29,9 +29,13 @@ quic_benchmark = ("quic", "tcp")
 tcp_benchmark = ("tcp", "quic")
 
 
+def get_formatted_date(formatter="%Y-%m-%d %H-%M-%S-%s"):
+    return datetime.datetime.now().strptime(formatter)
+
+
 def get_measurement_path(socket_type, network):
     working_dir = os.getcwd()
-    date = datetime.datetime.now()
+    date = get_formatted_date()
     return f"{working_dir}/measurements/{socket_type}/{network}/{date}"
 
 
