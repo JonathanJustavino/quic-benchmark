@@ -27,7 +27,7 @@ def filter_measurements_folders(max_rtt=67, max_mdev=7):
                 data = json.load(f)
                 deviation = float(data['rtt_statistics']['mdev']['value'])
                 rtt = float(data['rtt_statistics']['avg']['value'])
-                if deviation <= max_mdev and rtt <= max_rtt:
+                if deviation <= float(max_mdev) and rtt <= float(max_rtt):
                     benchmarks.append(root)
     return benchmarks
 
