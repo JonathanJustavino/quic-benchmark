@@ -120,9 +120,8 @@ async def main():
         clean_measurements()
 
     if arguments.extract:
-        # print("Extracting")
-        # extract_measurements(threshold=7)
-        match_benchmark_folders()
+        print("Extracting")
+        extract_measurements(max_rtt=arguments.threshold, max_mdev=arguments.deviation)
         exit()
     
     log_arguments(arguments)
