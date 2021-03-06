@@ -30,7 +30,7 @@ tcp_benchmark = ("tcp", "quic")
 
 
 def get_formatted_date(formatter="%Y-%m-%d %H-%M-%S-%s"):
-    return datetime.datetime.now().strptime(formatter)
+    return datetime.datetime.now().strftime(formatter)
 
 
 def get_measurement_path(socket_type, network):
