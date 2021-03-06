@@ -71,6 +71,9 @@ def filter_sole_folders(socket_type):
             server_list.append(folder)
         if client:
             client_list.append(folder)
+        if server and client:
+            print("Samples have been merged previously, aborting...")
+            exit()
     server_list.sort()
     client_list.sort()
     return server_list, client_list, deletables
@@ -90,10 +93,6 @@ def remove_folders(folders, path):
     for date in folders:
         folder = datetime_to_string(date)
         shutil.rmtree(f"{path}{folder}", ignore_errors=True)
-        fail = os.path.exists(f"{path}{folder}")
-        print(fail)
-        if fail:
-            shutil.rmtree(f"{path}{folder}", ignore_errors=True)
 
 
 def match_folders(socket_type):
@@ -117,6 +116,7 @@ def match_folders(socket_type):
         if len(matches) < 2:
             if matches:
                 deletables.append(matches[0])
+            matches = []
             continue
         sample_pairs.append((matches[0], matches[len(matches) - 1]))
         matches = []
@@ -136,21 +136,26 @@ def merge_folder():
     tcp_pairs, tcp_deletables = match_folders('tcp')
     tcp_path = f"{get_folder_path()}/tcp/remote/"
 
-    # remove_folders(tcp_deletables, tcp_path)
-    remove_folders(quic_deletables, quic_path)
+    remove_folders(tcp_deletables, tcp_path)
     remove_folders(quic_deletables, quic_path)
 
     if quic_pairs:
-        print("merge")
+        print("Merging QUIC")
         f = lambda tup: (f"{quic_path}{datetime_to_string(tup[0])}", f"{quic_path}{datetime_to_string(tup[1])}")
         quic_pairs = list(map(f, quic_pairs))
-        for pair in quic_pairs:
-            shutil.copytree(pair[1], pair[0], dirs_exist_ok=True)
-            shutil.rmtree(pair[1])
+        merge_pairs(quic_pairs)
     if tcp_pairs:
-       print("merge")
-
+        print("Merging TCP")
+        f = lambda tup: (f"{tcp_path}{datetime_to_string(tup[0])}", f"{tcp_path}{datetime_to_string(tup[1])}")
+        tcp_pairs = list(map(f, tcp_pairs))
+        merge_pairs(tcp_pairs)
     return
+
+
+def merge_pairs(pairs):
+    for pair in pairs:
+        shutil.copytree(pair[1], pair[0], dirs_exist_ok=True)
+        shutil.rmtree(pair[1])    
 
 
 def is_client(files, client_list):
