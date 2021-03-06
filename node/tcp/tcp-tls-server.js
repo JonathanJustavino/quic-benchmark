@@ -39,6 +39,15 @@ var options = {
 
 const logFile = fs.createWriteStream('ssl-keys.log', { flags: 'a' });
 
+var startHandshake
+var endHandshake
+
+function duration(startHandshake, endHandshake) {
+    let first = (endHandshake[0] - startHandshake[0]) * 1000000
+    let second = (endHandshake[1] - startHandshake[1])
+    return first + second
+}
+
 var measurements = {
     events: {
       listening: '',
@@ -83,7 +92,8 @@ function createServer(host, port, options) {
 
 function registerEventHandler(server, keylogFlag) {
     server.on('connection', () => {
-        measurements.hrTimeStamps.beforeHandshake = process.hrtime();
+        startHandshake = process.hrtime();
+        measurements.hrTimeStamps.beforeHandshake = startHandshake;
     });
     server.on('listening', function(error) { measurements.events.listening = new Date(); });
     
@@ -101,8 +111,9 @@ function registerEventHandler(server, keylogFlag) {
     
     server.on('secureConnection', (socket) => {
         measurements.events.secure = new Date();
-        measurements.hrTimeStamps.afterHandshake = process.hrtime();
-        measurements.durations.handshakeDurationInNs = measurements.hrTimeStamps.afterHandshake[1] - measurements.hrTimeStamps.beforeHandshake[1];
+        endHandshake = process.hrtime();
+        measurements.hrTimeStamps.afterHandshake = endHandshake;
+        measurements.durations.handshakeDurationInNs = duration(startHandshake, endHandshake);
     });
     
     server.on('close', () => {
