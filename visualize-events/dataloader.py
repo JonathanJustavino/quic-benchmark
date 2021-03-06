@@ -1,25 +1,8 @@
 # from ..utils.measurements import get_folder_path
 import os
-import re
 import json
 from datetime import datetime
 from dateutil import parser, relativedelta
-
-
-quic_results = {'ping': {}, 'server': {}, 'client': {}}
-tcp_results = {'ping': {}, 'server': {}, 'client': {}}
-
-
-# def temporary_get_folder_path(samples_folder='samples'):
-#     '''
-#         This function should be removed once the dataloader is working
-#         it is only used for debugging purposes
-#     '''
-#     folder_filter = r'(.*measurements)'
-#     folder_filter = 'quic-benchmark'
-#     dst_folder = os.getcwd()
-#     dst_folder = re.sub(folder_filter, "", dst_folder)
-#     return f"{dst_folder}{samples_folder}"
 
 
 def load_folders(socket_type, path):
@@ -35,17 +18,15 @@ def load_folders(socket_type, path):
     return folders
 
 
-def clear_results(results):
-    results.clear()
-    return {'ping': {}, 'server': {}, 'client': {}}
-
-
 def read_results(folders, socket_type, results):
     server = f"{socket_type}-benchmark-server.json"
     client = f"{socket_type}-benchmark-client.json"
     for folder in folders:
-        accumulate_client_data(f"{folder}/{client}", results)
-        accumulate_server_data(f"{folder}/{server}", results)
+        client_path = f"{folder}/{client}"
+        server_path = f"{folder}/{server}"
+        accumulate_client_data(client_path, results)
+        accumulate_server_data(server_path, results)
+        accumulate_ready_to_session(client_path, server_path, results)
 
 
 def accumulate_data(data, results, side='server'):
@@ -75,10 +56,23 @@ def accumulate_server_data(file, results):
         data = json.load(f)
         events = data["events"].items()
         accumulate_data(events, results)
-        if duration not in results:    
-            results['handshakeDuration'] = float(data["durations"]["handshakeDurationInNs"]) / 1000
+        if duration not in results:
+            results[duration] = float(data["durations"]["handshakeDurationInNs"]) / 1000
             return
-        results['handshakeDuration'] += float(data["durations"]["handshakeDurationInNs"]) / 1000
+        results[duration] += float(data["durations"]["handshakeDurationInNs"]) / 1000
+
+
+def accumulate_ready_to_session(client_path, server_path, results):
+    rdy_2_session = 'ready-to-session'
+    with open(client_path, 'r') as c, open(server_path, 'r') as s:
+        client_data = json.load(c)
+        server_data = json.load(s)
+        client_date = parser.parse(client_data['ready'])
+        server_date = parser.parse(server_data['events']['session'])
+        if rdy_2_session not in results:
+            results[rdy_2_session] = relativedelta.relativedelta(server_date, client_date).microseconds
+            return
+        results[rdy_2_session] += relativedelta.relativedelta(server_date, client_date).microseconds
 
 
 def average_results(results, count):
@@ -87,6 +81,7 @@ def average_results(results, count):
     for key, _ in results['client'].items():
         results['client'][key] /= count
     results['handshakeDuration'] /= count
+    results['ready-to-session'] /= count
 
 
 def load_results(socket_type, path):
