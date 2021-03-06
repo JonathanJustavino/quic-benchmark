@@ -86,6 +86,7 @@ def average_results(results, count):
         results['server'][key] /= count
     for key, _ in results['client'].items():
         results['client'][key] /= count
+    results['handshakeDuration'] /= count
 
 
 def load_results(socket_type, path):
