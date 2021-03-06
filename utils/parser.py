@@ -14,7 +14,10 @@ dockerParser.add_argument('-d', '--delay', action='store', default=0,
 dockerParser.add_argument('--threshold', action='store', default=1, 
                     help='Define a threshold for network  usage')
 dockerParser.add_argument('--clean', action='store_true', help='Remove all measurement files')
-
+dockerParser.add_argument('-x', '--extract', action='store_true', help='Filter and archive measurement files')
+dockerParser.add_argument('-dev', '--deviation', action='store', default=1, 
+                    help='Define max RTT deviation')
+dockerParser.add_argument('-m', '--merge', action='store_true', help='Merge client output folders into server output folders')
 
 pingParser = argparse.ArgumentParser(description='Run ping with or without network usage check')
 pingParser.add_argument('-c', '--check', action='store_true', help='Run ping and check if the \
