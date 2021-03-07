@@ -29,7 +29,7 @@ quic_benchmark = ("quic", "tcp")
 tcp_benchmark = ("tcp", "quic")
 
 
-def get_formatted_date(formatter="%Y-%m-%d %H-%M-%S-%s"):
+def get_formatted_date(formatter="%Y-%m-%d %H-%M-%S.%f"):
     return datetime.datetime.now().strftime(formatter)
 
 
