@@ -25,6 +25,25 @@ def read_results(path, folders, socket_type, results):
         accumulate_server_data(server_path, results, folder)
 
 
+def load_ping(folders, results):
+    rtt_stats = "rtt_statistics"
+    stats = ["min", "max", "mdev"]
+    setup_ping_properties(results, rtt_stats, stats)
+    for folder in folders:
+        file = f"{folder}/ping.json"
+        with open(file, 'r') as f:
+            ping = json.load(f)
+            results['ping'][rtt_stats][stats[0]] += float(ping[rtt_stats][stats[0]]['value'])
+            results['ping'][rtt_stats][stats[1]] += float(ping[rtt_stats][stats[1]]['value'])
+            results['ping'][rtt_stats][stats[2]] += float(ping[rtt_stats][stats[2]]['value'])
+
+def setup_ping_properties(results, parent_key, keys):
+    if parent_key not in results['ping']:
+        results['ping'][parent_key] = {}
+    for key in keys:
+        results['ping'][parent_key][key] = 0.0
+
+
 def accumulate_data(data, results, folder, side='server'):
     for key_1, value_1 in data:
         for key_2, value_2 in data:
