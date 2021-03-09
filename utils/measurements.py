@@ -122,8 +122,8 @@ def match_folders(socket_type):
         matches = []
 
     last_server = server_list[len_server - 1]
-    last_client = client_list[len(client_list) - 1]
-    if last_client > last_server:
+    last_client = client_list[len(client_list) - 1] if len(client_list) > 0 else None
+    if last_client and last_client > last_server:
         sample_pairs.append((last_server, last_client))
         client_list.remove(last_client)
     deletables += client_list
