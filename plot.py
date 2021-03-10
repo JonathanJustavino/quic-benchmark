@@ -21,21 +21,21 @@ def get_values(folder_name):
     quic_dict = load_results(quic_key, samples_path(folder_name))
     tcp_dict = load_results(tcp_key, samples_path(folder_name))
 
-    session_key = "ready-to-session"
     handshake_key = "handshakeDuration"
     byte_key = "secure-to-data"
     transfer_key = "data-to-streamEnd"
     socket_key = "streamEnd-to-socketClose"
+    average = "avg"
 
     quic_handshake = quic_dict[handshake_key]
-    quic_byte = quic_dict['server'][byte_key]
-    quic_transfer = quic_dict['server'][transfer_key]
-    quic_socket = quic_dict['server'][socket_key]
+    quic_byte = quic_dict['server'][byte_key][average]
+    quic_transfer = quic_dict['server'][transfer_key][average]
+    quic_socket = quic_dict['server'][socket_key][average]
 
     tcp_handshake = tcp_dict[handshake_key]
-    tcp_byte = tcp_dict['server'][byte_key]
-    tcp_transfer = tcp_dict['server'][transfer_key]
-    tcp_socket = tcp_dict['server'][socket_key]
+    tcp_byte = tcp_dict['server'][byte_key][average]
+    tcp_transfer = tcp_dict['server'][transfer_key][average]
+    tcp_socket = tcp_dict['server'][socket_key][average]
 
     convert_to_ms = lambda t: round((t / 1000), 1)
     quic_results = list(map(convert_to_ms, [quic_handshake, quic_byte, quic_transfer, quic_socket]))
