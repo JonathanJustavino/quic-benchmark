@@ -43,9 +43,9 @@ var startHandshake
 var endHandshake
 
 function duration(startHandshake, endHandshake) {
-    let first = (endHandshake[0] - startHandshake[0]) * 1000000000
-    let second = (endHandshake[1] - startHandshake[1])
-    return first + second
+    let end = endHandshake[0] * 1000000000 + endHandshake[1]
+    let start = startHandshake[0] * 1000000000 + startHandshake[1]
+    return end - start
 }
 
 var measurements = {
