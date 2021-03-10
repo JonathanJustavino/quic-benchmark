@@ -23,7 +23,6 @@ def read_results(path, folders, socket_type, results):
         server_path = f"{path}/{socket_type}/remote/{folder}/{server}"
         accumulate_client_data(client_path, results, folder)
         accumulate_server_data(server_path, results, folder)
-        accumulate_ready_to_session(client_path, server_path, results)
 
 
 def accumulate_data(data, results, folder, side='server'):
@@ -37,7 +36,7 @@ def accumulate_data(data, results, folder, side='server'):
                 new_key = f"{key_1}-to-{key_2}"
                 if new_key not in results[side]:
                     results[side][f"{key_1}-to-{key_2}"] = {folder: 0}
-                results[side][f"{key_1}-to-{key_2}"][f"{folder}"] = relativedelta.relativedelta(date_2, date_1).microseconds
+                results[side][f"{key_1}-to-{key_2}"][folder] = relativedelta.relativedelta(date_2, date_1).microseconds
     
 
 def accumulate_client_data(file, results, folder):
@@ -53,9 +52,8 @@ def accumulate_server_data(file, results, folder):
         events = data["events"].items()
         accumulate_data(events, results, folder)
         if duration not in results:
-            results[duration] = float(data["durations"]["handshakeDurationInNs"]) / 1000
-            return
-        results[duration] += float(data["durations"]["handshakeDurationInNs"]) / 1000
+            results[duration] = {folder: 0}
+        results[duration][folder] = float(data["durations"]["handshakeDurationInNs"]) / 1000
 
 
 def accumulate_ready_to_session(client_path, server_path, results):
@@ -78,8 +76,8 @@ def average_results(results, count):
     for key, _ in results['client'].items():
         values = results['client'][key].values()
         results['client'][key]['avg'] = sum(values) / len(values)
-    results['handshakeDuration'] /= count
-    results['ready-to-session'] /= count
+    values = results['handshakeDuration'].values()
+    results['handshakeDuration']['avg'] = sum(values) / len(values)
 
 
 def load_results(socket_type, path):
