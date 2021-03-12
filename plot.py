@@ -1,10 +1,8 @@
 import os
 import re
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import colors
 from visualize_events.plot_timeplan import *
-from visualize_events.dataloader import load_results, read_results
+from visualize_events.dataloader import load_results
 
 
 def convert_to_ms(value):
@@ -50,9 +48,9 @@ def get_values(folder_name):
 def plot_graphs():
     category_names = ['Handshake', 'Time to first byte', 'Content Transfer', 'Close socket']
     del0_quic_results, del0_tcp_results = get_values("samples_threshold5_dev2_delay0")
-    del10_quic_results, del10_tcp_results = get_values("samples_threshold5_dev2_delay0")
-    del20_quic_results, del20_tcp_results = get_values("samples_threshold5_dev2_delay0")
-    del60_quic_results, del60_tcp_results = get_values("samples_threshold5_dev2_delay0")
+    del10_quic_results, del10_tcp_results = get_values("samples_threshold15_dev2_delay10")
+    del20_quic_results, del20_tcp_results = get_values("samples_threshold25_dev2_delay20")
+    del60_quic_results, del60_tcp_results = get_values("samples_threshold55_dev2_delay50")
 
     results = {
         'QUIC (Delay 0)': del0_quic_results,
@@ -64,7 +62,7 @@ def plot_graphs():
         'QUIC (Delay 60)': del60_quic_results,
         'TCP/TLS (Delay 60)': del60_tcp_results,
     }
-    survey(results, category_names)
+    survey(results, category_names, multiple_graphs=True)
 
 
 def plot_single_graph():
@@ -105,8 +103,8 @@ def plot_single_graph():
 
 
 if __name__ == '__main__':
-    plot_single_graph()
-    # plot_graphs()
+    # plot_single_graph()
+    plot_graphs()
     plt.xlabel("Milliseconds")
     plt.ylabel("Socket type")
     plt.show()
