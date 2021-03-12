@@ -94,9 +94,10 @@ Currently, 4 logfiles are in the "measurements" folder, so it draws the timeline
 The communication between TCP+TLS Server and TCP+TLS Client is depicted by the following flowchart.
 
 ### Flowchart QUIC
-The communication between QUIC Server and QUIC Client is depicted in the following flowcharts.
+The communication between QUIC Server and QUIC Client is depicted in the followin QUIC flowchart.
+
 The QUIC protocol uses two types of headers: Long Header for the handshake and Short Header after the connection is established.
-SCID == Source connection ID, DCID = destination connection ID.
+In the QUIC flowchart, each packet of the handshake (depicted with purple arrows) has a QUIC long header, after the connection is established, each packet has a QUIC short header.
 
 The Long Header contains the following headerfields:
 | Field Type | Size in Byte |
@@ -137,8 +138,7 @@ There is an important difference with the usage of TLS between QUIC and TCP, as 
 > level.  For instance, an implementation might bundle a Handshake
 > message and an ACK for some Handshake data into the same packet.
 
-This can be seen/explains at flowchart... packet 2. and 4. ...
-In message 2., TLS Client hello + TLS encrypted extensions are inluded in 2 different QUIC frames within this packet..
-
-
+This can be seen at the QUIC flowchart:
+The second packet (20,103 ms) contains one QUIC frame including TLS Server Hello, and another QUIC frame including TLS encrypted extensions. 
+The fifth packet (92,746) contains one QUIC frame including TLS handshake finished, and another QUIC frame including a new connection ID. 
 
