@@ -91,12 +91,15 @@ Currently, 4 logfiles are in the "measurements" folder, so it draws the timeline
 ## Evaluation
 
 ### Flowchart TCP+TLS
-The communication between TCP+TLS Server and TCP+TLS Client is depicted by the following flowchart.
+The communication between TCP+TLS Server and TCP+TLS Client is depicted in the following flowchart:
+
+![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_2021-02-18 21 08 37.464861.png)
+
 
 ### Flowchart QUIC
 The communication between QUIC Server and QUIC Client is depicted in the followin QUIC flowchart:
 
-![setup parameters](./documentation/QUIC_flowchart_to_pcap_2021-02-18_19_57_03.396422.png)
+![quic_flowchart](./documentation/QUIC_flowchart_to_pcap_2021-02-18_19_57_03.396422.png)
 
 The QUIC protocol uses two types of headers: Long Header for the handshake and Short Header after the connection is established.
 In the QUIC flowchart, each packet of the handshake (depicted with <span style="color:#9673A6">purple</span> arrows) has a QUIC long header, after the connection is established, each packet has a QUIC short header.
