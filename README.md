@@ -93,7 +93,7 @@ Currently, 4 logfiles are in the "measurements" folder, so it draws the timeline
 ### Flowchart TCP+TLS
 The communication between TCP+TLS Server and TCP+TLS Client is depicted in the following flowchart:
 
-![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_2021-02-18 21 08 37.464861.png)
+![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_2021-02-18_21_08_37.464861.png)
 
 
 ### Flowchart QUIC
