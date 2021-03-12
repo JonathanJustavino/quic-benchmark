@@ -56,8 +56,8 @@ def annotate_points(subplot, stamps, labels, socket_type, color):
 
 def plot_graph(quic_labels, quic_stamps, tcp_labels, tcp_stamps):
     # static colors for graphs -> quic == blue, tcp == red
-    quic_serv_col = 'b'
-    col_tcp_serv = 'r'
+    quic_serv_col = '#0f2080'
+    col_tcp_serv = '#a95aa1'
 
     # init figure
     fig = plt.figure()
@@ -68,8 +68,8 @@ def plot_graph(quic_labels, quic_stamps, tcp_labels, tcp_stamps):
     annotate_points(ax, quic_stamps, quic_labels, 'quic', quic_serv_col)
 
     plt.grid(1)
-    plt.xlabel("Events of connection")
-    plt.ylabel("Timeline in milliseconds")
+    plt.ylabel("Events of connection")
+    plt.xlabel("Timeline in milliseconds")
     plt.legend()
     plt.show()
 
