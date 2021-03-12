@@ -34,12 +34,6 @@ pip3 install docker
 sudo apt-get install tshark
 ```
 
-[pyshark](https://github.com/KimiNewt/pyshark):
-
-```[bash]
-pip3 install pyshark
-```
-
 [matplotlib](https://matplotlib.org/stable/index.html):
 
 ```[bash]
@@ -77,7 +71,7 @@ To run the setup in docker you do not have to have nodejs installed. Instead the
 
 #### Benchmark parameters
 
-![setup parameters](./documentation/setup-parameters.png)
+![setup parameters](./documentation/setup_parameters.png)
 
 > Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
 
@@ -141,4 +135,8 @@ This can be seen/explains at flowchart... packet 2. and 4. ...
 In message 2., TLS Client hello + TLS encrypted extensions are inluded in 2 different QUIC frames within this packet..
 
 
+### Time comparisons
 
+![setup parameters](./documentation/socket_comparison.png)
+![setup parameters](./documentation/delay_comparison.png)
+![setup parameters](./documentation/events_comparison.png)
