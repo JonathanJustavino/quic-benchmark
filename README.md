@@ -1,4 +1,4 @@
-# Komplexpraktikum quic-benchmark
+# University project QUIC benchmarking
 
 A project comparing the performance of QUIC sockets with TCP sockets.
 
@@ -32,6 +32,8 @@ Our Router only had the possibility to connect one LAN cable, because of this th
 
 ![topology](./documentation/topology.png)
 
+
+
 ## Prerequisites
 
 [dockerpy](https://docker-py.readthedocs.io/en/stable/):
@@ -44,12 +46,6 @@ pip3 install docker
 
 ```[bash]
 sudo apt-get install tshark
-```
-
-[pyshark](https://github.com/KimiNewt/pyshark):
-
-```[bash]
-pip3 install pyshark
 ```
 
 [matplotlib](https://matplotlib.org/stable/index.html):
@@ -68,13 +64,25 @@ pip3 install colored
 
 Commands required to benchmark the sockets on your machine.
 
+### Run in docker container
+
+To run the setup in docker you do not have to have nodejs installed. Instead the image, which is built from the [Dockerfile](Dockerfile) is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
+
+#### Benchmark parameters
+
+![setup parameters](./documentation/setup_parameters.png)
+
+> Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
+
+The script generates a json file with timestamps for every comparable event for TCP+TLS and QUIC, as well as a packet capture via tshark and a json file documenting the ping output run simultaniously.
+
 ### Run locally on machine
 
 > Beware: Running the server and client locally only works if you have nodejs 15.6 in experimental mode already installed on your system
 > This is **not recommended**, use the docker setup instead.
 
 ```[bash]
-npm run tcp 
+npm run tcp
 ```
 
 or
@@ -82,18 +90,6 @@ or
 ```[bash]
 npm run quic
 ```
-
-### Run in docker container
-
-To run the setup in docker you do not have to have nodejs installed. Instead the image, which is built from the [Dockerfile](Dockerfile) is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
-
-#### Benchmark parameters
-
-![setup parameters](./documentation/setup-parameters.png)
-
-> Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
-
-The script generates a json file with timestamps for every comparable event for tcp+tls and quic.
 
 ## Visualize Events: Plotting the result of the logfiles
 
@@ -147,7 +143,7 @@ The Short Header contains the following headerfields:
 | Packet Nr. | 1 |
 | | Σ = 27 |
 
-There is an important difference with the usage of TLS between QUIC and TCP, as noted in [draft-ietf-quic-tls-27](https://tools.ietf.org/html/draft-ietf-quic-tls-27#section-4):
+There is an important difference with the usage of TLS between QUIC and TCP, as noted in [draft-ietf-QUIC-tls-27](https://tools.ietf.org/html/draft-ietf-QUIC-tls-27#section-4):
 
 > One important difference between TLS records (used with TCP) and QUIC
 > CRYPTO frames is that in QUIC multiple frames may appear in the same
@@ -159,3 +155,22 @@ This can be seen at the QUIC flowchart:
 The second packet (20,103 ms) contains one QUIC frame including TLS Server Hello, and another QUIC frame including TLS encrypted extensions. 
 The fifth packet (92,746) contains one QUIC frame including TLS handshake finished, and another QUIC frame including a new connection ID. 
 
+### Event comparisons
+
+![setup parameters](./documentation/events_comparison.png)
+The events that occurred in the same sequence for QUIC and TCP, were picked to be compared by time difference.
+
+### Time comparisons
+
+Here is ..
+
+![setup parameters](./documentation/socket_comparison.png)
+
+If you look back to our package analysis, QUIC had fewer packets for the TLS Handshake than TCP. What is noticeable in this graph, is that even though the number of packets transferred is fewer for QUIC, the time duration is actually longer than for TCP.
+We can think of two explanations for this result: firstly, the different priorities of executions in user-space and kernel-space. The QUIC protocol is implemented in user-space and the TCP protocol is implemented in kernel-space. User-space tasks have a lower priority in the execution sequence than kernel-space tasks. Secondly, the nodejs version 16.05 is an experimental build. The implementation for QUIC may not be 100% finished and we cannot be sure if this didn't affect our measurements.
+
+![setup parameters](./documentation/delay_comparison.png)
+<<<<<<< HEAD
+
+=======
+>>>>>>> Update README
