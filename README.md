@@ -189,6 +189,7 @@ Based on the results we obtained in our experiment and the features we managed t
 ### Measuring with higher delay -> maybe take that out
 
 ### Simulation of packet loss with the [TC tool](https://linux.die.net/man/8/tc)
+One of the main advantages of QUIC is the improved package loss handling. Therefore it is possible that increasing the packet loss during measurements leads to better results for QUIC.
 
 ### Reusing the connection for sending more payload 
 
