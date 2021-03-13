@@ -17,6 +17,8 @@ In this experiment, we implemented two different Server-Client setups: One for c
 * The experiment can be easily used on different operation systems 
 * Conducting the measurements is automated via docker-compose
 
+A detailed depiction of the experiment is shown in [Topology](#topology)
+
 The QUIC implementation of nodejs 15.0.6 is based on the QUIC IETF [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27).
 
 The [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27) expired on 24 August 2020, the current deployable draft is [draft-32](https://tools.ietf.org/html/draft-ietf-quic-transport-32).
@@ -36,12 +38,12 @@ As we built our own dockerimage with the nodejs version installed, it is still e
 
 ## Topology
 ### Local Measurements
-For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and ran the Client and Server on localhost.
+For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and ran the Client and Server on localhost. As described in [Experimental Setup](#experiment-setup), the client and server are running inside docker-containers.
 
 *insert topology pic of local measurment*
 
 ### Remote Measurements
-For the remote measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client.
+For the remote measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client.  
 Our Router only had the possibility to connect one LAN cable, because of this the Client had to be connected via WLAN. It is recommended to use LAN cable connections for both hosts if possible, because it reduces the network round trip time.
 
 ![topology](./documentation/topology.png)
