@@ -11,12 +11,24 @@ The purpose of this project is performance measurement of the QUIC protocol and 
 ## Experiment setup
 
 In the experiment, we implemented two different setups: Client-Server communication with QUIC and Client-Server communication with TCP+TLS.
-We implemented both in rust and nodejs.
-We decided to go with nodejs for the rest of the experiment, because it is possible to set up QUIC as a socket and also directly as HTTP/3.
-Also the documentation in nodejs is more detailed.
+We use the experimental nodejs version 15.0.6.
+We decided to go with nodejs for this experiment because it is possible to set up QUIC as a socket and also directly as HTTP/3 and the documentation is really detailed.
 Server and Client are currently running in a docker environment on one machine and communicate via localhost.
 
+
+The QUIC documentation to our nodejs experimental version is available here: https://nodejs.org/docs/v15.7.0/api/quic.html
+
+:red_circle: The experimental nodejs version we used is **no longer maintained**, as explained in this [commit](https://github.com/nodejs/node/pull/37067
+) in the official nodejs repository:
+> The OpenSSL OMC has not yet committed to landing the updated QUIC APIs and has indicated that they will not even look at it until OpenSSL 3.1. With OpenSSL 3.0 > beta currently delayed with no clear idea of when it will actually land, the initial QUIC support landed in core has now just become a maintenance burden with 
+> no clear idea of when we'd ever be capable of delivering it. This PR, therefore, removes the QUIC support and reverts the patched in modifications to openssl. I > will be investigating a userland alternative that does not depend on the built-in openssl bindings.
+
+This happened unfortunately after we were nearly finished with our project. Switching to another QUIC Server/Client architecture and do everything again would not have been possible on such a short notice.
+As we built our own dockerimage with the nodejs version installed, it is still easily possible to run our project without having to get the now deprecated nodejs version from some archived nodejs repository.
+
 ## Topology
+For the measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client.
+Our Router only had the possibility to connect one LAN cable, because of this the Client had to be connected via WLAN. It is recommended to use LAN cable connections for both hosts if possible, because it reduces the network round trip time.
 
 ![topology](./documentation/topology.png)
 
@@ -87,12 +99,18 @@ Currently, 4 logfiles are in the "measurements" folder, so it draws the timeline
 ## Evaluation
 
 ### Flowchart TCP+TLS
-The communication between TCP+TLS Server and TCP+TLS Client is depicted by the following flowchart.
+The communication between TCP+TLS Server and TCP+TLS Client is depicted in the following flowchart:
+
+![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_2021-02-18_21_08_37.464861.png)
+
 
 ### Flowchart QUIC
-The communication between QUIC Server and QUIC Client is depicted in the following flowcharts.
+The communication between QUIC Server and QUIC Client is depicted in the followin QUIC flowchart:
+
+![quic_flowchart](./documentation/QUIC_flowchart_to_pcap_2021-02-18_19_57_03.396422.png)
+
 The QUIC protocol uses two types of headers: Long Header for the handshake and Short Header after the connection is established.
-SCID == Source connection ID, DCID = destination connection ID.
+In the QUIC flowchart, each packet of the handshake (depicted with <span style="color:#9673A6">purple</span> arrows) has a QUIC long header, after the connection is established, each packet has a QUIC short header.
 
 The Long Header contains the following headerfields:
 | Field Type | Size in Byte |
@@ -133,8 +151,9 @@ There is an important difference with the usage of TLS between QUIC and TCP, as 
 > level.  For instance, an implementation might bundle a Handshake
 > message and an ACK for some Handshake data into the same packet.
 
-This can be seen/explains at flowchart... packet 2. and 4. ...
-In message 2., TLS Client hello + TLS encrypted extensions are inluded in 2 different QUIC frames within this packet..
+This can be seen at the QUIC flowchart:
+The second packet (20,103 ms) contains one QUIC frame including TLS Server Hello, and another QUIC frame including TLS encrypted extensions. 
+The fifth packet (92,746) contains one QUIC frame including TLS handshake finished, and another QUIC frame including a new connection ID. 
 
 ### Event comparisons
 
@@ -151,3 +170,4 @@ If you look back to our package analysis, QUIC had fewer packets for the TLS Han
 We can think of two explanations for this result: firstly, the different priorities of executions in user-space and kernel-space. The QUIC protocol is implemented in user-space and the TCP protocol is implemented in kernel-space. User-space tasks have a lower priority in the execution sequence than kernel-space tasks. Secondly, the nodejs version 16.05 is an experimental build. The implementation for QUIC may not be 100% finished and we cannot be sure if this didn't affect our measurements.
 
 ![setup parameters](./documentation/delay_comparison.png)
+
