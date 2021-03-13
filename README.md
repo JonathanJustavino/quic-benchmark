@@ -173,14 +173,33 @@ The events that occurred in the same sequence for QUIC and TCP, were picked to b
 
 ### Time comparisons
 
-Here is ..
+For further comparison, we defined specific durations for the communication using the events mentioned before.
 
-![setup parameters](./documentation/socket_comparison.png)
+- **Handshake**: handshakeDuration
+- **Time to first Byte**: secure -> data
+- **Content Transfer**: data -> streamEnd
+- **Close socket**: streamEnd -> socketClose
+
+![socket_comparison](./documentation/socket_comparison.png)
 
 If you look back to our package analysis, QUIC had fewer packets for the TLS Handshake than TCP. What is noticeable in this graph, is that even though the number of packets transferred is fewer for QUIC, the time duration is actually longer than for TCP.
 We can think of two explanations for this result: firstly, the different priorities of executions in user-space and kernel-space. The QUIC protocol is implemented in user-space and the TCP protocol is implemented in kernel-space. User-space tasks have a lower priority in the execution sequence than kernel-space tasks. Secondly, the nodejs version 16.05 is an experimental build. The implementation for QUIC may not be 100% finished and we cannot be sure if this didn't affect our measurements.
 
-![setup parameters](./documentation/delay_comparison.png)
+Beside the **Handshake**, the remaining durations **Time to first Byte**, **Content Transfer** and  **Close socket** are lower with TCP/TLS than with QUIC. We also contribute this to the TCP kernel implementation.
+
+#### Adding Delay
+
+To see how the content transfer is affected by a slower connection, we added various network delays using tc.
+
+![delay_comparison](./documentation/delay_comparison.png)
+
+with increased delay, we can see a linear increase for the durations **Handshake**, **Time to first Byte** and **Content Transfer** for both TCP/TLS and QUIC.
+QUIC has a steeper linear increase than TCP.
+Most noticeable and surprising is the spike in the duration **Close socket** for QUIC. We hypothesize that this is due to the implementation of the experimental nodejs version.
+
+![delay_10](./documentation/delay_10.png)
+![delay_20](./documentation/delay_20.png)
+![delay_50](./documentation/delay_50.png)
 
 
 ## Future Work
