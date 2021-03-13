@@ -15,6 +15,13 @@ We use the experimental nodejs version 15.0.6.
 We decided to go with nodejs for this experiment because it is possible to set up QUIC as a socket and also directly as HTTP/3 and the documentation is really detailed.
 Server and Client are currently running in a docker environment on one machine and communicate via localhost.
 
+The [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27) on which the QUIC implementation of nodejs is based, expired on 24 August 2020. 
+The current deployable draft is [draft-32](https://tools.ietf.org/html/draft-ietf-quic-transport-32).
+
+The differences between those two drafts are mainly restructuring of the text, more detailed explanation of some features and the style of figures is different.
+Also the behaviour in some special cases has changed, i.e. "A server that chooses a zero-length connection ID MUST NOT provide a preferred address."
+Because we always use the same connection setup in which these special cases do not occur, they are not relevant for our project.
+In conclusion, the expired [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27) implementation of QUIC in nodejs is still sufficiently up to date to be used for our QUIC evaluation.
 
 The QUIC documentation to our nodejs experimental version is available here: https://nodejs.org/docs/v15.7.0/api/quic.html
 
@@ -90,11 +97,6 @@ or
 ```[bash]
 npm run quic
 ```
-
-## Visualize Events: Plotting the result of the logfiles
-
-The python script "visualize_events.py" in the folder visualize_events draws all given logfiles in the specified folder into one figure.
-Currently, 4 logfiles are in the "measurements" folder, so it draws the timeline of these 4 logfiles into one figure.
 
 ## Evaluation
 
