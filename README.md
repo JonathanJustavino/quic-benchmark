@@ -170,4 +170,7 @@ If you look back to our package analysis, QUIC had fewer packets for the TLS Han
 We can think of two explanations for this result: firstly, the different priorities of executions in user-space and kernel-space. The QUIC protocol is implemented in user-space and the TCP protocol is implemented in kernel-space. User-space tasks have a lower priority in the execution sequence than kernel-space tasks. Secondly, the nodejs version 16.05 is an experimental build. The implementation for QUIC may not be 100% finished and we cannot be sure if this didn't affect our measurements.
 
 ![setup parameters](./documentation/delay_comparison.png)
+<<<<<<< HEAD
 
+=======
+>>>>>>> Update README
