@@ -1,23 +1,25 @@
 # University project QUIC benchmarking
 
-A project comparing the performance of QUIC sockets with TCP sockets.
+Comparing the performance of the QUIC protocol with a combination of the TCP+TLS protocols on the transport layer via sockets.
 
 ## Motivation
 
-QUIC is a transport-layer protocol that was initially developed by Google and is currently developed and standardized by the IETF.
-HTTP mapping with QUIC is called HTTP/3, the newest version of HTTP. Communication via QUIC is encrypted by default.  
-The purpose of this project is performance measurement of the QUIC protocol and compare it with the transmission control protocol (TCP) in combination with the Transport Layer Security (TLS), because TCP does not communicate encrypted by default.
+QUIC is a transport-layer protocol that was initially developed by Google and is currently developed and standardized by the [IETF](https://datatracker.ietf.org/wg/quic/about/).
+HTTP mapping with QUIC is standardized in [HTTP/3](https://tools.ietf.org/html/draft-ietf-quic-http-32), the newest version of HTTP. Communication via QUIC is encrypted by default.  
+The purpose of this project is the performance measurement of the QUIC protocol and compare it with the combination of the transmission control protocol (TCP) and the Transport Layer Security (TLS) protocol. The combination of TCP and TLS is necessary, as TCP does not use encryption by default.
 
 ## Experiment setup
+The basis for our setup is the experimental (nodejs version 15.0.6)[https://nodejs.org/download/release/v15.6.0/].
+We decided to go with nodejs for this experiment because it is possible to set up QUIC as a socket and also directly as HTTP/3. Moreover, the documentation is really detailed. 
 
-In the experiment, we implemented two different setups: Client-Server communication with QUIC and Client-Server communication with TCP+TLS.
-We use the experimental nodejs version 15.0.6.
-We decided to go with nodejs for this experiment because it is possible to set up QUIC as a socket and also directly as HTTP/3 and the documentation is really detailed.
-Server and Client are currently running in a docker environment on one machine and communicate via localhost.
+In this experiment, we implemented two different Server-Client setups: One for communication via QUIC and the second for communication via TCP+TLS. Both implementations were installed into docker containers and uploaded to [dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs). Using docker has several advantages:
+* For reproducing the measurements, it is not necessary to download+compile nodejs in experimental mode.
+* The experiment can be easily used on different operation systems 
+* Conducting the measurements is automated via docker-compose
 
-The [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27) on which the QUIC implementation of nodejs is based, expired on 24 August 2020. 
-The current deployable draft is [draft-32](https://tools.ietf.org/html/draft-ietf-quic-transport-32).
+The QUIC implementation of nodejs 15.0.6 is based on the QUIC IETF [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27).
 
+The [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27) expired on 24 August 2020, the current deployable draft is [draft-32](https://tools.ietf.org/html/draft-ietf-quic-transport-32).
 The differences between those two drafts are mainly restructuring of the text, more detailed explanation of some features and the style of figures is different.
 Also the behaviour in some special cases has changed, i.e. "A server that chooses a zero-length connection ID MUST NOT provide a preferred address."
 Because we always use the same connection setup in which these special cases do not occur, they are not relevant for our project.
@@ -25,8 +27,7 @@ In conclusion, the expired [draft-27](https://tools.ietf.org/html/draft-ietf-qui
 
 The QUIC documentation to our nodejs experimental version is available here: https://nodejs.org/docs/v15.7.0/api/quic.html
 
-:red_circle: The experimental nodejs version we used is **no longer maintained**, as explained in this [commit](https://github.com/nodejs/node/pull/37067
-) in the official nodejs repository:
+:red_circle: The experimental nodejs version we used is **no longer maintained**, as explained in this [commit](https://github.com/nodejs/node/pull/37067) in the official nodejs repository:
 > The OpenSSL OMC has not yet committed to landing the updated QUIC APIs and has indicated that they will not even look at it until OpenSSL 3.1. With OpenSSL 3.0 > beta currently delayed with no clear idea of when it will actually land, the initial QUIC support landed in core has now just become a maintenance burden with 
 > no clear idea of when we'd ever be capable of delivering it. This PR, therefore, removes the QUIC support and reverts the patched in modifications to openssl. I > will be investigating a userland alternative that does not depend on the built-in openssl bindings.
 
@@ -34,7 +35,13 @@ This happened unfortunately after we were nearly finished with our project. Swit
 As we built our own dockerimage with the nodejs version installed, it is still easily possible to run our project without having to get the now deprecated nodejs version from some archived nodejs repository.
 
 ## Topology
-For the measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client.
+### Local Measurements
+For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and ran the Client and Server on localhost.
+
+*insert topology pic of local measurment*
+
+### Remote Measurements
+For the remote measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client.
 Our Router only had the possibility to connect one LAN cable, because of this the Client had to be connected via WLAN. It is recommended to use LAN cable connections for both hosts if possible, because it reduces the network round trip time.
 
 ![topology](./documentation/topology.png)
