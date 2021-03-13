@@ -25,17 +25,18 @@ def read_results(path, folders, socket_type, results):
         accumulate_server_data(server_path, results, folder)
 
 
-def load_ping(folders, results):
+def load_ping(path, socket_type, folders, results):
     rtt_stats = "rtt_statistics"
     stats = ["min", "max", "mdev"]
     setup_ping_properties(results, rtt_stats, stats)
     for folder in folders:
-        file = f"{folder}/ping.json"
+        file = f"{path}/{socket_type}/remote/{folder}/ping.json"
         with open(file, 'r') as f:
             ping = json.load(f)
             results['ping'][rtt_stats][stats[0]] += float(ping[rtt_stats][stats[0]]['value'])
             results['ping'][rtt_stats][stats[1]] += float(ping[rtt_stats][stats[1]]['value'])
             results['ping'][rtt_stats][stats[2]] += float(ping[rtt_stats][stats[2]]['value'])
+
 
 def setup_ping_properties(results, parent_key, keys):
     if parent_key not in results['ping']:
@@ -88,7 +89,7 @@ def accumulate_ready_to_session(client_path, server_path, results):
         results[rdy_2_session] += relativedelta.relativedelta(server_date, client_date).microseconds
 
 
-def average_results(results, count):
+def average_results(results):
     for key, _ in results['server'].items():
         values = results['server'][key].values()
         results['server'][key]['avg'] = sum(values) / len(values)
@@ -102,7 +103,14 @@ def average_results(results, count):
 def load_results(socket_type, path):
     results = {'ping': {}, 'server': {}, 'client': {}}
     folders = load_folders(socket_type, path)
-    folder_count = len(folders)
     read_results(path, folders, socket_type, results)
-    average_results(results, folder_count)
+    average_results(results)
+    load_ping(path, socket_type, folders, results)
+    return results
+
+
+def load_ping_results(socket_type, path):
+    results = {'ping': {}}
+    folders = load_folders(socket_type, path)
+    load_ping(path, socket_type, folders, results)
     return results
