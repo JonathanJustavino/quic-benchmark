@@ -11,15 +11,16 @@ The purpose of this project is the performance measurement of the QUIC protocol 
 ## Experiment setup
 
 The basis for our setup is the experimental [nodejs version 15.0.6](https://nodejs.org/download/release/v15.6.0/).
-We decided to go with nodejs for this experiment because it is possible to set up QUIC as a socket and also directly as HTTP/3. Moreover, the documentation is really detailed.
+We decided to go with nodejs for this experiment because it is possible to set up QUIC as a socket and also directly as HTTP/3. Moreover, the documentation is really detailed. 
 
-In this experiment, we implemented two different Server-Client setups: One for communication via QUIC and the second for communication via TCP+TLS. Both implementations were installed into docker containers and uploaded to [dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs). Using docker has several advantages:
+In this experiment, we implemented two different Server-Client setups: One for communication via QUIC and the second for communication via TCP+TLS. 
+Both implementations were installed into docker containers and uploaded to [dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs). Using docker has several advantages:
 
 * For reproducing the measurements, it is not necessary to download+compile nodejs in experimental mode.
 * The experiment can be easily used on different operation systems
 * Conducting the measurements is automated via docker-compose
 
-A detailed depiction of the experiment is shown in [Topology](#topology)
+A detailed depiction of the hardware setup is shown in [Topology](#topology).
 
 The QUIC implementation of nodejs 15.0.6 is based on the QUIC IETF [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27).
 
@@ -81,7 +82,8 @@ pip3 install colored
 
 ## Run setup
 
-Commands required to benchmark the sockets on your machine.
+
+The following commands are required to start benchmarking on your machine.
 
 ### Run in docker container
 
@@ -141,8 +143,6 @@ The TCP protocol contains following headerfields:
 | Urgent pointer | 2 |
 | Options | 12 |
 | |  Σ = 32 |
-
-The overhead of the 
 
 ### Flowchart QUIC
 
@@ -204,14 +204,55 @@ There is an important difference with the usage of TLS between QUIC and TCP, as 
 
 This can be seen at the QUIC flowchart:
 The second packet (20,103 ms) contains one QUIC frame including TLS Server Hello, and another QUIC frame including TLS encrypted extensions.
-The fifth packet (92,746) contains one QUIC frame including TLS handshake finished, and another QUIC frame including a new connection ID.
+The fifth packet (92,746 ms) contains one QUIC frame including TLS handshake finished, and another QUIC frame including a new connection ID.
+
+
+### Comparison transmitted Bytes in summary
+
+The information of the given flowcharts + documentiation summarized:
+
+| | TCP+TLS | QUIC |
+| ------------ | ------------ | ------------- |
+| **headerbytes/packet** | 32 (TCP) | 8 (UDP) + 55 (QUIC long header) = 63 |
+| | 32 (TCP) | 8 (UDP) + 27 (QUIC short header) = 35 |
+| **Σ Handshake on wire** | 2068 | 2947 |
+| **Σ Bytes transmitted in total** | 2589 | 4141 |
+| **Established connection** | 2589 (Bytes in total) - 2068 (Handshake) = 521 | 4141 (Bytes in total) - (2947 (Handshake) + 78 (1.QUIC frame) - 110 (2.QUIC frame)) = 1162 |
+| **Encrypted Application data** | 207 | 126 |
+
+In conclusion, the QUIC is transmitting more data than TCP+TLS for transmitting the same application data.
+QUIC uses roughly 1/3 more data than TCP+TLS during the handshake. This difference is not because the long header is used: The padding in the first packet/Client initial that is embedded after the "TLS Client hello" has a size of **921 Bytes**, consisting of zeros. This is necessary due to technical and security reasons:
+
+IETF documentation: [Padding](https://tools.ietf.org/html/draft-ietf-quic-transport-27#page-111) states:
+> The PADDING frame (type=0x00) has no semantic value.  PADDING frames
+> can be used to increase the size of a packet.  Padding can be used to
+> increase an initial client packet to the minimum required size, or to
+> provide protection against traffic analysis for protected packets.
+
+IETF documentation: [Packet Size](https://tools.ietf.org/html/draft-ietf-quic-transport-27#section-14)) states:
+
+> **A client MUST expand the payload of all UDP datagrams carrying
+> Initial packets to at least 1200 bytes** by adding PADDING frames to
+> the Initial packet or by coalescing the Initial packet.
+> Sending a UDP datagram of this size ensures that the
+> network path from the client to the server supports a reasonable
+> Maximum Transmission Unit (MTU).  Padding datagrams also helps reduce
+> the amplitude of amplification attacks caused by server responses
+> toward an unverified client address.
+
+After establishing the connection, the QUIC headersize is similar to the TCP headersize. Still, QUIC uses ~2x the amount of data than TCP+TLS.
+
+In summary, QUIC is transmitting more data, but is sending fewer packets than TCP. It is unfortunate that QUIC needs 921 Bytes in the handshake only for padding, but it is necessary due to technical and security reasons. Maybe it is possible to improve the QUIC protocol by filling the first packet more efficiently.
+Reusing the same connection to send more application data would at least reduce the handshake data for QUIC and probably improve the performance - this is also stated in (Future Work)[#future-work].
+QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it is sending 2 packets less. This could be because QUIC is running in user-space instead of kernel-space, like TCP+TLS (see the summary of (Time Comparison)[#time-comparison] for a detailed explanation).
+Moreover, the QUIC implementation in the nodejs version we are using is still experimental, so this could also be a limiting factor.
 
 ### Event comparisons
 
 ![setup parameters](./documentation/events_comparison.png)
 The events that occurred in the same sequence for QUIC and TCP, were picked to be compared by time difference.
 
-### Time comparisons
+### Time comparison
 
 For further comparison, we defined specific durations for the communication using the events mentioned before.
 
@@ -249,7 +290,7 @@ Based on the results we obtained in our experiment and the features we managed t
 
 * **Simulation of packet loss with the [TC tool](https://linux.die.net/man/8/tc):** One of the main advantages of QUIC is the improved package loss handling. Therefore it is possible that increasing the packet loss during measurements leads to better results for QUIC.
 
-* **Reusing the connection for sending more payload:** As the socket close event of the QUIC connection takes exceedingly more time than all other events, reusing the connection could benefit the QUIC performance.
+* **Reusing the connection for sending more payload:** As the socket close event of the QUIC connection takes exceedingly more time than all other events and the QUIC handshake is transmitting a lot of data, reusing the connection will probably improve QUIC performance. 
 
 * **Comparison of socket-based transport layer with HTTP/3 application layer:** It could be interesting to check the difference in performance when comparing socket layer implementation to application layer implementation.
 
