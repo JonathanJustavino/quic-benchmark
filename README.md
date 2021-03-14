@@ -112,6 +112,15 @@ npm run quic
 
 ## Evaluation
 
+The general structure of QUIC and TCP+TLS communication, based on network protocol layers:
+![layers_comparison_QUIC_TCP](./documentation/layers_comparison_QUIC_TCP.png)
+
+Both protocols work similar until they use TCP and UDP respectively in the transport layer.
+Notably, the payload of the transport layer protocols is structured different: 
+* **TCP+TLS**: The TLS layer is directly included in the TCP payload. Traffic control is managed by TCP.
+* **QUIC:** The QUIC packet is included in the UDP payload. The encryption is also done via TLS, but the TLS CRYPTO frames are part of the QUIC payload. Traffic control is managed by QUIC.
+
+
 ### Flowchart TCP+TLS
 
 The communication between TCP+TLS Server and TCP+TLS Client is depicted in the following flowchart:
