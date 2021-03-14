@@ -153,6 +153,7 @@ The communication between QUIC Server and QUIC Client is depicted in the followi
 QUIC frames are encapsulated in the payload of UDP packets.
 The UDP protocol contains the following headerfields:
 | Field Type | Size in Byte |
+| --- | --- |
 | Source port | 2 |
 | Destination port | 2 |
 | Length | 2 |
