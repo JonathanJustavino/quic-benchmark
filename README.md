@@ -97,7 +97,7 @@ The script generates a json file with timestamps for every comparable event for 
 
 ### Run locally on machine
 
-> Beware: Running the server and client locally only works if you have nodejs 15.6 in experimental mode already installed on your system
+> Beware: Running the server and client directly on your OS only works if you have nodejs 15.6 in experimental mode already installed on your system
 > This is **not recommended**, use the docker setup instead.
 
 ```[bash]
@@ -118,7 +118,7 @@ The communication between TCP+TLS Server and TCP+TLS Client is depicted in the f
 
 ![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_2021-02-18_21_08_37.464861.png)
 
-The TCP protocol has one type of header. It has the following headerfields:
+The TCP protocol contains following headerfields:
 | Field Type | Size in Byte |
 | --- | --- |
 | Source Port | 2 |
@@ -133,12 +133,20 @@ The TCP protocol has one type of header. It has the following headerfields:
 | |  Σ = 32 |
 
 
-
 ### Flowchart QUIC
 
 The communication between QUIC Server and QUIC Client is depicted in the followin QUIC flowchart:
 
 ![quic_flowchart](./documentation/QUIC_flowchart_to_pcap_2021-02-18_19_57_03.396422.png)
+
+QUIC frames are encapsulated in the payload of UDP packets.
+The UDP protocol contains the following headerfields:
+| Field Type | Size in Byte |
+| Source port | 2 |
+| Destination port | 2 |
+| Length | 2 |
+| Checksum | 2 |
+| | Σ = 8 |
 
 The QUIC protocol uses two types of headers: Long Header for the handshake and Short Header after the connection is established.
 In the QUIC flowchart, each packet of the handshake (depicted with <span style="color:#9673A6">purple</span> arrows) has a QUIC long header, after the connection is established, each packet has a QUIC short header.
