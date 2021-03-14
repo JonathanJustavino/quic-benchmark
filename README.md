@@ -118,6 +118,22 @@ The communication between TCP+TLS Server and TCP+TLS Client is depicted in the f
 
 ![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_2021-02-18_21_08_37.464861.png)
 
+The TCP protocol has one type of header. It has the following headerfields:
+| Field Type | Size in Byte |
+| --- | --- |
+| Source Port | 2 |
+| Destination Port | 2 |
+| Sequence number | 4 |
+| Acknowledgement number | 4 |
+| Flags | 2 |
+| Window size | 2 |
+| TCP checksum | 2 |
+| Urgent pointer | 2 |
+| Options | 12 |
+| |  Σ = 32 |
+
+
+
 ### Flowchart QUIC
 
 The communication between QUIC Server and QUIC Client is depicted in the followin QUIC flowchart:
