@@ -248,6 +248,49 @@ QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it
 Moreover, the QUIC implementation in the nodejs version we are using is still experimental, so this could also be a limiting factor.
 
 ### Event comparisons
+We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/api/quic.html) and [TCP](https://nodejs.org/docs/v15.6.0/api/net.html) and [TLS](https://nodejs.org/docs/v15.6.0/api/tls.html), that are emitted during the stages of connection and transmission.
+
+|   Label                 |  QUIC event                   |   TCP event  |
+| :-------------          | :----------:                  | -----------: |
+|   listening             |  QuicSocket.listening         | net.Server.listening |
+|   ready                 |  QuicSocket.ready             | net.Socket.ready |
+|   session               |  QuicSocket.session           | tls.Server.newSession |
+|   keylog                |  QuicSession.keylog           | tls.Server.keylog |
+|   secure                |  QuicSession.secure           | tls.Server.secureConnection |
+|   data                  |  QuicStream.data              | net.Socket.data |
+|   streamEnd             |  QuicStream.end               | net.Socket.end |
+|   streamClose           |  QuicStream.close             | net.Socket.close |
+|   socketClose           |  QuicSocket.close             | net.Server.close |
+|   error                 |  QuicSocket.error             | net.Socket.error |
+|   handshakeDurationInNs | QuicSession.handshakeDuration | tls.Server.connection - tls.Server.secureConnection |
+
+#### QUIC events
+
+* QuicSocket.**listening:** Quic Server Socket is listening for new connections
+* QuicSocket.**ready:** Client Quic Socket has been bound to an UDP Port
+* QuicSocket.**session:** Quic Server Session has been created
+* QuicSession.**keylog:** Key material is generated or received by a QuicSession. Can be during or immediately following the handshake process
+* QuicSession.**secure:** Quic Session declares TLS Handshake has been completed
+* QuicStream.**data:** Quic Stream receives data
+* QuicStream.**end:** Quic Stream has ended, all data received
+* QuicStream.**close:** Quic Stream is completely closed and the underlying resources have been freed
+* QuicSocket.**close:** Quic Socket has been destroyed and is no longer usable
+* QuicSocket.**error:** Quic Socket was destroyed with an error
+* QuicSession.**handshakeDuration:** length of time taken to complete the TLS handshake
+
+#### TCP events
+
+* net.Server.**listening:** Server has been bound after calling server.listen()
+* net.Socket.**ready:** Client Socket is ready to be used. Triggered immediately after net.Socket.connect
+* tls.Server.**newSession:** Emitted upon creation of a new TLS session
+* tls.Server.**keylog:** Key material is generated or received by a connection to this server (typically before handshake has completed, but not necessarily)
+* tls.Server.**secureConnection:** Handshaking process for a new connection has successfully completed
+* net.Socket.**data:** Emitted when data is received
+* net.Socket.**end:** Emitted when the other end of the socket sends a FIN packet, thus ending the readable side of the socket
+* net.Socket**close:** socket is fully closed
+* net.Server.**close:** Server closes. If connections exist, this event is not emitted until all connections are ended
+* net.Socket.**error:** Error occurs. The 'close' event will be called directly following this event
+* tls.Server.**connection** Emitted when a new TCP stream is established, before the TLS handshake begins
 
 ![setup parameters](./documentation/events_comparison.png)
 The events that occurred in the same sequence for QUIC and TCP, were picked to be compared by time difference.
