@@ -113,12 +113,13 @@ npm run quic
 ## Evaluation
 
 The general structure of QUIC and TCP+TLS communication, based on network protocol layers:
+
 ![layers_comparison_QUIC_TCP](./documentation/layers_comparison_QUIC_TCP.png)
 
 Both protocols work similar until they use TCP and UDP respectively in the transport layer.
 Notably, the payload of the transport layer protocols is structured different: 
 * **TCP+TLS**: The TLS layer is directly included in the TCP payload. Traffic control is managed by TCP.
-* **QUIC:** The QUIC packet is included in the UDP payload. The encryption is also done via TLS, but the TLS CRYPTO frames are part of the QUIC payload. Traffic control is managed by QUIC.
+* **QUIC:** The QUIC packet is included in the UDP payload. The encryption is also done via TLS, but the TLS CRYPTO frames are part of the QUIC payload. Traffic control is managed by QUIC. After exchanging encryption details via TLS, QUIC communication works with encrypted streams.
 
 
 ### Flowchart TCP+TLS
@@ -141,6 +142,7 @@ The TCP protocol contains following headerfields:
 | Options | 12 |
 | |  Σ = 32 |
 
+The overhead of the 
 
 ### Flowchart QUIC
 
@@ -219,20 +221,22 @@ For further comparison, we defined specific durations for the communication usin
 
 ![socket_comparison](./documentation/socket_comparison.png)
 
-If you look back to our package analysis, QUIC had fewer packets for the TLS Handshake than TCP. What is noticeable in this graph, is that even though the number of packets transferred is fewer for QUIC, the time duration is actually longer than for TCP.
-We can think of two explanations for this result: firstly, the different priorities of executions in user-space and kernel-space. The QUIC protocol is implemented in user-space and the TCP protocol is implemented in kernel-space. User-space tasks have a lower priority in the execution sequence than kernel-space tasks. Secondly, the nodejs version 16.05 is an experimental build. The implementation for QUIC may not be 100% finished and we cannot be sure if this didn't affect our measurements.
+If looking back at the package analysis, QUIC uses fewer packets for the TLS Handshake than TCP. What is noticeable in this graph, is that even though the number of transferred packets is fewer for QUIC, the total duration of the connection is actually longer compared to TCP.
+We can think of two explanations for this result: 
+Firstly, the different priorities when executing a network protocol in user-space and kernel-space. The QUIC protocol is implemented in user-space and the TCP protocol is implemented in kernel-space. User-space tasks have a lower priority in the execution sequence than kernel-space tasks. 
+Secondly, the nodejs version 16.05 is an experimental build. The implementation for QUIC may not be 100% finished and we cannot be sure if this didn't affect our measurements.
 
 Beside the **Handshake**, the remaining durations **Time to first Byte**, **Content Transfer** and  **Close socket** are lower with TCP/TLS than with QUIC. We also contribute this to the TCP kernel implementation.
 
 #### Adding Delay
 
-To see how the content transfer is affected by a slower connection, we added various network delays using tc.
+To see how the content transfer is affected by a slower connection, we added various network delays using [traffic control (TC)](https://linux.die.net/man/8/tc).
 
 ![delay_comparison](./documentation/delay_comparison.png)
 
-with increased delay, we can see a linear increase for the durations **Handshake**, **Time to first Byte** and **Content Transfer** for both TCP/TLS and QUIC.
+With increased delay, we can see a linear increase for the duration of **Handshake**, **Time to first Byte** and **Content Transfer** for both TCP/TLS and QUIC.
 QUIC has a steeper linear increase than TCP.
-Most noticeable and surprising is the spike in the duration **Close socket** for QUIC. We hypothesize that this is due to the implementation of the experimental nodejs version.
+Most noticeable and surprising is the spike in the duration of **Close socket** for QUIC. We assume this is caused by the specific QUIC implementation in nodejs, as it is still in experimental state.
 
 ![delay_10](./documentation/delay_10.png)
 ![delay_20](./documentation/delay_20.png)
