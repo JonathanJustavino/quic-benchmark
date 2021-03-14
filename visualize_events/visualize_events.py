@@ -17,7 +17,6 @@ def samples_path(samples_folder='samples'):
     return f"{dst_folder}{samples_folder}"
 
 
-# def get_values(folder_name):
 def set_timestamps():
     quic_key = "quic"
     tcp_key = "tcp"

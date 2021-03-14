@@ -45,24 +45,35 @@ def get_values(folder_name):
     return quic_results, tcp_results
 
 
-def plot_graphs():
+def plot_graphs(samples):
     category_names = ['Handshake', 'Time to first byte', 'Content Transfer', 'Close socket']
-    del0_quic_results, del0_tcp_results = get_values("samples_threshold5_dev2_delay0")
-    del10_quic_results, del10_tcp_results = get_values("samples_threshold15_dev2_delay10")
-    del20_quic_results, del20_tcp_results = get_values("samples_threshold25_dev2_delay20")
-    del60_quic_results, del60_tcp_results = get_values("samples_threshold55_dev2_delay50")
+    quic_key = 'QUIC'
+    tcp_key = 'TCP/TLS'
+    multiple_graphs = True if len(samples) > 1 else False
+    title = ""
+    results = {}
 
-    results = {
-        'QUIC (Delay 0)': del0_quic_results,
-        'TCP/TLS (Delay 0)': del0_tcp_results,
-        'QUIC (Delay 10)': del10_quic_results,
-        'TCP/TLS (Delay 10)': del10_tcp_results,
-        'QUIC (Delay 20)': del20_quic_results,
-        'TCP/TLS (Delay 20)': del20_tcp_results,
-        'QUIC (Delay 60)': del60_quic_results,
-        'TCP/TLS (Delay 60)': del60_tcp_results,
-    }
-    survey(results, category_names, multiple_graphs=True)
+    for sample in samples:
+        value = get_dataset_delay(sample)
+        if not value:
+            continue
+        delay = f"Delay {value}"
+        title = delay
+        quic_results, tcp_results = get_values(sample)
+        results.update({f"{quic_key}-{delay}": quic_results})
+        results.update({f"{tcp_key}-{delay}": tcp_results})
+
+    survey(results, category_names, multiple_graphs=multiple_graphs)
+    title = "" if multiple_graphs else title
+    return title
+
+
+def get_dataset_delay(folder):
+    pattern = r'delay(.*)$'
+    match = re.findall(pattern, folder)
+    if len(match) > 0:
+        return match.pop()
+    return None
 
 
 def plot_single_graph():
@@ -76,7 +87,6 @@ def plot_single_graph():
     byte_key = "secure-to-data"
     transfer_key = "data-to-streamEnd"
     socket_key = "streamEnd-to-socketClose"
-    average = "avg"
 
     quic_dict = load_results(quic_key, samples_path(samples))
     tcp_dict = load_results(tcp_key, samples_path(samples))
@@ -100,11 +110,18 @@ def plot_single_graph():
     survey(read_results, category_names)
 
 
-
-
 if __name__ == '__main__':
+    samples = [
+        # "samples_threshold5_dev2_delay0",
+        "samples_threshold15_dev2_delay10",
+        # "samples_threshold25_dev2_delay20",
+        # "samples_threshold55_dev2_delay50"
+    ]
+
+    title = plot_graphs(samples)
     # plot_single_graph()
-    plot_graphs()
     plt.xlabel("Milliseconds")
     plt.ylabel("Socket type")
+    pad = {'x': 0.485, 'y': 1.08}
+    plt.title(title, loc="center", **pad)
     plt.show()
