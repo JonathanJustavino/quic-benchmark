@@ -324,8 +324,11 @@ QUIC has a steeper linear increase than TCP.
 Most noticeable and surprising is the spike in the duration of **Close socket** for QUIC. We assume this is caused by the specific QUIC implementation in nodejs, as it is still in experimental state.
 
 ![delay_10](./documentation/delay_10.png)
+![delay_10](./documentation/delay_10_comp.png)
 ![delay_20](./documentation/delay_20.png)
+![delay_20](./documentation/delay_20_comp.png)
 ![delay_50](./documentation/delay_50.png)
+![delay_50](./documentation/delay_50_comp.png)
 
 ## Future Work
 
