@@ -295,6 +295,12 @@ We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/a
 ![setup parameters](./documentation/events_comparison.png)
 The events that occurred in the same sequence for QUIC and TCP, were picked to be compared by time difference.
 
+| Protocol: QUIC | listening | ready | session | keylog | secure | data | end | close (stream)| close (socket) |  
+| ------------- | ---------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| Middle value (ms) | ? | ? | ?  | ? | ? | ? | ? | ? | ? |
+| Standard deviation (ms) | ? | ? | ? | ? | ? | ? | ? | ? |
+| Median (ms) | ? | ? | ? | ? | ? | ? | ? | ? | ? |
+
 ### Time comparison
 
 For further comparison, we defined specific durations for the communication using the events mentioned before.
