@@ -292,12 +292,18 @@ We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/a
 * net.Socket.**error:** Error occurs. The 'close' event will be called directly following this event
 * tls.Server.**connection** Emitted when a new TCP stream is established, before the TLS handshake begins
 
+Not all of these events occur at the same time in the QUIC and TCP+TLS protocol, even though some have the same name.
+Only those that are comparable because they happend at the same time were picked for comparison.
+
+
+We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation respectively.
+The following graph shows the average value of the 5 comparable events "secure, data, streamEnd, streamClose, socketClose":
+
 ![setup parameters](./documentation/events_comparison.png)
-The events that occurred in the same sequence for QUIC and TCP, were picked to be compared by time difference.
 
 | Protocol: QUIC | listening | ready | session | keylog | secure | data | end | close (stream)| close (socket) |  
 | ------------- | ---------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | ? | ? | ?  | ? | ? | ? | ? | ? | ? |
+| Average value / mean value (ms) | ? | ? | ?  | ? | ? | ? | ? | ? | ? |
 | Standard deviation (ms) | ? | ? | ? | ? | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? | ? | ? | ? | ? | ? |
 
@@ -316,13 +322,13 @@ We sent the application data "I am the client sending you a message" 10x with th
 
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | 20.6 | 2.1 | 8.6 | 13.3 |
+| Average value / mean (ms) | 20.6 | 2.1 | 8.6 | 13.3 |
 | Standard deviation (ms) | ? | ? | ? | |
 | Median (ms) | ? | ? | ? |  |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | 10.0 | 1.1 | 1.1 | 2.8 |
+| Average value / mean (ms) | 10.0 | 1.1 | 1.1 | 2.8 |
 | Standard deviation (ms) | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? |
 
@@ -345,19 +351,19 @@ QUIC has a steeper linear increase than TCP.
 Most noticeable and surprising is the spike in the duration of **Close socket** for QUIC. We assume this is caused by the specific QUIC implementation in nodejs, as it is still in experimental state.
 
 #### Delay: 10 ms
-We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms on top of the existing network RTT.
+We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms on top of the existing network RTT. The following graph shows the average values:
 
 ![delay_10](./documentation/delay_10_comp.png)
 
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | 33.6 | 2.9 | 18.5 | 524.2 |
+| Average value / mean (ms) | 33.6 | 2.9 | 18.5 | 524.2 |
 | Standard deviation (ms) | ? | ? | ? | |
 | Median (ms) | ? | ? | ? |  |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | 22.0 | 1.4 | 1.6 | 3.9 |
+| Average value / mean (ms) | 22.0 | 1.4 | 1.6 | 3.9 |
 | Standard deviation (ms) | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? |
 
@@ -368,13 +374,13 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | 41.3 | 4.4 | 28.9 | 595.9 |
+| Average value / mean value (ms) | 41.3 | 4.4 | 28.9 | 595.9 |
 | Standard deviation (ms) | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | 35.3 | 2.2 | 2.1 | 5.4 |
+| Average value / mean value (ms) | 35.3 | 2.2 | 2.1 | 5.4 |
 | Standard deviation (ms) | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? |
 
@@ -386,13 +392,13 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value | 73.7 | 4.9 | 60.3 | 216.2 |
+| Average value / mean value | 73.7 | 4.9 | 60.3 | 216.2 |
 | Standard deviation | ? | ? | ? | ? |
 | Median | ? | ? | ? | ? |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value | 65.7 | 2.2 | 2.3 | 5.2 |
+| Average value / mean value | 65.7 | 2.2 | 2.3 | 5.2 |
 | Standard deviation | ? | ? | ? | ? |
 | Median | ? | ? | ? | ? |
 
