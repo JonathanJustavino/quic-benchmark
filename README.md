@@ -1,28 +1,30 @@
 # University project QUIC benchmarking
 
 Comparing the performance of the QUIC protocol with a combination of the TCP+TLS protocols on the transport layer via sockets.
-* [Motivation](#motivation)
-* [Experiment setup](#experiment-setup)
-* [Topology](#topology)
-    * [Local Measurements](#local-measurements)
-    * [Remote Measurements](#remote-measurements)
-* [Prerequisites](#prerequisites)
-* [Run setup](#run-setup)
-    * [Run in docker container](#run-in-docker-container)
-    * [Run on local machine](#run-locally-on-machine)
-* [Evaluation](#evaluation)
-    * [Flowchart TCP+TLS](#flowchart-tcp+tls)
-    * [Flowchart QUIC](#flowchart-quic)
-    * [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
-    * [Event comparisons](#event-comparisons)
-        * [QUIC events](#quic-events)
-        * [TCP events](#tcp-events)
-    * [Time comparison](#time-comparison)
-        * [Adding Delay](#adding-delay)
-        * [Delay: 10 ms](#delay-10-ms)
-        * [Delay: 20 ms](#delay-20-ms)
-        * [Delay: 50 ms](#delay-50-ms)
-* [Future Work](#future-work)
+- [University project QUIC benchmarking](#university-project-quic-benchmarking)
+  - [Motivation](#motivation)
+  - [Experiment setup](#experiment-setup)
+  - [Topology](#topology)
+    - [Local Measurements](#local-measurements)
+    - [Remote Measurements](#remote-measurements)
+  - [Prerequisites](#prerequisites)
+  - [Run setup](#run-setup)
+    - [Run in docker container](#run-in-docker-container)
+      - [Benchmark parameters](#benchmark-parameters)
+    - [Run locally on machine](#run-locally-on-machine)
+  - [Evaluation](#evaluation)
+    - [Flowchart TCP+TLS](#flowchart-tcptls)
+    - [Flowchart QUIC](#flowchart-quic)
+    - [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
+    - [Event comparisons](#event-comparisons)
+      - [QUIC events](#quic-events)
+      - [TCP events](#tcp-events)
+    - [Time comparison](#time-comparison)
+      - [Adding Delay](#adding-delay)
+      - [Delay: 10 ms](#delay-10-ms)
+      - [Delay: 20 ms](#delay-20-ms)
+      - [Delay: 50 ms](#delay-50-ms)
+  - [Future Work](#future-work)
 
 ## Motivation
 
@@ -280,12 +282,13 @@ QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it
 Moreover, the QUIC implementation in the nodejs version we are using is still experimental, so this could also be a limiting factor.
 
 ### Event comparisons
+
 We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/api/quic.html) and [TCP](https://nodejs.org/docs/v15.6.0/api/net.html) and [TLS](https://nodejs.org/docs/v15.6.0/api/tls.html), that are emitted during the stages of connection and transmission.
 
 ![timeline](./documentation/event_timeline.png)
 
 |   Label                 |  QUIC event                   |   TCP event  |
-| :-------------:          | :----------:                  | :-----------: |
+| :-------------          | :----------                   | :----------- |
 |   listening             |  QuicSocket.listening         | net.Server.listening |
 |   ready                 |  QuicSocket.ready             | net.Socket.ready |
 |   session               |  QuicSocket.session           | tls.Server.newSession |
