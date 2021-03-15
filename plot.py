@@ -112,10 +112,10 @@ def plot_single_graph():
 
 if __name__ == '__main__':
     samples = [
-        # "samples_threshold5_dev2_delay0",
+        "samples_threshold5_dev2_delay0",
         # "samples_threshold15_dev2_delay10",
         # "samples_threshold25_dev2_delay20",
-        "samples_threshold55_dev2_delay50"
+        # "samples_threshold55_dev2_delay50"
     ]
 
     title = plot_graphs(samples)

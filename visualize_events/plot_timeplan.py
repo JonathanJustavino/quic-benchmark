@@ -33,11 +33,15 @@ def survey(results, category_names, multiple_graphs=False, split_threshold=20):
         set_xaxis_labels(ax2, '...', 'right', (-0.09, 0.5), size=20)
         ax.set_ylabel('Socket Type', loc='center', size=12)
         set_plot_labels(ax, ["QUIC", "TCP/TLS"])
-
         return figure, ax, ax2
 
     figure, ax = plt.subplots(figsize=(9.2, 5))
-    ax.invert_yaxis()
+    set_xaxis_labels(ax, 'Milliseconds', 'left', (0.42, -0.07))
+    ax.set_ylabel('Socket Type', loc='center', size=12)
+    set_plot_labels(ax, ["QUIC", "TCP/TLS"])
+    x_offset = -3.8
+    ax.text(x_offset, 0, "QUIC", ha='center', va='bottom')
+    ax.text(x_offset, 1, "TCP/TLS", ha='center', va='bottom')
     return figure, plot_it(ax, category_names, category_colors, data, data_cum, labels, multiple_graphs=multiple_graphs)
 
 
