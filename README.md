@@ -295,7 +295,6 @@ We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/a
 Not all of these events occur at the same time in the QUIC and TCP+TLS protocol, even though some have the same name.
 Only those that are comparable because they happend at the same time were picked for comparison.
 
-
 We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation respectively.
 The following graph shows the average value of the 5 comparable events "secure, data, streamEnd, streamClose, socketClose":
 
@@ -307,6 +306,13 @@ The following graph shows the average value of the 5 comparable events "secure, 
 | Standard deviation (ms) | ? | ? | ? | ? | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? | ? | ? | ? | ? | ? |
 
+| Protocol: TCP+TLS | listening | ready | newSession | keylog | secureConnection | data | end | close (stream)| close (socket) |  
+| ------------- | ---------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| Average value / mean value (ms) | ? | ? | ?  | ? | ? | ? | ? | ? | ? |
+| Standard deviation (ms) | ? | ? | ? | ? | ? | ? | ? | ? |
+| Median (ms) | ? | ? | ? | ? | ? | ? | ? | ? | ? |
+
+
 ### Time comparison
 
 For further comparison, we defined specific durations for the communication using the events mentioned before.
@@ -316,7 +322,7 @@ For further comparison, we defined specific durations for the communication usin
 * **Content Transfer**: data -> streamEnd
 * **Close socket**: streamEnd -> socketClose
 
-We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation with no artificial delay added:
+We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation with no artificial delay added, and calculated the average value:
 
 ![socket_comparison](./documentation/delay_0_comp.png)
 
@@ -342,7 +348,8 @@ Beside the **Handshake**, the remaining durations **Time to first Byte**, **Cont
 #### Adding Delay
 
 To see how the content transfer is affected by a slower connection, we added various network delays using [traffic control (TC)](https://linux.die.net/man/8/tc).
-This is an overview of the results of all the delays we used in summary:
+We sent the application data "I am the client sending you a message" 10 times and calculated the average value.
+This is an overview of the results of all the results and the respective delays we used in summary:
 
 ![delay_comparison](./documentation/delay_comparison.png)
 
@@ -368,7 +375,7 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Median (ms) | ? | ? | ? | ? |
 
 #### Delay: 20 ms
-We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 20ms on top of the existing network RTT.
+We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 20ms on top of the existing network RTT. The following graph shows the average values:
 
 ![delay_20](./documentation/delay_20_comp.png)
 
@@ -385,7 +392,7 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Median (ms) | ? | ? | ? | ? |
 
 #### Delay: 50 ms
-We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 50ms on top of the existing network RTT.
+We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 50ms on top of the existing network RTT. The following graph shows the average values:
 
 ![delay_50](./documentation/delay_50_comp.png)
 
