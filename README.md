@@ -304,7 +304,21 @@ For further comparison, we defined specific durations for the communication usin
 * **Content Transfer**: data -> streamEnd
 * **Close socket**: streamEnd -> socketClose
 
+We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation with no artificial delay added:
+
 ![socket_comparison](./documentation/delay_0_comp.png)
+
+| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Middle value (ms) | 20.6 | 2.1 | 8.6 | 13.3 |
+| Standard deviation (ms) | ? | ? | ? | |
+| Median (ms) | ? | ? | ? |  |
+
+| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Middle value (ms) | 10.0 | 1.1 | 1.1 | 2.8 |
+| Standard deviation (ms) | ? | ? | ? | ? |
+| Median (ms) | ? | ? | ? | ? |
 
 If looking back at the package analysis, QUIC uses fewer packets for the TLS Handshake than TCP. What is noticeable in this graph, is that even though the number of transferred packets is fewer for QUIC, the total duration of the connection is actually longer compared to TCP.
 We can think of two explanations for this result: 
