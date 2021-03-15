@@ -324,7 +324,7 @@ With increased delay, we can see a linear increase for the duration of **Handsha
 QUIC has a steeper linear increase than TCP.
 Most noticeable and surprising is the spike in the duration of **Close socket** for QUIC. We assume this is caused by the specific QUIC implementation in nodejs, as it is still in experimental state.
 
-##### Delay: 10 ms
+#### Delay: 10 ms
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms on top of the existing network RTT.
 
 ![delay_10](./documentation/delay_10_comp.png)
@@ -332,18 +332,16 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Middle value (ms) | 33.6 | 2.9 | 18.5 | 524.2 |
-| Middle value (ms) | 33.6 | 2.9 | 18.5 | |
 | Standard deviation (ms) | ? | ? | ? | |
 | Median (ms) | ? | ? | ? |  |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Middle value (ms) | 22.0 | 1.4 | 1.6 | 3.9 |
-| Middle value (ms) | ? | ? | ? | ? |
 | Standard deviation (ms) | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? |
 
-##### Delay: 20 ms
+#### Delay: 20 ms
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 20ms on top of the existing network RTT.
 
 ![delay_20](./documentation/delay_20_comp.png)
@@ -360,7 +358,7 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Standard deviation (ms) | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? |
 
-##### Delay: 50 ms
+#### Delay: 50 ms
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 50ms on top of the existing network RTT.
 
 ![delay_50](./documentation/delay_50_comp.png)
