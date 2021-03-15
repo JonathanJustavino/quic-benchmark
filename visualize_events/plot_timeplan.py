@@ -11,9 +11,6 @@ def survey(results, category_names, multiple_graphs=False, split_threshold=20):
     data = np.array(list(results.values()))
     data_cum = data.cumsum(axis=1)
     category_colors = ["#a95aa1","#85c0f9","#f5793a","#0f2080", "#ee442f"]
-    
-
-    print(data)
 
     if should_split(data, split_threshold):
         length = 10
@@ -72,6 +69,7 @@ def plot_split_handshake(axis, starts, width, color, label):
     return axis
 
 def plot_it(axis, category_names, category_colors, data, data_cum, labels, multiple_graphs=False):
+    axis.invert_yaxis() 
     for i, (colname, color) in enumerate(zip(category_names, category_colors)):
         widths = data[:, i]
         starts = data_cum[:, i] - widths
@@ -81,7 +79,6 @@ def plot_it(axis, category_names, category_colors, data, data_cum, labels, multi
         if multiple_graphs:
             continue
         text_color = color
-        print(text_color)
         for y, (x, c) in enumerate(zip(xcenters, widths)):
             y_pos = pow(-1, i) * 0.28
             axis.text(x, y - y_pos, str(float(c)), ha='center', va='center',
