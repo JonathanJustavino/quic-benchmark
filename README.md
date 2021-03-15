@@ -350,13 +350,13 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | ? | ? | ? | ? |
+| Middle value (ms) | 41.3 | 4.4 | 28.9 | 595.9 |
 | Standard deviation (ms) | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value (ms) | ? | ? | ? | ? |
+| Middle value (ms) | 35.3 | 2.2 | 2.1 | 5.4 |
 | Standard deviation (ms) | ? | ? | ? | ? |
 | Median (ms) | ? | ? | ? | ? |
 
@@ -368,13 +368,13 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value | ? | ? | ? | ? |
+| Middle value | 73.7 | 4.9 | 60.3 | 216.2 |
 | Standard deviation | ? | ? | ? | ? |
 | Median | ? | ? | ? | ? |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
-| Middle value | ? | ? | ? | ? |
+| Middle value | 65.7 | 2.2 | 2.3 | 5.2 |
 | Standard deviation | ? | ? | ? | ? |
 | Median | ? | ? | ? | ? |
 
