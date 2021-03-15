@@ -253,8 +253,8 @@ IETF documentation: [Packet Size](https://tools.ietf.org/html/draft-ietf-quic-tr
 After establishing the connection, the QUIC headersize is similar to the TCP headersize. Still, QUIC uses ~2x the amount of data than TCP+TLS.
 
 In summary, QUIC is transmitting more data, but is sending fewer packets than TCP. It is unfortunate that QUIC needs 921 Bytes in the handshake only for padding, but it is necessary due to technical and security reasons. Maybe it is possible to improve the QUIC protocol by filling the first packet more efficiently.
-Reusing the same connection to send more application data would at least reduce the handshake data for QUIC and probably improve the performance - this is also stated in (Future Work)[#future-work].
-QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it is sending 2 packets less. This could be because QUIC is running in user-space instead of kernel-space, like TCP+TLS (see the summary of (Time Comparison)[#time-comparison] for a detailed explanation).
+Reusing the same connection to send more application data would at least reduce the handshake data for QUIC and probably improve the performance - this is also stated in [Future Work](#future-work).
+QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it is sending 2 packets less. This could be because QUIC is running in user-space instead of kernel-space, like TCP+TLS (see the summary of [Time Comparison](#time-comparison) for a detailed explanation).
 Moreover, the QUIC implementation in the nodejs version we are using is still experimental, so this could also be a limiting factor.
 
 ### Event comparisons
