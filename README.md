@@ -126,12 +126,12 @@ Notably, the payload of the transport layer protocols is structured different:
 
 ### Flowchart TCP+TLS
 The following flowcharts are created out of two example pcap-files:
-* [TCP pcap example file](documentation/pcap-tcp-tls/tcp.pcap)
+* [TCP+TLS pcap example file](documentation/pcap-tcp-tls/tcp.pcap)
 * [QUIC pcap example file](documentation/pcap-quic/quic.pcap)
 
 Both files can also be viewed in wireshark for comparison. To be able to decrypt the pcap files,
 it's necessary to add the corresponding SSL-keys:
-* [SSL-key TLS pcap file](documentation/pcap-tcp-tls/ssl-keys-tcp+tls.log)
+* [SSL-key TCP+TLS pcap file](documentation/pcap-tcp-tls/ssl-keys-tcp+tls.log)
 * [SSL-key QUIC pcap file](documentation/pcap-quic/ssl-keys-quic.log)
 
 Because the execution structure of the protocols is always similar, it is sufficient so only look at one example for QUIC and TCP+TLS respectively as flowcharts.
