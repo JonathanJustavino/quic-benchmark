@@ -7,8 +7,6 @@ results/
 ping.json
 check-ping.json
 ping-to-json
-quic.pcap
-tcp-tls.pcap
 
 quic-benchmark-client.json
 quic-benchmark-server.json
