@@ -260,6 +260,8 @@ Moreover, the QUIC implementation in the nodejs version we are using is still ex
 ### Event comparisons
 We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/api/quic.html) and [TCP](https://nodejs.org/docs/v15.6.0/api/net.html) and [TLS](https://nodejs.org/docs/v15.6.0/api/tls.html), that are emitted during the stages of connection and transmission.
 
+![timeline](./documentation/event_timeline.png)
+
 |   Label                 |  QUIC event                   |   TCP event  |
 | :-------------          | :----------:                  | -----------: |
 |   listening             |  QuicSocket.listening         | net.Server.listening |
