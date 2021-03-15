@@ -30,7 +30,7 @@ Also the behaviour in some special cases has changed, i.e. "A server that choose
 Because we always use the same connection setup in which these special cases do not occur, they are not relevant for our project.
 In conclusion, the expired [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27) implementation of QUIC in nodejs is still sufficiently up to date to be used for our QUIC evaluation.
 
-The QUIC documentation to our nodejs experimental version is available [here](https://nodejs.org/docs/v15.7.0/api/quic.html)
+The QUIC documentation to our nodejs experimental version is available [here](https://nodejs.org/docs/v15.6.0/api/quic.html)
 
 :red_circle: The experimental nodejs version we used is **no longer maintained**, as explained in this [commit](https://github.com/nodejs/node/pull/37067) in the official nodejs repository:
 > The OpenSSL OMC has not yet committed to landing the updated QUIC APIs and has indicated that they will not even look at it until OpenSSL 3.1. With OpenSSL 3.0 > beta currently delayed with no clear idea of when it will actually land, the initial QUIC support landed in core has now just become a maintenance burden with
@@ -99,7 +99,7 @@ The script generates a json file with timestamps for every comparable event for 
 
 ### Run locally on machine
 
-> Beware: Running the server and client directly on your OS only works if you have nodejs 15.6 in experimental mode already installed on your system
+> Beware: Running the server and client directly on your OS only works if you have nodejs 15.0.6 in experimental mode already installed on your system
 > This is **not recommended**, use the docker setup instead.
 
 ```[bash]
@@ -263,7 +263,7 @@ We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/a
 ![timeline](./documentation/event_timeline.png)
 
 |   Label                 |  QUIC event                   |   TCP event  |
-| :-------------          | :----------:                  | -----------: |
+| :-------------:          | :----------:                  | :-----------: |
 |   listening             |  QuicSocket.listening         | net.Server.listening |
 |   ready                 |  QuicSocket.ready             | net.Socket.ready |
 |   session               |  QuicSocket.session           | tls.Server.newSession |
