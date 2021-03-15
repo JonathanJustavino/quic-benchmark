@@ -312,19 +312,6 @@ The following graph shows the average value of the 5 comparable events "secure, 
 
 ![setup parameters](./documentation/events_comparison.png)
 
-| Protocol: QUIC | listening | ready | session | keylog | secure | data | end | close (stream)| close (socket) |  
-| ------------- | ---------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
-| Average value / mean value (ms) | ? | ? | ?  | ? | ? | ? | ? | ? | ? |
-| Standard deviation (ms) | ? | ? | ? | ? | ? | ? | ? | ? |
-| Median (ms) | ? | ? | ? | ? | ? | ? | ? | ? | ? |
-
-| Protocol: TCP+TLS | listening | ready | newSession | keylog | secureConnection | data | end | close (stream)| close (socket) |  
-| ------------- | ---------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
-| Average value / mean value (ms) | ? | ? | ?  | ? | ? | ? | ? | ? | ? |
-| Standard deviation (ms) | ? | ? | ? | ? | ? | ? | ? | ? |
-| Median (ms) | ? | ? | ? | ? | ? | ? | ? | ? | ? |
-
-
 ### Time comparison
 
 For further comparison, we defined specific durations for the communication using the events mentioned before.
@@ -341,14 +328,12 @@ We sent the application data "I am the client sending you a message" 10x with th
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Average value / mean (ms) | 20.6 | 2.1 | 8.6 | 13.3 |
-| Standard deviation (ms) | ? | ? | ? | |
-| Median (ms) | ? | ? | ? |  |
+| Standard deviation (ms) | 9.1 | 0.5 | 6.2 | 5.1 |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Average value / mean (ms) | 10.0 | 1.1 | 1.1 | 2.8 |
-| Standard deviation (ms) | ? | ? | ? | ? |
-| Median (ms) | ? | ? | ? | ? |
+| Standard deviation (ms) | 2.7 | 0.3 | 0.3 | 0.4 |
 
 If looking back at the package analysis, QUIC uses fewer packets for the TLS Handshake than TCP. What is noticeable in this graph, is that even though the number of transferred packets is fewer for QUIC, the total duration of the connection is actually longer compared to TCP.
 We can think of two explanations for this result: 
@@ -377,14 +362,12 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Average value / mean (ms) | 33.6 | 2.9 | 18.5 | 524.2 |
-| Standard deviation (ms) | ? | ? | ? | |
-| Median (ms) | ? | ? | ? |  |
+| Standard deviation (ms) | 11.4 | 0.7 | 1.8 | 473.3 |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Average value / mean (ms) | 22.0 | 1.4 | 1.6 | 3.9 |
-| Standard deviation (ms) | ? | ? | ? | ? |
-| Median (ms) | ? | ? | ? | ? |
+| Standard deviation (ms) | 2.4 | 0.7 | 0.7 | 0.5 |
 
 #### Delay: 20 ms
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 20ms on top of the existing network RTT. The following graph shows the average values:
@@ -394,14 +377,12 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Average value / mean value (ms) | 41.3 | 4.4 | 28.9 | 595.9 |
-| Standard deviation (ms) | ? | ? | ? | ? |
-| Median (ms) | ? | ? | ? | ? |
+| Standard deviation (ms) | 2.8 | 0.5 | 1.3 | 471.6 |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Average value / mean value (ms) | 35.3 | 2.2 | 2.1 | 5.4 |
-| Standard deviation (ms) | ? | ? | ? | ? |
-| Median (ms) | ? | ? | ? | ? |
+| Standard deviation (ms) | 2.8 | 0.4 | 0.3 | 0.5 |
 
 #### Delay: 50 ms
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 50ms on top of the existing network RTT. The following graph shows the average values:
@@ -412,14 +393,12 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Average value / mean value | 73.7 | 4.9 | 60.3 | 216.2 |
-| Standard deviation | ? | ? | ? | ? |
-| Median | ? | ? | ? | ? |
+| Standard deviation | 2.1 | 0.3 | 2.1 | 383.2 |
 
 | Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
 | ------------- | ---------- | ----------- | ----------- | ----------- |
 | Average value / mean value | 65.7 | 2.2 | 2.3 | 5.2 |
-| Standard deviation | ? | ? | ? | ? |
-| Median | ? | ? | ? | ? |
+| Standard deviation | 4.7 | 0.4 | 0.5 | 0.3 |
 
 
 ## Future Work
