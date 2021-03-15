@@ -43,9 +43,9 @@ As we built our own dockerimage with the nodejs version installed, it is still e
 
 ### Local Measurements
 
-For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and ran the Client and Server on localhost. As described in [Experimental Setup](#experiment-setup), the client and server are running inside docker-containers.
+For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and ran the Client and Server on localhost. As described in [Experimental Setup](#experiment-setup), the client and server are running inside docker-containers:
 
-*insert topology pic of local measurment*
+![topology](./documentation/topology_localhost.png)
 
 ### Remote Measurements
 
