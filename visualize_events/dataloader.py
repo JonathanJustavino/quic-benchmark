@@ -101,11 +101,10 @@ def average_results(results):
 
 
 def load_results(socket_type, path):
-    results = {'ping': {}, 'server': {}, 'client': {}}
+    results = {'server': {}, 'client': {}}
     folders = load_folders(socket_type, path)
     read_results(path, folders, socket_type, results)
     average_results(results)
-    load_ping(path, socket_type, folders, results)
     return results
 
 
