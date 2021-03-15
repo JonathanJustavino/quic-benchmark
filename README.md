@@ -19,9 +19,9 @@ Comparing the performance of the QUIC protocol with a combination of the TCP+TLS
         * [TCP events](#tcp-events)
     * [Time comparison](#time-comparison)
         * [Adding Delay](#adding-delay)
-        * [Delay: 10 ms](#delay:-10-ms)
-        * [Delay: 20 ms](#delay:-20-ms)
-        * [Delay: 50 ms](#delay:-50-ms)
+        * [Delay: 10 ms](#delay-10-ms)
+        * [Delay: 20 ms](#delay-20-ms)
+        * [Delay: 50 ms](#delay-50-ms)
 * [Future Work](#future-work)
 
 ## Motivation
