@@ -425,6 +425,15 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Average value / mean value | 65.7 | 2.2 | 2.3 | 5.2 |
 | Standard deviation | 4.7 | 0.4 | 0.5 | 0.3 |
 
+## nginx QUIC
+* Install rust 1.50.0 (or later) via [rustup](https://rustup.rs/):
+  > curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+* Check rust version with:
+  > rustc --version
+* Build quiche: https://github.com/cloudflare/quiche#building
+* Requirements for building nginx from source:
+  > apt-get install build-essential zlib1g zlib1g-dev libssl-dev libpcre3 libpcre3-dev
+* 
 
 ## Future Work
 
