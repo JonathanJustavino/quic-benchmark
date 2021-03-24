@@ -433,8 +433,10 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 * Build quiche: https://github.com/cloudflare/quiche#building
 * Requirements for building nginx from source:
   > apt-get install build-essential zlib1g zlib1g-dev libssl-dev libpcre3 libpcre3-dev
-* 
-
+* Build nginx: https://github.com/cloudflare/quiche/tree/master/extras/nginx#readme
+  The .configure as stated in the documentation is not sufficient as it does not set all necessary parameters. Please check our [.configure file](./nginx_quic/nginx_.configure_for_compiling). After the `<make>` command, it is necessary to run `<sudo make install>`.
+* For us it was also necessary to create the directory `</var/cache/nginx>` with `<sudo mkdir /var/cache/nginx>`, as it is later needed by nginx and wasn't succesfully created before.
+* Check if everything worked: `<sudo nginx -t>`
 ## Future Work
 
 Based on the results we obtained in our experiment and the features we managed to implement in the given time, we think it would be interesting to explore the following topics:
