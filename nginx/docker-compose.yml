@@ -1,0 +1,24 @@
+version: '3.7'
+
+services:
+  nginx:
+    hostname: nginx
+
+    image: ymuski/nginx-quic
+    volumes:
+      - ./certs:/opt/nginx/certs/
+      - ./conf/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "443:443/tcp"
+      - "443:443/udp"
+      - "80:80"
+    network_mode: bridge
+
+  curl:
+    hostname: curl
+    image: ymuski/curl-http3
+    links:
+      - nginx
+    network_mode: bridge
+    command: ["curl", "-ILv", "https://nginx", "--http3"]
+    # command: ["curl", "-ILv", "--insecure", "https://nginx","--http2"]
