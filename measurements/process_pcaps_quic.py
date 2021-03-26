@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     avg_list = []
     # iterate over each row==time of 1st packet, 2nd packet etc.
-    for row in range(0, 9):
+    for row in range(0, 10):
         tmp_avg_list = []
 
         # extract row of each csv + append to tmp_avg_list
