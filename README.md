@@ -147,8 +147,7 @@ Notably, the payload of the transport layer protocols is structured different:
 * **TCP+TLS**: The TLS layer is directly included in the TCP payload. Traffic control is managed by TCP.
 * **QUIC:** The QUIC packet is included in the UDP payload. The encryption is also done via TLS, but the TLS CRYPTO frames are part of the QUIC payload. Traffic control is managed by QUIC. After exchanging encryption details via TLS, QUIC communication works with encrypted streams.
 
-### Captured Files
-
+### Captured Files  
 After capturing the traffic with tshark, pcapng files are generated. These can be found [here](./measurements/).
 For analyzing the behaviour of the protocols in detail, these pcap files are used. 
 Extracting the relative timestamps of one pcap file:
@@ -157,19 +156,12 @@ Extracting the relative timestamps of one pcap file:
 
 We compare the overhead for the transmitted payload and generate flowcharts where we depict the properties of each protocol.
 
+All pcap-files can also be viewed in wireshark for comparison. To be able to decrypt the pcap files,
+it's necessary to add the corresponding SSL-keys:
+The SSL-keys for each pcap-file can be found in the subfolder for each measurement.
+For example the SSL-key for [this QUIC pcap-file](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08 08-21-15.964770/quic.pcap) is located in the same folder [here](/measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08 08-21-15.964770/ssl-keys.log).
 
 ### Flowchart TCP+TLS
-The following flowcharts are created out of two example pcap-files:
-* [TCP+TLS pcap example file](documentation/pcap-tcp-tls/tcp.pcap)
-* [QUIC pcap example file](documentation/pcap-quic/quic.pcap)
-
-Both files can also be viewed in wireshark for comparison. To be able to decrypt the pcap files,
-it's necessary to add the corresponding SSL-keys:
-* [SSL-key TCP+TLS pcap file](documentation/pcap-tcp-tls/ssl-keys-tcp+tls.log)
-* [SSL-key QUIC pcap file](documentation/pcap-quic/ssl-keys-quic.log)
-
-Because the execution structure of the protocols is always similar, it is sufficient so only look at one example for QUIC and TCP+TLS respectively as flowcharts.
-
 The example communication between TCP+TLS Server and TCP+TLS Client is depicted in the following flowchart:
 
 ![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_2021-02-18_21_08_37.464861.png)
