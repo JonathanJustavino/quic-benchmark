@@ -1,28 +1,50 @@
 import pandas as pd
 from pathlib import Path
+import statistics as st
 
 
 def dataloader(import_path):
     # get all measurement folders
     all_folders = sorted(import_path.glob('*'))
 
-    # collect pcaps with 10 packets in one list
-    pcaps_10 = []
+    # collect csvs with 10 packets in one list
+    csvs_10 = []
     for folder in all_folders:
-        curr_csv = pd.read_csv(import_path / folder / 'timestamps.csv', header=None)
+        curr_csv = pd.read_csv(import_path / folder / 'timestamps.csv', header=None, delimiter='\t', index_col=False)
 
         # drop csv folders with 11 packets
         if len(curr_csv) == 10:
-            pcaps_10.append(curr_csv)
+            csvs_10.append(curr_csv)
 
-    return pcaps_10
+    return csvs_10
+
+
+def list_unwrap(wrapped_list):
+    newlist = []
+    for el in wrapped_list:
+        newlist.append(el[0])
+    return newlist
 
 
 if __name__ == '__main__':
     global_path = Path(
         '/home/amelie/Uni/RNP_Komplexpraktikum/quic-benchmark/measurements/samples_threshold5_dev2_delay0/quic/remote/')
 
-    pcaps = dataloader(global_path)
+    csvs = dataloader(global_path)
 
+    avg_list = []
+    # iterate over each row==time of 1st packet, 2nd packet etc.
+    for row in range(0, 9):
+        tmp_avg_list = []
 
+        # extract row of each csv + append to tmp_avg_list
+        for one_csv in csvs:
+            one_csv = one_csv.values.tolist()  # convert panda DataFrame to List
+            one_csv = list_unwrap(one_csv)  # unwrap list of list
+            tmp_avg_list.append(one_csv[row])
+            print(tmp_avg_list)
+
+        avg_list.append(st.mean(tmp_avg_list))
+
+    print(avg_list)
 
