@@ -136,7 +136,7 @@ or
 npm run quic
 ```
 
-## Evaluation
+## Analysis
 
 The general structure of QUIC and TCP+TLS communication, based on network protocol layers:
 
@@ -146,6 +146,16 @@ Both protocols work similar until they use TCP and UDP respectively in the trans
 Notably, the payload of the transport layer protocols is structured different: 
 * **TCP+TLS**: The TLS layer is directly included in the TCP payload. Traffic control is managed by TCP.
 * **QUIC:** The QUIC packet is included in the UDP payload. The encryption is also done via TLS, but the TLS CRYPTO frames are part of the QUIC payload. Traffic control is managed by QUIC. After exchanging encryption details via TLS, QUIC communication works with encrypted streams.
+
+### Captured Files
+
+After capturing the traffic with tshark, pcapng files are generated. These can be found [here](./measurements/).
+For analyzing the behaviour of the protocols in detail, these pcap files are used. 
+Extracting the relative timestamps of one pcap file:
+
+> tshark -r input.pcap -T fields -e frame.time_relative > timestamps_of_pcap.csv
+
+We compare the overhead for the transmitted payload and generate flowcharts where we depict the properties of each protocol.
 
 
 ### Flowchart TCP+TLS
