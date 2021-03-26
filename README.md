@@ -192,7 +192,7 @@ The TCP protocol contains following headerfields:
 
 The communication between QUIC Server and QUIC Client is depicted in the followin QUIC flowchart:
 
-![quic_flowchart](./documentation/QUIC_flowchart_to_pcap_2021-02-18_19_57_03.396422.png)
+![quic_flowchart](./documentation/QUIC_flowchart_to_pcap_MEAN.png)
 
 QUIC frames are encapsulated in the payload of UDP packets.
 The UDP protocol contains the following headerfields:
