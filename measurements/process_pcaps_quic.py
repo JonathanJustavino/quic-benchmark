@@ -42,7 +42,6 @@ if __name__ == '__main__':
             one_csv = one_csv.values.tolist()  # convert panda DataFrame to List
             one_csv = list_unwrap(one_csv)  # unwrap list of list
             tmp_avg_list.append(one_csv[row])
-            print(tmp_avg_list)
 
         avg_list.append(st.mean(tmp_avg_list))
 
