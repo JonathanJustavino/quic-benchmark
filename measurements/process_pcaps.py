@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 
 
-def dataloader(impport_path):
+def dataloader(import_path):
     # get all measurement folders
     all_folders = sorted(import_path.glob('*'))
 
@@ -17,17 +17,12 @@ def dataloader(impport_path):
 
     return pcaps_10
 
-if __name__ == '__main__':
 
-    import_path = Path(
+if __name__ == '__main__':
+    global_path = Path(
         '/home/amelie/Uni/RNP_Komplexpraktikum/quic-benchmark/measurements/samples_threshold5_dev2_delay0/quic/remote/')
 
-    pcaps = dataloader(import_path)
-    print(len(pcaps))
+    pcaps = dataloader(global_path)
 
 
 
-#    df = pd.read_csv(import_path / '2021-03-08 08-21-15.964770' / 'timestamps.csv', header=None, sep='\t',
-#                     index_col=False)
-#    print(df)
-#    print(len(df))
