@@ -14,11 +14,20 @@ services:
       - "80:80"
     network_mode: bridge
 
-  curl:
-    hostname: curl
+  curl-http3:
+    hostname: curl-http3
     image: ymuski/curl-http3
     links:
       - nginx
     network_mode: bridge
-    command: ["curl", "-ILv", "https://nginx", "--http3"]
+    command: ["sleep", "200"]
+    # command: ["curl", "-ILv", "https://nginx", "--http3"]
+
+  curl-http2:
+    hostname: curl-http2
+    image: curlimages/curl
+    links:
+      - nginx
+    network_mode: bridge
+    command: ["sleep", "200"]
     # command: ["curl", "-ILv", "--insecure", "https://nginx","--http2"]
