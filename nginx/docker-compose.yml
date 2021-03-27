@@ -17,6 +17,8 @@ services:
   curl-http3:
     hostname: curl-http3
     image: ymuski/curl-http3
+    volumes: 
+      - ./utils/:/utils/
     links:
       - nginx
     network_mode: bridge
@@ -26,6 +28,8 @@ services:
   curl-http2:
     hostname: curl-http2
     image: curlimages/curl
+    volumes: 
+      - ./utils/:/utils/
     links:
       - nginx
     network_mode: bridge

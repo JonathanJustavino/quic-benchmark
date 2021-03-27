@@ -9,7 +9,7 @@ from traffic.delay import add_delay
 from utils.parser import dockerParser
 from traffic.shark import monitor_network
 from utils.measurements import extract_measurements, merge_folder
-from benchmarks.benchmarks import quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path, move_results
+from benchmarks.benchmarks import quic_benchmark, tcp_benchmark, dump_results, docker_ping, get_measurement_path, move_nginx_results
 
 
 network = ("local", "remote")
@@ -72,6 +72,15 @@ def log_arguments(arguments):
             print(arg.capitalize())
 
 
+def ping_install_cmds(container_name, http2=False):
+    install_cmd = "apt-get update && apt-get install -y python3 python3-distutils git iputils-ping"
+    if http2:
+        install_cmd = "apk update && apk add python3 && apk add python3-distutils && apk add git && apk add iputils-ping"
+    clone_cmd = "git clone https://github.com/richardimaoka/ping-to-json.git"
+    subprocess.run(f"sudo docker exec -i -u 0 {container_name} sh -c '{install_cmd}'", shell=True)
+    subprocess.run(f"sudo docker exec -i -u 0 {container_name} sh -c '{clone_cmd}'", shell=True)
+
+
 @log_helper
 def run_benchmark(arguments):
     if arguments.quic:
@@ -92,25 +101,29 @@ def run_benchmark(arguments):
             time.sleep(300)
             return
         if arguments.client:
-            delay = float(arguments.delay)
-            add_delay(benchmark[1], delay)
-            threshold = float(arguments.threshold) + delay
+            threshold = float(arguments.threshold)
             # Warmup ping
-            docker_ping(benchmark[1], arguments.ipaddress, threshold=threshold, check=True)
-            low_network_usage = docker_ping(benchmark[1], arguments.ipaddress, threshold=threshold, check=True)
-            if not low_network_usage:
-                return
+            # if arguments.tcp:
+            #     ping_install_cmds("nginx_curl-http2_1", http2=True)
+            #     docker_ping("nginx_curl-http2_1", arguments.ipaddress, threshold=threshold, check=True)
+            #     low_network_usage = docker_ping("nginx_curl-http2_1", arguments.ipaddress, threshold=threshold, check=True)
+            # else:
+            #     ping_install_cmds("nginx_curl-http3_1")
+            #     docker_ping("nginx_curl-http3_1", arguments.ipaddress, threshold=threshold, check=True)
+            #     low_network_usage = docker_ping("nginx_curl-http3_1", arguments.ipaddress, threshold=threshold, check=True)
+            # if not low_network_usage:
+            #     return
             path = get_measurement_path(socket_type, network[1])
-            ping_thread = start_thread(target=docker_ping, container=benchmark[1], ip=arguments.ipaddress, threshold=threshold)
+            # ping_thread = start_thread(target=docker_ping, container="nginx_curl-http3_1", ip=arguments.ipaddress, threshold=threshold)
             shark_thread = start_thread(target=monitor_network, socket_type=socket_type)
-            time.sleep(3)
+            time.sleep(5)
             if arguments.tcp:
                 start_http2_curl(f"{arguments.ipaddress}:443")
             else:
                 start_http3_curl(f"{arguments.ipaddress}:443")
-            ping_thread.join()
+            # ping_thread.join()
             shark_thread.join()
-            # move_results(path, socket_type, threshold=threshold, delay=delay)
+            # move_nginx_results(path, socket_type)
 
 
 def create_measurements():

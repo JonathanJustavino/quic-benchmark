@@ -33,11 +33,12 @@ def get_network_interface():
 
 def monitor_network(socket_type):
     pkt_filter = ''
-    interface = get_network_interface()
+    # interface = get_network_interface()
+    interface = "wlp61s0"
 
     if socket_type == 'quic':
-        pkt_filter = 'udp port 1234'
+        pkt_filter = 'udp port 443'
     elif socket_type == 'tcp':
-        pkt_filter = 'tcp port 1337'
+        pkt_filter = 'tcp port 443'
 
     capture_packets(interface, filter=pkt_filter, output_file=f"{socket_type}")

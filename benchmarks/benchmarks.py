@@ -5,6 +5,7 @@ import shutil
 import docker
 import tarfile
 import datetime
+import subprocess
 from io import BytesIO
 from os import path as os_path
 
@@ -155,3 +156,8 @@ def move_results(results_path, socket_type, threshold=None, delay=None):
             json.dump(data, result_file, indent=2, separators=(',', ': '))
     else:
         shutil.move("./utils/ping.json", results_path)
+
+
+def move_nginx_results(results_path, socket_type):
+    results_path = f"{results_path}/"
+    shutil.move(f"./traffic/{socket_type}.pcap", results_path)
