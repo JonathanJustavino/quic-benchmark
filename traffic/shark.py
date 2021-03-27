@@ -15,7 +15,7 @@ def create_output_file(func):
 
 
 @create_output_file
-def capture_packets(interface, filter="", output_file="", time=20):
+def capture_packets(interface, filter="", output_file="", time=30):
     command = f"sudo tshark -i {interface} -w './traffic/{output_file}.pcap' -f '{filter}' -a 'duration: {time}'"
     output = subprocess.run(command, shell=True, check=True, capture_output=True)
     output = output.stderr.decode('utf-8').split("\n")

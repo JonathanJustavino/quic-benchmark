@@ -98,7 +98,8 @@ def run_benchmark(arguments):
     else:
         if arguments.server:
             path = get_measurement_path(socket_type, network[1])
-            time.sleep(300)
+            shark_thread = start_thread(target=monitor_network, socket_type=socket_type)
+            shark_thread.join()
             return
         if arguments.client:
             threshold = float(arguments.threshold)
@@ -113,16 +114,13 @@ def run_benchmark(arguments):
             #     low_network_usage = docker_ping("nginx_curl-http3_1", arguments.ipaddress, threshold=threshold, check=True)
             # if not low_network_usage:
             #     return
-            path = get_measurement_path(socket_type, network[1])
             # ping_thread = start_thread(target=docker_ping, container="nginx_curl-http3_1", ip=arguments.ipaddress, threshold=threshold)
-            shark_thread = start_thread(target=monitor_network, socket_type=socket_type)
             time.sleep(5)
             if arguments.tcp:
                 start_http2_curl(f"{arguments.ipaddress}:443")
             else:
                 start_http3_curl(f"{arguments.ipaddress}:443")
             # ping_thread.join()
-            shark_thread.join()
             # move_nginx_results(path, socket_type)
 
 
