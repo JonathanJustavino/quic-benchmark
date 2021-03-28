@@ -81,65 +81,6 @@ This happened unfortunately after we were nearly finished with our project. Swit
 As we built our own dockerimage with the nodejs version installed, it is still easily possible to run our project without having to get the now deprecated nodejs version from some archived nodejs repository.
 
 
-## Run setup
-
-In this chapter, the prerequisites for reproducing our experiments are described.
-The following software is needs to be installed: 
-
-[dockerpy](https://docker-py.readthedocs.io/en/stable/):
-
-```[bash]
-pip3 install docker
-```
-
-[tshark](https://tshark.dev/setup/install/):
-
-```[bash]
-sudo apt-get install tshark
-```
-
-[matplotlib](https://matplotlib.org/stable/index.html):
-
-```[bash]
-pip3 install matplotlib
-```
-
-[colored](https://gitlab.com/dslackw/colored):
-
-```[bash]
-pip3 install colored
-```
-
-
-The following commands are required to start benchmarking on your machine.
-
-### Run in docker container
-
-To run the setup in docker you do not have to have nodejs installed. Instead the image, which is built from the [Dockerfile](Dockerfile) is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
-
-#### Benchmark parameters
-
-![setup parameters](./documentation/setup_parameters.png)
-
-> Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
-
-The script generates a json file with timestamps for every comparable event for TCP+TLS and QUIC, as well as a packet capture via tshark and a json file documenting the ping output run simultaniously.
-
-### Run locally on machine
-
-> Beware: Running the server and client directly on your OS only works if you have nodejs 15.0.6 in experimental mode already installed on your system
-> This is **not recommended**, use the docker setup instead.
-
-```[bash]
-npm run tcp
-```
-
-or
-
-```[bash]
-npm run quic
-```
-
 ## Analysis
 
 The general structure of QUIC and TCP+TLS communication, based on network protocol layers:
@@ -208,6 +149,7 @@ The TCP protocol contains the following headerfields:
 | Urgent pointer | 2 |
 | Options | 12 |
 | |  Σ = 32 |
+
 
 ### Flowchart QUIC
 
@@ -340,7 +282,125 @@ Reusing the same connection to send more application data would at least reduce 
 QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it is sending 2 packets less. This could be because QUIC is running in user-space instead of kernel-space, like TCP+TLS (see the summary of [Time Comparison](#time-comparison) for a detailed explanation).
 Moreover, the QUIC implementation in the nodejs version we are using is still experimental, so this could also be a limiting factor.
 
+## Run setup
+
+In this chapter, the prerequisites and commands for reproducing our experiments are described.
+The following software needs to be installed: 
+
+[dockerpy](https://docker-py.readthedocs.io/en/stable/):
+
+```[bash]
+pip3 install docker
+```
+
+[tshark](https://tshark.dev/setup/install/):
+
+```[bash]
+sudo apt-get install tshark
+```
+
+[matplotlib](https://matplotlib.org/stable/index.html):
+
+```[bash]
+pip3 install matplotlib
+```
+
+[colored](https://gitlab.com/dslackw/colored):
+
+```[bash]
+pip3 install colored
+```
+
+
+The following commands are required to start benchmarking on your machine.
+
+### Run in docker container
+
+To run the setup in docker nodejs does not have to be installed. It is sufficient to use our docker-image, which is built from the [Dockerfile](Dockerfile) and is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
+
+#### Benchmark parameters
+
+![setup parameters](./documentation/setup_parameters.png)
+
+> Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
+
+The script generates a json file with timestamps for every comparable event for TCP+TLS and QUIC, as well as a packet capture via tshark and a json file documenting the ping output run simultaniously.
+
+### Run locally on machine
+
+> Beware: Running the server and client directly on your OS only works if you have nodejs 15.0.6 in experimental mode already installed on your system
+> This is **not recommended**, use the docker setup instead.
+
+```[bash]
+npm run tcp
+```
+
+or
+
+```[bash]
+npm run quic
+```
+
+## Evaluation / Results
+
+In this chapter, the results of the experiments are  interpreted and represented in different forms. 
+
+The results are saved in the following directory structure:
+
+measurements
+├── samples_threshold15_dev2_delay10
+│   ├── quic
+│   │   └── remote
+│   │       ├── 2021-03-11 00-31-37.626624
+│   │       │   ├── ping.json
+│   │       │   ├── quic-benchmark-client.json
+│   │       │   ├── quic-benchmark-server.json
+│   │       │   ├── quic.pcap
+│   │       │   └── ssl-keys.log
+│   │       └── ...
+│   └── tcp
+│       └── remote
+│           ├── 2021-03-11 00-54-54.330962
+│           │   ├── ping.json
+│           │   ├── ssl-keys.log
+│           │   ├── tcp-benchmark-client.json
+│           │   ├── tcp-benchmark-server.json
+│           │   └── tcp.pcap
+│           └── ...
+├── samples_threshold25_dev2_delay20
+│   ├── quic
+│   │   └── remote
+│   │       ├── 2021-03-11 02-34-44.458038
+│   │       │   ├── ping.json
+│   │       │   ├── quic-benchmark-client.json
+│   │       │   ├── quic-benchmark-server.json
+│   │       │   ├── quic.pcap
+│   │       │   └── ssl-keys.log
+│   │       └── ...
+│   └── tcp
+│       └── remote
+│           ├── 2021-03-11 02-57-32.656990
+│           │   ├── ping.json
+│           │   ├── ssl-keys.log
+│           │   ├── tcp-benchmark-client.json
+│           │   ├── tcp-benchmark-server.json
+│           │   └── tcp.pcap
+│           └── ...
+└── ...
+
+
+As it can be seen at the folder structure above, after conducting the measurements, the following files have been generated for each QUIC and TCP+TLS measurement:
+
+* **ping.json:** For reporting the current workload of the network during measuring, the round trip time of the network is measured by running the [ping-command](https://linux.die.net/man/8/ping) in parallel.
+* **ssl-keys.log:**
+* **tcp/quic-benchmark-client.json:**
+* **tcp/quic-benchmark-server.json:**
+* **tcp/quic.pcap:** 
+
+
 ### Event comparisons
+
+During the measurements, 
 
 We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/api/quic.html) and [TCP](https://nodejs.org/docs/v15.6.0/api/net.html) and [TLS](https://nodejs.org/docs/v15.6.0/api/tls.html), that are emitted during the stages of connection and transmission.
 
