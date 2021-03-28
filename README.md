@@ -147,26 +147,34 @@ Notably, the payload of the transport layer protocols is structured different:
 * **TCP+TLS**: The TLS layer is directly included in the TCP payload. Traffic control is managed by TCP.
 * **QUIC:** The QUIC packet is included in the UDP payload. The encryption is also done via TLS, but the TLS CRYPTO frames are part of the QUIC payload. Traffic control is managed by QUIC. After exchanging encryption details via TLS, QUIC communication works with encrypted streams.
 
-### Captured Files  
-After capturing the traffic with tshark, pcapng files are generated. These can be found [here](./measurements/).
-For analyzing the behaviour of the protocols in detail, these pcap files are used. 
-Extracting the relative timestamps of one pcap file:
+This section is mainly based on the analysis of the packages captured on the network interface of the client during the testruns.
+The traffic on the interface is captured with [tshark](https://tshark.dev). The resulting [pcapng](https://wiki.wireshark.org/Development/PcapNg#PcapNg) (short for packet capture next generation dump file format ) files are the basis for analyzing the behaviour of the different protocols in detail.
 
-> tshark -r input.pcap -T fields -e frame.time_relative > timestamps_of_pcap.csv
-
-We compare the overhead for the transmitted payload and generate flowcharts where we depict the properties of each protocol.
-
-All pcap-files can also be viewed in wireshark for comparison. To be able to decrypt the pcap files,
-it's necessary to add the corresponding SSL-keys:
+All pcap-files can be viewed in [wireshark](https://www.wireshark.org/) for comparison, it is the GUI version of tshark.
+To be able to decrypt the pcap files, it is necessary to add the corresponding SSL-keys to wireshark:
 The SSL-keys for each pcap-file can be found in the subfolder for each measurement.
-For example the SSL-key for [this QUIC pcap-file](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08 08-21-15.964770/quic.pcap) is located in the same folder [here](/measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08 08-21-15.964770/ssl-keys.log).
+For example the SSL-key for [this QUIC pcap-file](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08 08-21-15.964770/quic.pcap) is located in the same folder [here](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08 08-21-15.964770/ssl-keys.log).
+After opening a specific pcap-file in wireshark, go to Edit&#8594;Preferences&#8594;Protocols&#8594;TLS and add the path to the **corresponding** SSL-key.log to field "(Pre)-Master-Secret log filename".
+
+Based on these pcap-files, we generate flowcharts and compare the overhead for the transmitted payload where we depict the properties of each protocol.
+This is done only for the measurements of QUIC and TCP+TLS with **no artificial threshold added** to the network RTT, because the goal is to analyze the protocol behaviour in general.
+The flowcharts are described in detail in the following sections:
 
 ### Flowchart TCP+TLS
-The example communication between TCP+TLS Server and TCP+TLS Client is depicted in the following flowchart:
 
-![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_2021-02-18_21_08_37.464861.png)
+First, the relative timestamps of each TCP+TLS pcap file (with **no artificial network RTT** added) are extracted:
 
-The TCP protocol contains following headerfields:
+> tshark -r tcp.pcap -T fields -e frame.time_relative > timestamps.csv
+
+
+
+
+The example communication between TCP+TLS Server and TCP+TLS Client is depicted in one flowchart.  
+
+![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_MEAN.png)
+
+
+The TCP protocol contains the following headerfields:
 | Field Type | Size in Byte |
 | --- | --- |
 | Source Port | 2 |
@@ -182,7 +190,31 @@ The TCP protocol contains following headerfields:
 
 ### Flowchart QUIC
 
-The communication between QUIC Server and QUIC Client is depicted in the followin QUIC flowchart:
+Like for the TCP+TLS flowcharts, the relative timestamps of each quic-pcap file (with **no artificial network RTT** added) are extracted:
+
+> tshark -r quic.pcap -T fields -e frame.time_relative > timestamps.csv
+
+Notably, for the quic-pcap files, only 5 out of 10 measurements contain the same amount of packages sent: During 5 measurements 10 packets were sent, during the other 5 measurements 11 packets were sent.
+For each connection with 11 packets, there is one more ACK-packet sent at the end:
+
+| Measurement Timestamp | # packets transmitted |
+| --- | --- |
+| 2021-03-08 08-21-15.964770 | 10 |
+| 2021-03-08 08-23-34.178260 | 11 |
+| 2021-03-08 08-25-08.967745 | 10 |
+| 2021-03-08 08-26-31.705285 | 10 |
+| 2021-03-08 08-28-21.012236 | 11 |
+| 2021-03-08 08-32-17.040706 | 11 |
+| 2021-03-08 08-34-36.318718 | 10 |
+| 2021-03-08 08-40-19.121335 | 11 |
+| 2021-03-08 08-42-11.102905 | 11 |
+| 2021-03-08 08-43-43.584919 | 10 |
+
+The missing ACK-package doesn't seem to have an impact on the protocol behaviour.
+So we decided for the flowcharts to work only with the pcap-files with **10 tansmitted packets** to generate a consistent flowchart where we can calculate the average over each packet timestamp:
+
+The script [process_pcaps_quic.py](.measurements/process_pcaps_quic.py) uses the timestamps.csv of each quic-pcap and filters out the ones with 11 packets transmitted.
+Then, it prints the mean value of each connection - these mean values are used as timestamps in the following flowchart.
 
 ![quic_flowchart](./documentation/QUIC_flowchart_to_pcap_MEAN.png)
 
