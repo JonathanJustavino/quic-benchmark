@@ -343,7 +343,7 @@ npm run quic
 
 ## Evaluation / Results
 
-In this chapter, the results of the experiments are  interpreted and represented in different forms. 
+In this chapter, the results of the experiments are interpreted and represented in different forms. 
 
 The results are saved in the following directory structure:
 
@@ -371,39 +371,24 @@ measurements
 │           └── ...
 ├── samples_threshold25_dev2_delay20
 │   ├── quic
-│   │   └── remote
-│   │       ├── 2021-03-11 02-34-44.458038
-│   │       │   ├── ping.json
-│   │       │   ├── quic-benchmark-client.json
-│   │       │   ├── quic-benchmark-server.json
-│   │       │   ├── quic.pcap
-│   │       │   └── ssl-keys.log
-│   │       └── ...
+│   │   └── ...
 │   └── tcp
-│       └── remote
-│           ├── 2021-03-11 02-57-32.656990
-│           │   ├── ping.json
-│           │   ├── ssl-keys.log
-│           │   ├── tcp-benchmark-client.json
-│           │   ├── tcp-benchmark-server.json
-│           │   └── tcp.pcap
-│           └── ...
+│       └── ...
 └── ...
 ```
 
 As it can be seen at the folder structure above, after conducting the measurements, the following files have been generated for each QUIC and TCP+TLS measurement:
 
 * **ping.json:** For reporting the current workload of the network during measuring, the round trip time of the network is measured by running the [ping-command](https://linux.die.net/man/8/ping) in parallel.
-* **ssl-keys.log:**
-* **tcp/quic-benchmark-client.json:**
-* **tcp/quic-benchmark-server.json:**
-* **tcp/quic.pcap:** 
+* **ssl-keys.log:** The ssl-key that is needed to decrypt the corresponding pcap-file in the same folder.
+* **tcp/quic-benchmark-client.json:** The events of the client and their corresponding timestamps.
+* **tcp/quic-benchmark-server.json:** The events of the server and their corresponding timestamps.
+* **tcp/quic.pcap:** The pcap-file that is generated during the measurement by capturing on the network-interface of the client with tshark.
 
 
 ### Event comparisons
 
-During the measurements, 
-
+This section analyzes the behaviour and results of the QUIC and TCP+TLS protocol on the basis of the events of nodejs. 
 We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/api/quic.html) and [TCP](https://nodejs.org/docs/v15.6.0/api/net.html) and [TLS](https://nodejs.org/docs/v15.6.0/api/tls.html), that are emitted during the stages of connection and transmission.
 
 ![timeline](./documentation/event_timeline.png)
