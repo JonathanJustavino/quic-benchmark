@@ -153,7 +153,7 @@ The traffic on the interface is captured with [tshark](https://tshark.dev). The 
 All pcap-files can be viewed in [wireshark](https://www.wireshark.org/) for comparison, it is the GUI version of tshark.
 To be able to decrypt the pcap files, it is necessary to add the corresponding SSL-keys to wireshark:
 The SSL-keys for each pcap-file can be found in the subfolder for each measurement.
-For example the SSL-key for [this QUIC pcap-file](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08 08-21-15.964770/quic.pcap) is located in the same folder [here](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08 08-21-15.964770/ssl-keys.log).
+For example the SSL-key for [this QUIC pcap-file](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/quic.pcap) is located in the same folder [here](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/ssl-keys.log).
 After opening a specific pcap-file in wireshark, go to Edit&#8594;Preferences&#8594;Protocols&#8594;TLS and add the path to the **corresponding** SSL-key.log to field "(Pre)-Master-Secret log filename".
 
 Based on these pcap-files, we generate flowcharts and compare the overhead for the transmitted payload where we depict the properties of each protocol.
