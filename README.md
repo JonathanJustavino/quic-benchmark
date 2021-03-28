@@ -166,10 +166,27 @@ First, the relative timestamps of each TCP+TLS pcap file (with **no artificial n
 
 > tshark -r tcp.pcap -T fields -e frame.time_relative > timestamps.csv
 
+Notably, from all 10 captured tcp-pcap files, there exist 2 pcaps that contain 1 packet less than the other 8 pcaps. These 2 pcaps contain 13 packets, while the remaining 8 pcaps contain 14 packages:
 
+| Measurement Timestamp of pcap | # packets transmitted |
+| --- | --- |
+| 2021-03-08 08-53-34.612692 | 14 |
+| 2021-03-08 08-55-12.544361 | **13** |
+| 2021-03-08 08-56-46.086451 | 14 |
+| 2021-03-08 08-58-29.177156 | 14 |
+| 2021-03-08 08-59-06.053982 | 14 |
+| 2021-03-08 09-00-39.234748 | 14 |
+| 2021-03-08 09-06-13.770530 | 14 |
+| 2021-03-08 09-08-23.246872 | **13** |
+| 2021-03-08 09-08-55.386537 | 14 |
+| 2021-03-08 09-12-51.075999 | 14 |
 
+This is due to a missing __TCP Window update__ package in the 8 tcp-pcap files. This doesn't change important behaviour of the protocol (i.e. the handshake) in general. 
+Therefore, to create a consistent flowchart and calculate the average value of each sent packet, the 2 tcp-pcap files which contain 13 packets are omitted.
 
-The example communication between TCP+TLS Server and TCP+TLS Client is depicted in one flowchart.  
+The script [process_pcaps_tcp+tls.py](.measurements/process_pcaps_tcp+tls.py) uses the timestamps.csv of each tcp-pcap and filters out the ones where 13 packets instead of 14 are transmitted.
+Then, the average of the timestamps of each connection is printed - these mean values are used as timestamps in the following flowchart.
+Moreover, important properties of each packet (i.e. the flags like ACK, FIN or the handshake messages) and the Bytes of the packet on wire are shown. 
 
 ![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_MEAN.png)
 
@@ -197,7 +214,7 @@ Like for the TCP+TLS flowcharts, the relative timestamps of each quic-pcap file 
 Notably, for the quic-pcap files, only 5 out of 10 measurements contain the same amount of packages sent: During 5 measurements 10 packets were sent, during the other 5 measurements 11 packets were sent.
 For each connection with 11 packets, there is one more ACK-packet sent at the end:
 
-| Measurement Timestamp | # packets transmitted |
+| Measurement Timestamp of pcap | # packets transmitted |
 | --- | --- |
 | 2021-03-08 08-21-15.964770 | 10 |
 | 2021-03-08 08-23-34.178260 | 11 |
@@ -214,8 +231,8 @@ The missing ACK-package doesn't seem to have an impact on the protocol behaviour
 So we decided for the flowcharts to work only with the pcap-files with **10 tansmitted packets** to generate a consistent flowchart where we can calculate the average over each packet timestamp:
 
 The script [process_pcaps_quic.py](.measurements/process_pcaps_quic.py) uses the timestamps.csv of each quic-pcap and filters out the ones with 11 packets transmitted.
-Then, the mean values of each connection is printed - these mean values are used as timestamps in the following flowchart.
-Moreover, the general properties of each packet (i.e. the flags like ACK, FIN or the handshake messages) and the Bytes of the packet on wire are shown. 
+Then, the mean values of the timestamp of each connection is printed - these mean values are used as timestamps in the following flowchart.
+Moreover, important properties of each packet (i.e. the flags like ACK, FIN or the handshake messages) and the Bytes of the packet on wire are shown. 
 
 ![quic_flowchart](./documentation/QUIC_flowchart_to_pcap_MEAN.png)
 
