@@ -52,12 +52,14 @@ For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and
 
 ![topology](./documentation/topology_localhost.png)
 
+
 ### Remote Measurements
 
 For the remote measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client, again running in docker-containers.  
 Our Router only had the possibility to connect one LAN cable, because of this the Client had to be connected via WLAN. It is recommended to use LAN cable connections for both hosts if possible, because it reduces the network round trip time.
 
 ![topology](./documentation/topology.png)
+
 
 ### Considerations regarding nodejs + QUIC
 
@@ -80,6 +82,9 @@ As we built our own dockerimage with the nodejs version installed, it is still e
 
 
 ## Run setup
+
+In this chapter, the prerequisites for reproducing our experiments are described.
+The following software is needs to be installed: 
 
 [dockerpy](https://docker-py.readthedocs.io/en/stable/):
 
