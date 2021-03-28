@@ -37,14 +37,29 @@ The purpose of this project is the performance measurement of the QUIC protocol 
 The basis for our setup is the experimental [nodejs version 15.0.6](https://nodejs.org/download/release/v15.6.0/).
 We decided to go with nodejs for this experiment because it is possible to set up QUIC as a socket and also directly as HTTP/3. Moreover, the documentation is really detailed. 
 
-In this experiment, we implemented two different Server-Client setups: One for communication via QUIC and the second for communication via TCP+TLS. 
+In this experiment, we implemented two different Server-Client setups: One for communication via QUIC and the second for communication via TCP+TLS based on sockets. 
 Both implementations were installed into docker containers and uploaded to [dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs). Using docker has several advantages:
 
 * For reproducing the measurements, it is not necessary to download+compile nodejs in experimental mode.
 * The experiment can be easily used on different operation systems
 * Conducting the measurements is automated via docker-compose
 
-A detailed depiction of the hardware setup is shown in [Topology](#topology).
+We conducted the experiments on two different setups - first on one machine, afterwards on two machines via LAN. The setup of the two experiment is described below.
+
+### Local Measurements
+
+For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and ran the Client and Server on localhost. The client and server are running inside docker-containers:
+
+![topology](./documentation/topology_localhost.png)
+
+### Remote Measurements
+
+For the remote measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client, again running in docker-containers.  
+Our Router only had the possibility to connect one LAN cable, because of this the Client had to be connected via WLAN. It is recommended to use LAN cable connections for both hosts if possible, because it reduces the network round trip time.
+
+![topology](./documentation/topology.png)
+
+### Considerations regarding nodejs + QUIC
 
 The QUIC implementation of nodejs 15.0.6 is based on the QUIC IETF [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27).
 
@@ -63,22 +78,8 @@ The QUIC documentation to our nodejs experimental version is available [here](ht
 This happened unfortunately after we were nearly finished with our project. Switching to another QUIC Server/Client architecture and do everything again would not have been possible on such a short notice.
 As we built our own dockerimage with the nodejs version installed, it is still easily possible to run our project without having to get the now deprecated nodejs version from some archived nodejs repository.
 
-## Topology
 
-### Local Measurements
-
-For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and ran the Client and Server on localhost. As described in [Experimental Setup](#experiment-setup), the client and server are running inside docker-containers:
-
-![topology](./documentation/topology_localhost.png)
-
-### Remote Measurements
-
-For the remote measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client.  
-Our Router only had the possibility to connect one LAN cable, because of this the Client had to be connected via WLAN. It is recommended to use LAN cable connections for both hosts if possible, because it reduces the network round trip time.
-
-![topology](./documentation/topology.png)
-
-## Prerequisites
+## Run setup
 
 [dockerpy](https://docker-py.readthedocs.io/en/stable/):
 
@@ -103,8 +104,6 @@ pip3 install matplotlib
 ```[bash]
 pip3 install colored
 ```
-
-## Run setup
 
 
 The following commands are required to start benchmarking on your machine.
