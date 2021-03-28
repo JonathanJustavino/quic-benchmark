@@ -347,6 +347,8 @@ In this chapter, the results of the experiments are  interpreted and represented
 
 The results are saved in the following directory structure:
 
+
+```bash
 measurements
 ├── samples_threshold15_dev2_delay10
 │   ├── quic
@@ -387,7 +389,7 @@ measurements
 │           │   └── tcp.pcap
 │           └── ...
 └── ...
-
+```
 
 As it can be seen at the folder structure above, after conducting the measurements, the following files have been generated for each QUIC and TCP+TLS measurement:
 
