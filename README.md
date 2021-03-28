@@ -214,7 +214,8 @@ The missing ACK-package doesn't seem to have an impact on the protocol behaviour
 So we decided for the flowcharts to work only with the pcap-files with **10 tansmitted packets** to generate a consistent flowchart where we can calculate the average over each packet timestamp:
 
 The script [process_pcaps_quic.py](.measurements/process_pcaps_quic.py) uses the timestamps.csv of each quic-pcap and filters out the ones with 11 packets transmitted.
-Then, it prints the mean value of each connection - these mean values are used as timestamps in the following flowchart.
+Then, the mean values of each connection is printed - these mean values are used as timestamps in the following flowchart.
+Moreover, the general properties of each packet (i.e. the flags like ACK, FIN or the handshake messages) and the Bytes of the packet on wire are shown. 
 
 ![quic_flowchart](./documentation/QUIC_flowchart_to_pcap_MEAN.png)
 
@@ -287,8 +288,11 @@ The information of the given flowcharts + documentiation summarized:
 | **Σ Bytes transmitted in total** | 2589 | 4141 |
 | **Established connection** | 2589 (Bytes in total) - 2068 (Handshake) = 521 | 4141 (Bytes in total) - (2947 (Handshake) + 78 (1.QUIC frame) - 110 (2.QUIC frame)) = 1162 |
 | **Encrypted Application data** | 207 | 126 |
+| **Raw Application data** | 46 | 46 |
+| **Overhead** (Σ Bytes transmitted in total) - (Raw Application data) | 2589 - 46 = 2543 | 4141 - 46 = 4095 | 
 
-In conclusion, the QUIC is transmitting more data than TCP+TLS for transmitting the same application data.
+
+In conclusion, QUIC is transmitting more data than TCP+TLS for transmitting the same application data - QUIC uses roughly 2x the overhead of TCP+TLS to transmit the 46 Byte mesage "I am the client sending you a message" from client to server.
 QUIC uses roughly 1/3 more data than TCP+TLS during the handshake. This difference is not because the long header is used: The padding in the first packet/Client initial that is embedded after the "TLS Client hello" has a size of **921 Bytes**, consisting of zeros. This is necessary due to technical and security reasons:
 
 IETF documentation: [Padding](https://tools.ietf.org/html/draft-ietf-quic-transport-27#page-111) states:
