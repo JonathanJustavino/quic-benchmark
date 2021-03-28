@@ -393,19 +393,19 @@ We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/a
 
 ![timeline](./documentation/event_timeline.png)
 
-|   Label                 |  QUIC event                   |   TCP event  |
-| :-------------          | :----------                   | :----------- |
-|   listening             |  QuicSocket.listening         | net.Server.listening |
-|   ready                 |  QuicSocket.ready             | net.Socket.ready |
-|   session               |  QuicSocket.session           | tls.Server.newSession |
-|   keylog                |  QuicSession.keylog           | tls.Server.keylog |
-|   secure                |  QuicSession.secure           | tls.Server.secureConnection |
-|   data                  |  QuicStream.data              | net.Socket.data |
-|   streamEnd             |  QuicStream.end               | net.Socket.end |
-|   streamClose           |  QuicStream.close             | net.Socket.close |
-|   socketClose           |  QuicSocket.close             | net.Server.close |
-|   error                 |  QuicSocket.error             | net.Socket.error |
-|   handshakeDurationInNs | QuicSession.handshakeDuration | tls.Server.connection - tls.Server.secureConnection |
+|   Label                 |  QUIC event                   |   TCP event  		| Event comparable |
+| :-------------          | :----------                   | :----------- 		| :-----------  |
+|   listening             |  QuicSocket.listening         | net.Server.listening	| &#10007;	|
+|   ready                 |  QuicSocket.ready             | net.Socket.ready 		| &#10007;	|
+|   session               |  QuicSocket.session           | tls.Server.newSession 	| &#10007;	|
+|   keylog                |  QuicSession.keylog           | tls.Server.keylog 		| &#10007;	|
+|   secure                |  QuicSession.secure           | tls.Server.secureConnection | &#10003;	|
+|   data                  |  QuicStream.data              | net.Socket.data 		| &#10003;	|
+|   streamEnd             |  QuicStream.end               | net.Socket.end 		| &#10003;	|
+|   streamClose           |  QuicStream.close             | net.Socket.close 		| &#10003;	|
+|   socketClose           |  QuicSocket.close             | net.Server.close 		| &#10003;	| 
+|   error                 |  QuicSocket.error             | net.Socket.error 		| &#10007;	|
+|   handshakeDurationInNs | QuicSession.handshakeDuration | tls.Server.connection - tls.Server.secureConnection | &#10003; |
 
 #### QUIC events
 
