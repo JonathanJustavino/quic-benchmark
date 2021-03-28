@@ -390,10 +390,12 @@ As it can be seen at the folder structure above, after conducting the measuremen
 
 This section analyzes the behaviour and results of the QUIC and TCP+TLS protocol on the basis of the events of nodejs. 
 We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/api/quic.html) and [TCP](https://nodejs.org/docs/v15.6.0/api/net.html) and [TLS](https://nodejs.org/docs/v15.6.0/api/tls.html), that are emitted during the stages of connection and transmission.
+Notably, **not** all events are happening **at the same point** during QUIC / TCP+TLS protocol execution, even though some have the same name.
+All events that are happening at the same point in the protocol execution and can therefore be used for comparison are marked with a &#10003;-symbol, the non-comparable ones with a &#10007;-symbol.
 
 ![timeline](./documentation/event_timeline.png)
 
-|   Label                 |  QUIC event                   |   TCP event  		| Event comparable |
+|   Label                 |  QUIC event                   |   TCP event  		| Event comparable? |
 | :-------------          | :----------                   | :----------- 		| :-----------  |
 |   listening             |  QuicSocket.listening         | net.Server.listening	| &#10007;	|
 |   ready                 |  QuicSocket.ready             | net.Socket.ready 		| &#10007;	|
@@ -435,11 +437,8 @@ We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/a
 * net.Socket.**error:** Error occurs. The 'close' event will be called directly following this event
 * tls.Server.**connection** Emitted when a new TCP stream is established, before the TLS handshake begins
 
-Not all of these events occur at the same time in the QUIC and TCP+TLS protocol, even though some have the same name.
-Only those that are comparable because they happend at the same time were picked for comparison.
-
 We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation respectively.
-The following graph shows the average value of the 5 comparable events "secure, data, streamEnd, streamClose, socketClose":
+The following graph shows the average value of the 5 **comparable events** (also marked in the events-table) "secure, data, streamEnd, streamClose, socketClose":
 
 ![setup parameters](./documentation/events_comparison.png)
 
