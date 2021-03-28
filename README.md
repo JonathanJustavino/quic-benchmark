@@ -393,8 +393,6 @@ We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/a
 Notably, **not** all events are happening **at the same point** during QUIC / TCP+TLS protocol execution, even though some have the same name.
 All events that are happening at the same point in the protocol execution and can therefore be used for comparison are marked with a &#10003;-symbol, the non-comparable ones with a &#10007;-symbol.
 
-![timeline](./documentation/event_timeline.png)
-
 |   Label                 |  QUIC event                   |   TCP event  		| Event comparable? |
 | :-------------          | :----------                   | :----------- 		| :-----------  |
 |   listening             |  QuicSocket.listening         | net.Server.listening	| &#10007;	|
@@ -408,6 +406,11 @@ All events that are happening at the same point in the protocol execution and ca
 |   socketClose           |  QuicSocket.close             | net.Server.close 		| &#10003;	| 
 |   error                 |  QuicSocket.error             | net.Socket.error 		| &#10007;	|
 |   handshakeDurationInNs | QuicSession.handshakeDuration | tls.Server.connection - tls.Server.secureConnection | &#10003; |
+
+
+This following graph gives an overview of the timeline of **all** events for each protocol:
+
+![timeline](./documentation/event_timeline.png)
 
 #### QUIC events
 
