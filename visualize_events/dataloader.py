@@ -1,5 +1,6 @@
 import os
 import json
+from statistics import median
 from dateutil import parser, relativedelta
 
 
@@ -100,11 +101,23 @@ def average_results(results):
     results['handshakeDuration']['avg'] = sum(values) / len(values)
 
 
+def median_results(results):
+    for key, _ in results['server'].items():
+        values = results['server'][key].values()
+        results['server'][key]['avg'] = median(values)
+    for key, _ in results['client'].items():
+        values = results['client'][key].values()
+        results['client'][key]['avg'] = median(values)
+    values = results['handshakeDuration'].values()
+    results['handshakeDuration']['avg'] = median(values)
+
+
 def load_results(socket_type, path):
     results = {'server': {}, 'client': {}}
     folders = load_folders(socket_type, path)
     read_results(path, folders, socket_type, results)
     average_results(results)
+    # median_results(results)
     return results
 
 
