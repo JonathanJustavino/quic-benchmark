@@ -4,18 +4,13 @@ Comparing the performance of the QUIC protocol with a combination of the TCP+TLS
 - [University project QUIC benchmarking](#university-project-quic-benchmarking)
   - [Motivation](#motivation)
   - [Experiment setup](#experiment-setup)
-  - [Topology](#topology)
-    - [Local Measurements](#local-measurements)
-    - [Remote Measurements](#remote-measurements)
-  - [Prerequisites](#prerequisites)
+    - [Hardware specifications](#hardware-specifications)
+    - [Considerations regarding nodejs + QUIC](#considerations-regarding-nodejs--quic)
   - [Run setup](#run-setup)
     - [Run in docker container](#run-in-docker-container)
       - [Benchmark parameters](#benchmark-parameters)
     - [Run locally on machine](#run-locally-on-machine)
-  - [Evaluation](#evaluation)
-    - [Flowchart TCP+TLS](#flowchart-tcptls)
-    - [Flowchart QUIC](#flowchart-quic)
-    - [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
+  - [Evaluation / Results](#evaluation--results)
     - [Event comparisons](#event-comparisons)
       - [QUIC events](#quic-events)
       - [TCP events](#tcp-events)
@@ -24,6 +19,11 @@ Comparing the performance of the QUIC protocol with a combination of the TCP+TLS
       - [Delay: 10 ms](#delay-10-ms)
       - [Delay: 20 ms](#delay-20-ms)
       - [Delay: 50 ms](#delay-50-ms)
+    - [Comparing nodejs to other implementations](#comparing-nodejs-to-other-implementations)
+  - [Analysis](#analysis)
+    - [Flowchart TCP+TLS](#flowchart-tcptls)
+    - [Flowchart QUIC](#flowchart-quic)
+    - [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
   - [Future Work](#future-work)
 
 ## Motivation
@@ -46,20 +46,12 @@ Both implementations were installed into docker containers and uploaded to [dock
 
 We conducted the experiments on two different setups - first on one machine, afterwards on two machines via LAN. The setup of the two experiment is described below.
 
-### Local Measurements
-
-For the local measurements, we used a Thinkpad T480s with Ubuntu 20.04.2 LTS and ran the Client and Server on localhost. The client and server are running inside docker-containers:
-
-![topology](./documentation/topology_localhost.png)
-
-
-### Remote Measurements
+### Hardware specifications
 
 For the remote measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client, again running in docker-containers.  
 Our Router only had the possibility to connect one LAN cable, because of this the Client had to be connected via WLAN. It is recommended to use LAN cable connections for both hosts if possible, because it reduces the network round trip time.
 
 ![topology](./documentation/topology.png)
-
 
 ### Considerations regarding nodejs + QUIC
 
@@ -80,6 +72,262 @@ The QUIC documentation to our nodejs experimental version is available [here](ht
 This happened unfortunately after we were nearly finished with our project. Switching to another QUIC Server/Client architecture and do everything again would not have been possible on such a short notice.
 As we built our own dockerimage with the nodejs version installed, it is still easily possible to run our project without having to get the now deprecated nodejs version from some archived nodejs repository.
 
+## Run setup
+
+In this chapter, the prerequisites and commands for reproducing our experiments are described.
+The following software needs to be installed:
+
+```[bash]
+pip3 install docker
+sudo apt-get install tshark
+pip3 install matplotlib
+pip3 install colored
+```
+
+The following commands are required to start benchmarking on your machine.
+
+### Run in docker container
+
+To run the setup in docker nodejs does not have to be installed. It is sufficient to use our docker-image, which is built from the [Dockerfile](Dockerfile) and is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
+
+#### Benchmark parameters
+
+![setup parameters](./documentation/setup_parameters.png)
+
+> Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
+
+The script generates a json file with timestamps for every comparable event for TCP+TLS and QUIC, as well as a packet capture via tshark and a json file documenting the ping output run simultaniously.
+
+### Run locally on machine
+
+> Beware: Running the server and client directly on your OS only works if you have nodejs 15.0.6 in experimental mode already installed on your system
+> This is **not recommended**, use the docker setup instead.
+
+```[bash]
+npm run tcp
+```
+
+or
+
+```[bash]
+npm run quic
+```
+
+## Evaluation / Results
+
+In this chapter, the results of the experiments are interpreted and represented in different forms.
+
+The results are saved in the following directory structure:
+
+```bash
+measurements
+├── samples_threshold15_dev2_delay10
+│   ├── quic
+│   │   └── remote
+│   │       ├── 2021-03-11 00-31-37.626624
+│   │       │   ├── ping.json
+│   │       │   ├── quic-benchmark-client.json
+│   │       │   ├── quic-benchmark-server.json
+│   │       │   ├── quic.pcap
+│   │       │   └── ssl-keys.log
+│   │       └── ...
+│   └── tcp
+│       └── remote
+│           ├── 2021-03-11 00-54-54.330962
+│           │   ├── ping.json
+│           │   ├── ssl-keys.log
+│           │   ├── tcp-benchmark-client.json
+│           │   ├── tcp-benchmark-server.json
+│           │   └── tcp.pcap
+│           └── ...
+├── samples_threshold25_dev2_delay20
+│   ├── quic
+│   │   └── ...
+│   └── tcp
+│       └── ...
+└── ...
+```
+
+As it can be seen at the folder structure above, after conducting the measurements, the following files have been generated for each QUIC and TCP+TLS measurement:
+
+* **ping.json:** For reporting the current workload of the network during measuring, the round trip time of the network is measured by running the [ping-command](https://linux.die.net/man/8/ping) in parallel.
+* **ssl-keys.log:** The ssl-key that is needed to decrypt the corresponding pcap-file in the same folder.
+* **tcp/quic-benchmark-client.json:** The events of the client and their corresponding timestamps.
+* **tcp/quic-benchmark-server.json:** The events of the server and their corresponding timestamps.
+* **tcp/quic.pcap:** The pcap-file that is generated during the measurement by capturing on the network-interface of the client with tshark.
+
+### Event comparisons
+
+This section analyzes the behaviour and results of the QUIC and TCP+TLS protocol on the basis of the events of nodejs.
+We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/api/quic.html) and [TCP](https://nodejs.org/docs/v15.6.0/api/net.html) and [TLS](https://nodejs.org/docs/v15.6.0/api/tls.html), that are emitted during the stages of connection and transmission.
+Notably, **not** all events are happening **at the same point** during QUIC / TCP+TLS protocol execution, even though some have the same name.
+All events that are happening at the same point in the protocol execution and can therefore be used for comparison are marked with a &#10003;-symbol, the non-comparable ones with a &#10007;-symbol.
+
+|   Label                 |  QUIC event                   |   TCP event  | Event comparable? |
+| :-------------          | :----------                   | :----------- | :-----------  |
+|   listening             |  QuicSocket.listening         | net.Server.listening| &#10007;|
+|   ready                 |  QuicSocket.ready             | net.Socket.ready | &#10007;|
+|   session               |  QuicSocket.session           | tls.Server.newSession | &#10007;|
+|   keylog                |  QuicSession.keylog           | tls.Server.keylog | &#10007;|
+|   secure                |  QuicSession.secure           | tls.Server.secureConnection | &#10003;|
+|   data                  |  QuicStream.data              | net.Socket.data | &#10003;|
+|   streamEnd             |  QuicStream.end               | net.Socket.end | &#10003;|
+|   streamClose           |  QuicStream.close             | net.Socket.close | &#10003;|
+|   socketClose           |  QuicSocket.close             | net.Server.close | &#10003;|
+|   error                 |  QuicSocket.error             | net.Socket.error | &#10007;|
+|   handshakeDurationInNs | QuicSession.handshakeDuration | tls.Server.connection - tls.Server.secureConnection | &#10003; |
+
+This following graph gives an overview of the timeline of **all** events for each protocol:
+
+![timeline](./documentation/event_timeline.png)
+
+#### QUIC events
+
+* QuicSocket.**listening:** Quic Server Socket is listening for new connections
+* QuicSocket.**ready:** Client Quic Socket has been bound to an UDP Port
+* QuicSocket.**session:** Quic Server Session has been created
+* QuicSession.**keylog:** Key material is generated or received by a QuicSession. Can be during or immediately following the handshake process
+* QuicSession.**secure:** Quic Session declares TLS Handshake has been completed
+* QuicStream.**data:** Quic Stream receives data
+* QuicStream.**end:** Quic Stream has ended, all data received
+* QuicStream.**close:** Quic Stream is completely closed and the underlying resources have been freed
+* QuicSocket.**close:** Quic Socket has been destroyed and is no longer usable
+* QuicSocket.**error:** Quic Socket was destroyed with an error
+* QuicSession.**handshakeDuration:** length of time taken to complete the TLS handshake
+
+#### TCP events
+
+* net.Server.**listening:** Server has been bound after calling server.listen()
+* net.Socket.**ready:** Client Socket is ready to be used. Triggered immediately after net.Socket.connect
+* tls.Server.**newSession:** Emitted upon creation of a new TLS session
+* tls.Server.**keylog:** Key material is generated or received by a connection to this server (typically before handshake has completed, but not necessarily)
+* tls.Server.**secureConnection:** Handshaking process for a new connection has successfully completed
+* net.Socket.**data:** Emitted when data is received
+* net.Socket.**end:** Emitted when the other end of the socket sends a FIN packet, thus ending the readable side of the socket
+* net.Socket**close:** socket is fully closed
+* net.Server.**close:** Server closes. If connections exist, this event is not emitted until all connections are ended
+* net.Socket.**error:** Error occurs. The 'close' event will be called directly following this event
+* tls.Server.**connection** Emitted when a new TCP stream is established, before the TLS handshake begins
+
+We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation respectively.
+The following graph shows the average value of the 5 **comparable events** (also marked in the events-table) "secure, data, streamEnd, streamClose, socketClose":
+
+![setup parameters](./documentation/events_comparison.png)
+
+### Time comparison
+
+For further comparison, we defined specific durations for the communication using the events mentioned before.
+
+* **Handshake**: handshakeDuration
+* **Time to first Byte**: secure -> data
+* **Content Transfer**: data -> streamEnd
+* **Close socket**: streamEnd -> socketClose
+
+We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation with no artificial delay added, and calculated the average value:
+
+![socket_comparison](./documentation/delay_0_comp.png)
+
+| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Average value / mean (ms) | 20.6 | 2.1 | 8.6 | 13.3 |
+| Standard deviation (ms) | 9.1 | 0.5 | 6.2 | 5.1 |
+
+| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Average value / mean (ms) | 10.0 | 1.1 | 1.1 | 2.8 |
+| Standard deviation (ms) | 2.7 | 0.3 | 0.3 | 0.4 |
+
+If looking back at the package analysis, QUIC uses fewer packets for the TLS Handshake than TCP. What is noticeable in this graph, is that even though the number of transferred packets is fewer for QUIC, the total duration of the connection is actually longer compared to TCP.
+We can think of two explanations for this result: 
+Firstly, the different priorities when executing a network protocol in user-space and kernel-space. The QUIC protocol is implemented in user-space and the TCP protocol is implemented in kernel-space. User-space tasks have a lower priority in the execution sequence than kernel-space tasks. 
+Secondly, the nodejs version 16.05 is an experimental build. The implementation for QUIC may not be 100% finished and we cannot be sure if this didn't affect our measurements.
+
+Beside the **Handshake**, the remaining durations **Time to first Byte**, **Content Transfer** and  **Close socket** are lower with TCP/TLS than with QUIC. We also contribute this to the TCP kernel implementation.
+
+#### Adding Delay
+
+To see how the content transfer is affected by a slower connection, we added various network delays using [traffic control (TC)](https://linux.die.net/man/8/tc).
+We sent the application data "I am the client sending you a message" 10 times and calculated the average value.
+This is an overview of the results of all the results and the respective delays we used in summary:
+
+![delay_comparison](./documentation/delay_comparison.png)
+
+With increased delay, we can see a linear increase for the duration of **Handshake**, **Time to first Byte** and **Content Transfer** for both TCP/TLS and QUIC.
+QUIC has a steeper linear increase than TCP.
+Most noticeable and surprising is the spike in the duration of **Close socket** for QUIC. We assume this is caused by the specific QUIC implementation in nodejs, as it is still in experimental state.
+
+#### Delay: 10 ms
+
+We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms on top of the existing network RTT. The following graph shows the average values:
+
+![delay_10](./documentation/delay_10_comp.png)
+
+| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Average value / mean (ms) | 33.6 | 2.9 | 18.5 | 524.2 |
+| Standard deviation (ms) | 11.4 | 0.7 | 1.8 | 473.3 |
+
+| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Average value / mean (ms) | 22.0 | 1.4 | 1.6 | 3.9 |
+| Standard deviation (ms) | 2.4 | 0.7 | 0.7 | 0.5 |
+
+#### Delay: 20 ms
+
+We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 20ms on top of the existing network RTT. The following graph shows the average values:
+
+![delay_20](./documentation/delay_20_comp.png)
+
+| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Average value / mean value (ms) | 41.3 | 4.4 | 28.9 | 595.9 |
+| Standard deviation (ms) | 2.8 | 0.5 | 1.3 | 471.6 |
+
+| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Average value / mean value (ms) | 35.3 | 2.2 | 2.1 | 5.4 |
+| Standard deviation (ms) | 2.8 | 0.4 | 0.3 | 0.5 |
+
+#### Delay: 50 ms
+
+We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 50ms on top of the existing network RTT. The following graph shows the average values:
+
+![delay_50](./documentation/delay_50_comp.png)
+
+| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Average value / mean value | 73.7 | 4.9 | 60.3 | 216.2 |
+| Standard deviation | 2.1 | 0.3 | 2.1 | 383.2 |
+
+| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
+| ------------- | ---------- | ----------- | ----------- | ----------- |
+| Average value / mean value | 65.7 | 2.2 | 2.3 | 5.2 |
+| Standard deviation | 4.7 | 0.4 | 0.5 | 0.3 |
+
+### Comparing nodejs to other implementations
+
+With QUIC taking a significant amount of time longer for Handshake, Content Transfer and most noticeable Close socket, we hypothesized that this may be due to the experimental implementation of QUIC in nodejs. To test this hypothesis, we compared it to the QUIC implementation for nginx.
+Following the guide [here](https://faun.pub/implementing-http3-quic-nginx-99094d3e39f), we used the Docker images:
+
+- [ymuski/nginx-quic](https://hub.docker.com/r/ymuski/nginx-quic) for the server capable of HTTP/3 and HTTP/2
+- [ymuski/curl-http3](https://hub.docker.com/r/ymuski/curl-http3) for the client capable of HTTP/3 curl GET request
+- [curlimages/curl](https://hub.docker.com/r/curlimages/curl) for the client capable of HTTP/2 curl GET request
+
+Similarly to nodejs, we captured the traffic using tshark in the same network. We also pinged the server, to ensure RTT avg was less than 5ms and stdev less than 2ms.
+  
+| NGINX HTTP/3 QUIC | NGINX HTTP/2 TCP |
+| :---------------- | :--------------- |
+| ![nginx-quic](./documentation/nginx-quic-flow.png) | ![nginx-tcp](./documentation/nginx-tcp-flow.png) |
+
+Looking at the traffic flow, the complete communication for HTTP/3 took 17ms less than HTTP/2.
+
+| NGINX HTTP/3 QUIC | Nodejs QUIC Socket |
+| :---------------- | :----------------- |
+| ![nginx-quic](./documentation/nginx-quic-flow.png) | ![nginx-tcp](./documentation/nodejs-quic-flow.png) |
+
+Here in comparison is the nginx HTTP/3 implementation and the nodejs socket implementation.
+We can see that even though the nodejs communication does not include the application layer, it is still overall taking 24ms longer to complete.
+This supports our hypothesis that the implementation of nodejs for QUIC in its experimental state is not yet applicable and returns worse results than TCP/TLS.
 
 ## Analysis
 
@@ -135,7 +383,6 @@ Moreover, important properties of each packet (i.e. the flags like ACK, FIN or t
 
 ![tcp+tls_flowchart](./documentation/TCP_flowchart_to_pcap_MEAN.png)
 
-
 The TCP protocol contains the following headerfields:
 | Field Type | Size in Byte |
 | --- | --- |
@@ -149,7 +396,6 @@ The TCP protocol contains the following headerfields:
 | Urgent pointer | 2 |
 | Options | 12 |
 | |  Σ = 32 |
-
 
 ### Flowchart QUIC
 
@@ -238,7 +484,6 @@ This can be seen at the QUIC flowchart:
 The second packet (20,103 ms) contains one QUIC frame including TLS Server Hello, and another QUIC frame including TLS encrypted extensions.
 The fifth packet (92,746 ms) contains one QUIC frame including TLS handshake finished, and another QUIC frame including a new connection ID.
 
-
 ### Comparison transmitted Bytes in summary
 
 The information of the given flowcharts + documentiation summarized:
@@ -252,8 +497,7 @@ The information of the given flowcharts + documentiation summarized:
 | **Established connection** | 2589 (Bytes in total) - 2068 (Handshake) = 521 | 4141 (Bytes in total) - (2947 (Handshake) + 78 (1.QUIC frame) - 110 (2.QUIC frame)) = 1162 |
 | **Encrypted Application data** | 207 | 126 |
 | **Raw Application data** | 46 | 46 |
-| **Overhead** (Σ Bytes transmitted in total) - (Raw Application data) | 2589 - 46 = 2543 | 4141 - 46 = 4095 | 
-
+| **Overhead** (Σ Bytes transmitted in total) - (Raw Application data) | 2589 - 46 = 2543 | 4141 - 46 = 4095 |
 
 In conclusion, QUIC is transmitting more data than TCP+TLS for transmitting the same application data - QUIC uses roughly 2x the overhead of TCP+TLS to transmit the 46 Byte mesage "I am the client sending you a message" from client to server.
 QUIC uses roughly 1/3 more data than TCP+TLS during the handshake. This difference is not because the long header is used: The padding in the first packet/Client initial that is embedded after the "TLS Client hello" has a size of **921 Bytes**, consisting of zeros. This is necessary due to technical and security reasons:
@@ -282,265 +526,13 @@ Reusing the same connection to send more application data would at least reduce 
 QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it is sending 2 packets less. This could be because QUIC is running in user-space instead of kernel-space, like TCP+TLS (see the summary of [Time Comparison](#time-comparison) for a detailed explanation).
 Moreover, the QUIC implementation in the nodejs version we are using is still experimental, so this could also be a limiting factor.
 
-## Run setup
-
-In this chapter, the prerequisites and commands for reproducing our experiments are described.
-The following software needs to be installed: 
-
-[dockerpy](https://docker-py.readthedocs.io/en/stable/):
-
-```[bash]
-pip3 install docker
-```
-
-[tshark](https://tshark.dev/setup/install/):
-
-```[bash]
-sudo apt-get install tshark
-```
-
-[matplotlib](https://matplotlib.org/stable/index.html):
-
-```[bash]
-pip3 install matplotlib
-```
-
-[colored](https://gitlab.com/dslackw/colored):
-
-```[bash]
-pip3 install colored
-```
-
-
-The following commands are required to start benchmarking on your machine.
-
-### Run in docker container
-
-To run the setup in docker nodejs does not have to be installed. It is sufficient to use our docker-image, which is built from the [Dockerfile](Dockerfile) and is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
-
-#### Benchmark parameters
-
-![setup parameters](./documentation/setup_parameters.png)
-
-> Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
-
-The script generates a json file with timestamps for every comparable event for TCP+TLS and QUIC, as well as a packet capture via tshark and a json file documenting the ping output run simultaniously.
-
-### Run locally on machine
-
-> Beware: Running the server and client directly on your OS only works if you have nodejs 15.0.6 in experimental mode already installed on your system
-> This is **not recommended**, use the docker setup instead.
-
-```[bash]
-npm run tcp
-```
-
-or
-
-```[bash]
-npm run quic
-```
-
-## Evaluation / Results
-
-In this chapter, the results of the experiments are interpreted and represented in different forms. 
-
-The results are saved in the following directory structure:
-
-
-```bash
-measurements
-├── samples_threshold15_dev2_delay10
-│   ├── quic
-│   │   └── remote
-│   │       ├── 2021-03-11 00-31-37.626624
-│   │       │   ├── ping.json
-│   │       │   ├── quic-benchmark-client.json
-│   │       │   ├── quic-benchmark-server.json
-│   │       │   ├── quic.pcap
-│   │       │   └── ssl-keys.log
-│   │       └── ...
-│   └── tcp
-│       └── remote
-│           ├── 2021-03-11 00-54-54.330962
-│           │   ├── ping.json
-│           │   ├── ssl-keys.log
-│           │   ├── tcp-benchmark-client.json
-│           │   ├── tcp-benchmark-server.json
-│           │   └── tcp.pcap
-│           └── ...
-├── samples_threshold25_dev2_delay20
-│   ├── quic
-│   │   └── ...
-│   └── tcp
-│       └── ...
-└── ...
-```
-
-As it can be seen at the folder structure above, after conducting the measurements, the following files have been generated for each QUIC and TCP+TLS measurement:
-
-* **ping.json:** For reporting the current workload of the network during measuring, the round trip time of the network is measured by running the [ping-command](https://linux.die.net/man/8/ping) in parallel.
-* **ssl-keys.log:** The ssl-key that is needed to decrypt the corresponding pcap-file in the same folder.
-* **tcp/quic-benchmark-client.json:** The events of the client and their corresponding timestamps.
-* **tcp/quic-benchmark-server.json:** The events of the server and their corresponding timestamps.
-* **tcp/quic.pcap:** The pcap-file that is generated during the measurement by capturing on the network-interface of the client with tshark.
-
-
-### Event comparisons
-
-This section analyzes the behaviour and results of the QUIC and TCP+TLS protocol on the basis of the events of nodejs. 
-We chose multiple comparable events for [QUIC](https://nodejs.org/docs/v15.6.0/api/quic.html) and [TCP](https://nodejs.org/docs/v15.6.0/api/net.html) and [TLS](https://nodejs.org/docs/v15.6.0/api/tls.html), that are emitted during the stages of connection and transmission.
-Notably, **not** all events are happening **at the same point** during QUIC / TCP+TLS protocol execution, even though some have the same name.
-All events that are happening at the same point in the protocol execution and can therefore be used for comparison are marked with a &#10003;-symbol, the non-comparable ones with a &#10007;-symbol.
-
-|   Label                 |  QUIC event                   |   TCP event  		| Event comparable? |
-| :-------------          | :----------                   | :----------- 		| :-----------  |
-|   listening             |  QuicSocket.listening         | net.Server.listening	| &#10007;	|
-|   ready                 |  QuicSocket.ready             | net.Socket.ready 		| &#10007;	|
-|   session               |  QuicSocket.session           | tls.Server.newSession 	| &#10007;	|
-|   keylog                |  QuicSession.keylog           | tls.Server.keylog 		| &#10007;	|
-|   secure                |  QuicSession.secure           | tls.Server.secureConnection | &#10003;	|
-|   data                  |  QuicStream.data              | net.Socket.data 		| &#10003;	|
-|   streamEnd             |  QuicStream.end               | net.Socket.end 		| &#10003;	|
-|   streamClose           |  QuicStream.close             | net.Socket.close 		| &#10003;	|
-|   socketClose           |  QuicSocket.close             | net.Server.close 		| &#10003;	| 
-|   error                 |  QuicSocket.error             | net.Socket.error 		| &#10007;	|
-|   handshakeDurationInNs | QuicSession.handshakeDuration | tls.Server.connection - tls.Server.secureConnection | &#10003; |
-
-
-This following graph gives an overview of the timeline of **all** events for each protocol:
-
-![timeline](./documentation/event_timeline.png)
-
-#### QUIC events
-
-* QuicSocket.**listening:** Quic Server Socket is listening for new connections
-* QuicSocket.**ready:** Client Quic Socket has been bound to an UDP Port
-* QuicSocket.**session:** Quic Server Session has been created
-* QuicSession.**keylog:** Key material is generated or received by a QuicSession. Can be during or immediately following the handshake process
-* QuicSession.**secure:** Quic Session declares TLS Handshake has been completed
-* QuicStream.**data:** Quic Stream receives data
-* QuicStream.**end:** Quic Stream has ended, all data received
-* QuicStream.**close:** Quic Stream is completely closed and the underlying resources have been freed
-* QuicSocket.**close:** Quic Socket has been destroyed and is no longer usable
-* QuicSocket.**error:** Quic Socket was destroyed with an error
-* QuicSession.**handshakeDuration:** length of time taken to complete the TLS handshake
-
-#### TCP events
-
-* net.Server.**listening:** Server has been bound after calling server.listen()
-* net.Socket.**ready:** Client Socket is ready to be used. Triggered immediately after net.Socket.connect
-* tls.Server.**newSession:** Emitted upon creation of a new TLS session
-* tls.Server.**keylog:** Key material is generated or received by a connection to this server (typically before handshake has completed, but not necessarily)
-* tls.Server.**secureConnection:** Handshaking process for a new connection has successfully completed
-* net.Socket.**data:** Emitted when data is received
-* net.Socket.**end:** Emitted when the other end of the socket sends a FIN packet, thus ending the readable side of the socket
-* net.Socket**close:** socket is fully closed
-* net.Server.**close:** Server closes. If connections exist, this event is not emitted until all connections are ended
-* net.Socket.**error:** Error occurs. The 'close' event will be called directly following this event
-* tls.Server.**connection** Emitted when a new TCP stream is established, before the TLS handshake begins
-
-We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation respectively.
-The following graph shows the average value of the 5 **comparable events** (also marked in the events-table) "secure, data, streamEnd, streamClose, socketClose":
-
-![setup parameters](./documentation/events_comparison.png)
-
-### Time comparison
-
-For further comparison, we defined specific durations for the communication using the events mentioned before.
-
-* **Handshake**: handshakeDuration
-* **Time to first Byte**: secure -> data
-* **Content Transfer**: data -> streamEnd
-* **Close socket**: streamEnd -> socketClose
-
-We sent the application data "I am the client sending you a message" 10x with the QUIC and TCP+TLS implementation with no artificial delay added, and calculated the average value:
-
-![socket_comparison](./documentation/delay_0_comp.png)
-
-| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
-| ------------- | ---------- | ----------- | ----------- | ----------- |
-| Average value / mean (ms) | 20.6 | 2.1 | 8.6 | 13.3 |
-| Standard deviation (ms) | 9.1 | 0.5 | 6.2 | 5.1 |
-
-| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
-| ------------- | ---------- | ----------- | ----------- | ----------- |
-| Average value / mean (ms) | 10.0 | 1.1 | 1.1 | 2.8 |
-| Standard deviation (ms) | 2.7 | 0.3 | 0.3 | 0.4 |
-
-If looking back at the package analysis, QUIC uses fewer packets for the TLS Handshake than TCP. What is noticeable in this graph, is that even though the number of transferred packets is fewer for QUIC, the total duration of the connection is actually longer compared to TCP.
-We can think of two explanations for this result: 
-Firstly, the different priorities when executing a network protocol in user-space and kernel-space. The QUIC protocol is implemented in user-space and the TCP protocol is implemented in kernel-space. User-space tasks have a lower priority in the execution sequence than kernel-space tasks. 
-Secondly, the nodejs version 16.05 is an experimental build. The implementation for QUIC may not be 100% finished and we cannot be sure if this didn't affect our measurements.
-
-Beside the **Handshake**, the remaining durations **Time to first Byte**, **Content Transfer** and  **Close socket** are lower with TCP/TLS than with QUIC. We also contribute this to the TCP kernel implementation.
-
-#### Adding Delay
-
-To see how the content transfer is affected by a slower connection, we added various network delays using [traffic control (TC)](https://linux.die.net/man/8/tc).
-We sent the application data "I am the client sending you a message" 10 times and calculated the average value.
-This is an overview of the results of all the results and the respective delays we used in summary:
-
-![delay_comparison](./documentation/delay_comparison.png)
-
-With increased delay, we can see a linear increase for the duration of **Handshake**, **Time to first Byte** and **Content Transfer** for both TCP/TLS and QUIC.
-QUIC has a steeper linear increase than TCP.
-Most noticeable and surprising is the spike in the duration of **Close socket** for QUIC. We assume this is caused by the specific QUIC implementation in nodejs, as it is still in experimental state.
-
-#### Delay: 10 ms
-We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms on top of the existing network RTT. The following graph shows the average values:
-
-![delay_10](./documentation/delay_10_comp.png)
-
-| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
-| ------------- | ---------- | ----------- | ----------- | ----------- |
-| Average value / mean (ms) | 33.6 | 2.9 | 18.5 | 524.2 |
-| Standard deviation (ms) | 11.4 | 0.7 | 1.8 | 473.3 |
-
-| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
-| ------------- | ---------- | ----------- | ----------- | ----------- |
-| Average value / mean (ms) | 22.0 | 1.4 | 1.6 | 3.9 |
-| Standard deviation (ms) | 2.4 | 0.7 | 0.7 | 0.5 |
-
-#### Delay: 20 ms
-We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 20ms on top of the existing network RTT. The following graph shows the average values:
-
-![delay_20](./documentation/delay_20_comp.png)
-
-| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
-| ------------- | ---------- | ----------- | ----------- | ----------- |
-| Average value / mean value (ms) | 41.3 | 4.4 | 28.9 | 595.9 |
-| Standard deviation (ms) | 2.8 | 0.5 | 1.3 | 471.6 |
-
-| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
-| ------------- | ---------- | ----------- | ----------- | ----------- |
-| Average value / mean value (ms) | 35.3 | 2.2 | 2.1 | 5.4 |
-| Standard deviation (ms) | 2.8 | 0.4 | 0.3 | 0.5 |
-
-#### Delay: 50 ms
-We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 50ms on top of the existing network RTT. The following graph shows the average values:
-
-![delay_50](./documentation/delay_50_comp.png)
-
-
-| Protocol: QUIC | Handshake | Time to first Byte | Content transfer | Close socket |
-| ------------- | ---------- | ----------- | ----------- | ----------- |
-| Average value / mean value | 73.7 | 4.9 | 60.3 | 216.2 |
-| Standard deviation | 2.1 | 0.3 | 2.1 | 383.2 |
-
-| Protocol: TCP+TLS | Handshake | Time to first Byte | Content transfer | Close socket |
-| ------------- | ---------- | ----------- | ----------- | ----------- |
-| Average value / mean value | 65.7 | 2.2 | 2.3 | 5.2 |
-| Standard deviation | 4.7 | 0.4 | 0.5 | 0.3 |
-
-
 ## Future Work
 
 Based on the results we obtained in our experiment and the features we managed to implement in the given time, we think it would be interesting to explore the following topics:
 
 * **Simulation of packet loss with the [TC tool](https://linux.die.net/man/8/tc):** One of the main advantages of QUIC is the improved package loss handling. Therefore it is possible that increasing the packet loss during measurements leads to better results for QUIC.
 
-* **Reusing the connection for sending more payload:** As the socket close event of the QUIC connection takes exceedingly more time than all other events and the QUIC handshake is transmitting a lot of data, reusing the connection will probably improve QUIC performance. 
+* **Reusing the connection for sending more payload:** As the socket close event of the QUIC connection takes exceedingly more time than all other events and the QUIC handshake is transmitting a lot of data, reusing the connection will probably improve QUIC performance.
 
 * **Comparison of socket-based transport layer with HTTP/3 application layer:** It could be interesting to check the difference in performance when comparing socket layer implementation to application layer implementation.
 
