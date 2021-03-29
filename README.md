@@ -76,7 +76,7 @@ Our Router only had the possibility to connect one LAN cable, because of this th
 For the comparison of each protocol, it is necessary to create the same network conditions during the testruns.
 To achieve this goal, we monitored the network workload with constantly using [ping](https://linux.die.net/man/8/ping) and calculating the mean and standard deviation of the ping response for each measurement.
 The ping statistics are saved in ping.json file and stored in the folder of the specific measurement. 
-For example for the QUIC measurement ``2021-03-08 08-21-15.964770`` (folder name == timestamp of the measurement) inside the folder ``samples_threshold5_dev2_delay0`` (read: underlying network threshold <= 5ms, standard deviation of ping <= 2ms, artificial network delay = 0ms) the ping-statistic is saved [here](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/ping.json).
+For example for the QUIC measurement ``2021-03-08``&#160;``08-21-15.964770`` (folder name == timestamp of the measurement) inside the folder ``samples_threshold5_dev2_delay0`` (read: underlying network threshold <= 5ms, standard deviation of ping <= 2ms, artificial network delay = 0ms) the ping-statistic is saved [here](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/ping.json).
 
 The network-conditions for each measurement:
 * **Underlying network RTT <= 5ms**: Measured with multiple pings and averaging the RTT-result of each ping.
