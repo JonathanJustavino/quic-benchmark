@@ -32,7 +32,12 @@ The purpose of this project is to analyze the behaviour and measure the performa
 QUIC is a transport-layer protocol that was initially developed by Google and is currently developed and standardized by the [IETF](https://datatracker.ietf.org/wg/quic/about/).
 HTTP mapping with QUIC is standardized in the [HTTP/3-draft](https://tools.ietf.org/html/draft-ietf-quic-http-32), the newest version of HTTP. QUIC on the transport layer (what we will mainly analyze in this project) is standardized in the [quic-transport-layer-draft](https://tools.ietf.org/html/draft-ietf-quic-transport-32).
 Communication via QUIC is encrypted by default. Because we compare it to TCP which is not encrypted by default, we always use TCP combined with TLS in our experiments for a fair comparison.
-The specific advantages of QUIC over TCP+TLS are...
+The main advantages of QUIC over TCP+TLS are:
+
+* Multiplexed connections, allowing multiple streams of data to reach all the endpoints independently, and hence independent of packet losses involving other streams. 
+  In contrast, HTTP/2 hosted on Transmission Control Protocol (TCP) can suffer head-of-line-blocking delays of all multiplexed streams if any of the TCP packets are delayed or lost. 
+* QUIC uses encryption by default, while TCP needs to be used in combination with TLS to achieve encrypted communication. 
+  This saves time and packets at the begin of each connection, because it is not necessary to first set up TCP and afterwards negotiate the encryption via TLS
 
 First, we explain the general setup and the specific parameters (which OS was used, the topology of the network, etc.) of our experiment in the [Experiment setup](#experiment-setup) chapter. 
 There is also a detailed explanation of a [problem](#considerations-regarding-nodejs+QUIC) we encountered during the project: The support for the nodejs-version we used run out because OpenSSL probably won't include QUIC-support until OpenSSL 3.1, which does not have an official release date yet.
