@@ -26,11 +26,23 @@ Comparing the performance of the QUIC protocol with a combination of the TCP+TLS
     - [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
   - [Future Work](#future-work)
 
-## Motivation
+## Introduction
 
+The purpose of this project is to analyze the behaviour and measure the performance of the QUIC protocol and compare it with the combination of the transmission control protocol (TCP) and the Transport Layer Security (TLS) protocol. 
 QUIC is a transport-layer protocol that was initially developed by Google and is currently developed and standardized by the [IETF](https://datatracker.ietf.org/wg/quic/about/).
-HTTP mapping with QUIC is standardized in [HTTP/3](https://tools.ietf.org/html/draft-ietf-quic-http-32), the newest version of HTTP. Communication via QUIC is encrypted by default.  
-The purpose of this project is the performance measurement of the QUIC protocol and compare it with the combination of the transmission control protocol (TCP) and the Transport Layer Security (TLS) protocol. The combination of TCP and TLS is necessary, as TCP does not use encryption by default.
+HTTP mapping with QUIC is standardized in the [HTTP/3-draft](https://tools.ietf.org/html/draft-ietf-quic-http-32), the newest version of HTTP. QUIC on the transport layer (what we will mainly analyze in this project) is standardized in the [quic-transport-layer-draft](https://tools.ietf.org/html/draft-ietf-quic-transport-32).
+Communication via QUIC is encrypted by default. Because we compare it to TCP which is not encrypted by default, we always use TCP combined with TLS in our experiments for a fair comparison.
+The specific advantages of QUIC over TCP+TLS are...
+
+First, we explain the general setup and the specific parameters (which OS was used, the topology of the network, etc.) of our experiment in the [Experiment setup](#experiment-setup) chapter. 
+There is also a detailed explanation of a [problem](#considerations-regarding-nodejs+QUIC) we encountered during the project: The support for the nodejs-version we used run out because OpenSSL probably won't include QUIC-support until OpenSSL 3.1, which does not have an official release date yet.
+In the chapter [Analysis](#analysis), we inspect the behaviour of each protocol in detail, mainly based on the pcap-files that are captured during the measurements. 
+The behaviour is compared to the description in the QUIC-standard and the overhead for each protocol is calculated. 
+The [Run setup](#run-setup)-section includes the prerequisites for recreating the experiments. 
+In the [Evaluation / Results](#evaluation/results) chapter, we show the results of our measurements in detail. We used different methods to display the results of QUIC and TCP+TLS experiments with nodejs: Two figures show the specific events in comparison, and a third figure type shows intervals, i.e. the handshake duration with artifical network delay added.
+Because our nodejs-results did not match the expectation that QUIC would outperform TCP+TLS at least when adding a huge amount of artificial network delay, we set up a [nginx server for comparison](#comparing-nodejs-to-nginx-/-another-QUIC-implementation) that also supports QUIC and TCP+TLS.
+We measured nginx-QUIC and nginx-TCP+TLS each 10x with no artificial network delay added. Our results show that the nginx-QUIC-implemenation outperforms TCP+TLS for each measurement.
+This affirms our hypothesis that TCP+TLS in nodejs outperfoms nodejs-QUIC because of the implementation, as it is still experimental and also recieves no support at the moment.
 
 ## Experiment setup
 
@@ -44,11 +56,12 @@ Both implementations were installed into docker containers and uploaded to [dock
 * The experiment can be easily used on different operation systems
 * Conducting the measurements is automated via docker-compose
 
-We conducted the experiments on two different setups - first on one machine, afterwards on two machines via LAN. The setup of the two experiment is described below.
+We conducted the experiments on two machines inside a local area network (LAN). It has the advantage that it comes closer to using the protocols in practice, as using TCP+TLS and QUIC only on localhost would give TCP an advantage because it runs in the kernel-space, not the user-space with lower priority like QUIC.
+The specific parameters of the experiment (which OS was used etc.) of the experiment is described below.
 
 ### Hardware specifications
 
-For the remote measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client, again running in docker-containers.  
+For conducting the measurements, we used a MacBook11,3 with macOS 11.02.1 as Server and a Thinkpad T480s with Ubuntu 20.04.2 LTS as Client, again running in docker-containers.  
 Our Router only had the possibility to connect one LAN cable, because of this the Client had to be connected via WLAN. It is recommended to use LAN cable connections for both hosts if possible, because it reduces the network round trip time.
 
 ![topology](./documentation/topology.png)
@@ -63,7 +76,7 @@ Also the behaviour in some special cases has changed, i.e. "A server that choose
 Because we always use the same connection setup in which these special cases do not occur, they are not relevant for our project.
 In conclusion, the expired [draft-27](https://tools.ietf.org/html/draft-ietf-quic-transport-27) implementation of QUIC in nodejs is still sufficiently up to date to be used for our QUIC evaluation.
 
-The QUIC documentation to our nodejs experimental version is available [here](https://nodejs.org/docs/v15.6.0/api/quic.html)
+The QUIC documentation to our nodejs experimental version is available [here](https://nodejs.org/docs/v15.6.0/api/quic.html).
 
 :red_circle: The experimental nodejs version we used is **no longer maintained**, as explained in this [commit](https://github.com/nodejs/node/pull/37067) in the official nodejs repository:
 > The OpenSSL OMC has not yet committed to landing the updated QUIC APIs and has indicated that they will not even look at it until OpenSSL 3.1. With OpenSSL 3.0 > beta currently delayed with no clear idea of when it will actually land, the initial QUIC support landed in core has now just become a maintenance burden with
@@ -502,7 +515,7 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Average value / mean value | 65.7 | 2.2 | 2.3 | 5.2 |
 | Standard deviation | 4.7 | 0.4 | 0.5 | 0.3 |
 
-### Comparing nodejs to other implementations
+### Comparing nodejs to nginx / another QUIC implementation
 
 With QUIC taking a significant amount of time longer for Handshake, Content Transfer and most noticeable Close socket, we hypothesized that this may be due to the experimental implementation of QUIC in nodejs. To test this hypothesis, we compared it to the QUIC implementation for nginx.
 Following the guide [here](https://faun.pub/implementing-http3-quic-nginx-99094d3e39f), we used the Docker images:
