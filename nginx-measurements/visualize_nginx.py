@@ -28,7 +28,7 @@ def list_unwrap(wrapped_list):
 
 
 # calculate average values of QUIC packages
-def quic_average(quic_csvs):
+def quic_avg_std(quic_csvs):
     avg_list = []
     std_list = []
 
@@ -67,7 +67,6 @@ def plot_quic_graph(quic_avg_std_tuple):
 
     # standard deviation
     error = quic_avg_std_tuple[1]
-    print(error)
 
     ax.plot(x_axis, y_axis_ticks, c=quic_serv_col, marker='o', ls='', label="quic server")
     ax.errorbar(x_axis, y_axis_ticks, xerr=error, fmt="o")
@@ -80,12 +79,15 @@ def plot_quic_graph(quic_avg_std_tuple):
 
 if __name__ == '__main__':
     global_path = Path.cwd()
+
     # get directories: 1st run, 2nd run etc.
     directories = [x for x in global_path.iterdir() if x.is_dir()]
 
     # get list of quic and tcp csv's
     csv_tuple = dataloader(directories)
 
-    quic_avg_std_values = quic_average(csv_tuple[0])
+    # get the quic mean values + standard deviations as tuple
+    quic_avg_std_values = quic_avg_std(csv_tuple[0])
 
+    # plot graph
     plot_quic_graph(quic_avg_std_values)
