@@ -44,11 +44,11 @@ The main advantages of QUIC over TCP+TLS are:
   This saves time and packets at the begin of each connection, because it is not necessary to first set up TCP and afterwards negotiate the encryption via TLS
 
 First, we explain the general setup and the specific parameters (which OS was used, the topology of the network, etc.) of our experiment in the [Experiment setup](#experiment-setup) chapter. 
-There is also a detailed explanation of a [problem](#considerations-regarding-nodejs+QUIC) we encountered during the project: The support for the nodejs-version we used run out because OpenSSL probably won't include QUIC-support until OpenSSL 3.1, which does not have an official release date yet.
+There is also a detailed explanation of a [problem](#considerations-regarding-nodejs--quic) we encountered during the project: The support for the nodejs-version we used run out because OpenSSL probably won't include QUIC-support until OpenSSL 3.1, which does not have an official release date yet.
 In the chapter [Analysis](#analysis), we inspect the behaviour of each protocol in detail, mainly based on the pcap-files that are captured during the measurements. 
 The behaviour is compared to the description in the QUIC-standard and the overhead for each protocol is calculated. 
 The [Run setup](#run-setup)-section includes the prerequisites for recreating the experiments. 
-In the [Evaluation / Results](#evaluation/results) chapter, we show the results of our measurements in detail. We used different methods to display the results of QUIC and TCP+TLS experiments with nodejs: Two figures show the specific events in comparison, and a third figure type shows intervals, i.e. the handshake duration with artifical network delay added.
+In the [Evaluation / Results](#evaluation--results) chapter, we show the results of our measurements in detail. We used different methods to display the results of QUIC and TCP+TLS experiments with nodejs: Two figures show the specific events in comparison, and a third figure type shows intervals, i.e. the handshake duration with artifical network delay added.
 Because our nodejs-results did not match the expectation that QUIC would outperform TCP+TLS at least when adding a huge amount of artificial network delay, we set up a [nginx server for comparison](#comparing-nodejs-to-nginx-/-another-QUIC-implementation) that also supports QUIC and TCP+TLS.
 We measured nginx-QUIC and nginx-TCP+TLS each 10x with no artificial network delay added. Our results show that the nginx-QUIC-implemenation outperforms TCP+TLS for each measurement.
 This affirms our hypothesis that TCP+TLS in nodejs outperfoms nodejs-QUIC because of the implementation, as it is still experimental and also recieves no support at the moment.
@@ -154,7 +154,7 @@ Notably, from all 10 captured tcp-pcap files, there exist 2 pcaps that contain 1
 This is due to a missing __TCP Window update__ package in the 8 tcp-pcap files. This doesn't change important behaviour of the protocol (i.e. the handshake) in general. 
 Therefore, to create a consistent flowchart and calculate the average value of each sent packet, the 2 tcp-pcap files which contain 13 packets are omitted.
 
-The script [process_pcaps_tcp+tls.py](.measurements/process_pcaps_tcp+tls.py) uses the timestamps.csv of each tcp-pcap and filters out the ones where 13 packets instead of 14 are transmitted.
+The script [process_pcaps_tcp+tls.py](./measurements/process_pcaps_tcp+tls.py) uses the timestamps.csv of each tcp-pcap and filters out the ones where 13 packets instead of 14 are transmitted.
 Then, the average of the timestamps of each connection is printed - these mean values are used as timestamps in the following flowchart.
 Moreover, important properties of each packet (i.e. the flags like ACK, FIN or the handshake messages) and the Bytes of the packet on wire are shown. 
 
@@ -199,7 +199,7 @@ For each connection with 11 packets, there is one more ACK-packet sent at the en
 The missing ACK-package doesn't seem to have an impact on the protocol behaviour.
 So we decided for the flowcharts to work only with the pcap-files with **10 tansmitted packets** to generate a consistent flowchart where we can calculate the average over each packet timestamp:
 
-The script [process_pcaps_quic.py](.measurements/process_pcaps_quic.py) uses the timestamps.csv of each quic-pcap and filters out the ones with 11 packets transmitted.
+The script [process_pcaps_quic.py](./measurements/process_pcaps_quic.py) uses the timestamps.csv of each quic-pcap and filters out the ones with 11 packets transmitted.
 Then, the mean values of the timestamp of each connection is printed - these mean values are used as timestamps in the following flowchart.
 Moreover, important properties of each packet (i.e. the flags like ACK, FIN or the handshake messages) and the Bytes of the packet on wire are shown. 
 
