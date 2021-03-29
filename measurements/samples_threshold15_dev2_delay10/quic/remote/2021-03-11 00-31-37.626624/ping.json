@@ -1,0 +1,121 @@
+{
+  "rtt_summary": {
+    "packets_transmitted": 8,
+    "packets_received": 8,
+    "packet_loss_percentage": 0,
+    "time": {
+      "unit": "milliseconds",
+      "value": 7011
+    }
+  },
+  "rtt_statistics": {
+    "min": {
+      "value": "12.032",
+      "unit": "milliseconds"
+    },
+    "avg": {
+      "value": "13.912",
+      "unit": "milliseconds"
+    },
+    "max": {
+      "value": "16.995",
+      "unit": "milliseconds"
+    },
+    "mdev": {
+      "value": "1.417",
+      "unit": "milliseconds"
+    }
+  },
+  "icmp_sequences": [
+    {
+      "bytes": 64,
+      "target": "192.168.178.59",
+      "target_ip": "192.168.178.59",
+      "icmp_seq": 1,
+      "ttl": 63,
+      "time": {
+        "unit": "milliseconds",
+        "value": 12.2
+      }
+    },
+    {
+      "bytes": 64,
+      "target": "192.168.178.59",
+      "target_ip": "192.168.178.59",
+      "icmp_seq": 2,
+      "ttl": 63,
+      "time": {
+        "unit": "milliseconds",
+        "value": 14.2
+      }
+    },
+    {
+      "bytes": 64,
+      "target": "192.168.178.59",
+      "target_ip": "192.168.178.59",
+      "icmp_seq": 3,
+      "ttl": 63,
+      "time": {
+        "unit": "milliseconds",
+        "value": 14.1
+      }
+    },
+    {
+      "bytes": 64,
+      "target": "192.168.178.59",
+      "target_ip": "192.168.178.59",
+      "icmp_seq": 4,
+      "ttl": 63,
+      "time": {
+        "unit": "milliseconds",
+        "value": 13.8
+      }
+    },
+    {
+      "bytes": 64,
+      "target": "192.168.178.59",
+      "target_ip": "192.168.178.59",
+      "icmp_seq": 5,
+      "ttl": 63,
+      "time": {
+        "unit": "milliseconds",
+        "value": 12.0
+      }
+    },
+    {
+      "bytes": 64,
+      "target": "192.168.178.59",
+      "target_ip": "192.168.178.59",
+      "icmp_seq": 6,
+      "ttl": 63,
+      "time": {
+        "unit": "milliseconds",
+        "value": 13.9
+      }
+    },
+    {
+      "bytes": 64,
+      "target": "192.168.178.59",
+      "target_ip": "192.168.178.59",
+      "icmp_seq": 7,
+      "ttl": 63,
+      "time": {
+        "unit": "milliseconds",
+        "value": 17.0
+      }
+    },
+    {
+      "bytes": 64,
+      "target": "192.168.178.59",
+      "target_ip": "192.168.178.59",
+      "icmp_seq": 8,
+      "ttl": 63,
+      "time": {
+        "unit": "milliseconds",
+        "value": 13.9
+      }
+    }
+  ],
+  "benchmark threshold": 20.0,
+  "benchmark delay": 10.0
+}

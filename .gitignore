@@ -4,15 +4,15 @@ lib/
 .vscode/
 results/
 
-ping.json
-check-ping.json
-ping-to-json
+#ping.json
+#check-ping.json
+#ping-to-json
 
-quic-benchmark-client.json
-quic-benchmark-server.json
+#quic-benchmark-client.json
+#quic-benchmark-server.json
 
-tcp-tls-benchmark-client.json
-tcp-tls-benchmark-server.json
+#tcp-tls-benchmark-client.json
+#tcp-tls-benchmark-server.json
 
 # Python-specific
 
@@ -241,4 +241,4 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # Benchmark measurements
-measurements/*
+#measurements/*
