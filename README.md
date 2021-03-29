@@ -545,6 +545,31 @@ Following the guide [here](https://faun.pub/implementing-http3-quic-nginx-99094d
 - [curlimages/curl](https://hub.docker.com/r/curlimages/curl) for the client capable of HTTP/2 curl GET request
 
 Similarly to nodejs, we captured the traffic using tshark in the same network. We also pinged the server, to ensure RTT avg was less than 5ms and stdev less than 2ms.
+Because these measurements are only needed for checking our assumption that nodejs-QUIC performed worse than nodesjs-TCP+TLS because of the implementation,
+we did not save the corresponding ssl-keys and ping statistics.
+The nginx-results are stored the following way:
+
+```bash
+nginx-measurements
+├── 1st-run
+│   ├── quic.pcap
+│   └── tcp.pcap
+├── 2nd-run
+│   ├── quic.pcap
+│   └── tcp.pcap
+├── 3rd-run
+│   ├── quic.pcap
+│   └── tcp.pcap
+├── 4th-run
+│   ├── quic.pcap
+│   └── tcp.pcap
+└── 5th-run
+    ├── quic.pcap
+    └── tcp.pcap
+
+```
+
+The following graphs are the two example pcap-files out of the first run. Because QUIC outperformed TCP+TLS each time using nginx, we just show one example:
   
 | NGINX HTTP/3 QUIC | NGINX HTTP/2 TCP |
 | :---------------- | :--------------- |
