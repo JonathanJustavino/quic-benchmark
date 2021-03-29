@@ -28,7 +28,7 @@ def list_unwrap(wrapped_list):
 
 
 # calculate average values of QUIC packages
-def quic_average(quic_cvs_list):
+def quic_average(quic_csvs):
     avg_list = []
     std_list = []
 
@@ -37,7 +37,7 @@ def quic_average(quic_cvs_list):
         tmp_list = []
 
         # extract row of each csv + append to tmp_list
-        for one_csv in csv_tuple[0]:
+        for one_csv in quic_csvs:
             one_csv = one_csv.values.tolist()  # convert panda DataFrame to List
             one_csv = list_unwrap(one_csv)  # unwrap list of list
             tmp_list.append(one_csv[row])
