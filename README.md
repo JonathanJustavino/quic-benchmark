@@ -110,7 +110,7 @@ As we built our own dockerimage with the nodejs version installed, it is still e
 
 The general structure of QUIC and TCP+TLS communication, based on network protocol layers:
 
-![layer_comparison_QUIC_TCP](./documentation/layers_comparison_QUIC_TCP.png)
+![layers_comparison_QUIC_TCP](./documentation/layer_comparison_QUIC_TCP.png)
 
 Both protocols work similar until they use TCP and UDP respectively in the transport layer.
 Notably, the payload of the transport layer protocols is structured different: 
