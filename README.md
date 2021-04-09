@@ -32,21 +32,20 @@ Comparing the performance of the QUIC protocol with a combination of the TCP and
 
 ## Introduction
 
-The purpose of this project is to analyze the behaviour and measure the performance of the QUIC protocol and compare it with the combination of the transmission control protocol (TCP) and the Transport Layer Security (TLS) protocol. 
+The purpose of this project is to analyze the behaviour and measure the performance of the QUIC protocol and compare it with the combination of the Transmission Control Protocol (TCP) and the Transport Layer Security (TLS) protocol. 
 QUIC is a transport-layer protocol that was initially developed by Google and is currently developed and standardized by the [IETF](https://datatracker.ietf.org/wg/quic/about/).
 HTTP mapping with QUIC is standardized in the [HTTP/3-draft](https://tools.ietf.org/html/draft-ietf-quic-http-32), the newest version of HTTP. QUIC on the transport layer (what we will mainly analyze in this project) is standardized in the [quic-transport-layer-draft](https://tools.ietf.org/html/draft-ietf-quic-transport-32).
 Communication via QUIC is encrypted by default. Because we compare it to TCP which is not encrypted by default, we always use TCP combined with TLS in our experiments for a fair comparison.
 The main advantages of QUIC over TCP+TLS are:
 
-* Multiplexed connections, allowing multiple streams of data to reach all the endpoints independently, and hence independent of packet losses involving other streams. 
-  In contrast, HTTP/2 hosted on Transmission Control Protocol (TCP) can suffer head-of-line-blocking delays of all multiplexed streams if any of the TCP packets are delayed or lost. 
+* Multiplexed connections without head-of-line-blocking: TCP can suffer head-of-line-blocking delays of all multiplexed streams if any of the TCP packets are delayed or lost. 
+  When a multiplexed stream is lost in QUIC, the other streams are not paused/delayed.
 * QUIC uses encryption by default, while TCP needs to be used in combination with TLS to achieve encrypted communication. 
   This saves time and packets at the begin of each connection, because it is not necessary to first set up TCP and afterwards negotiate the encryption via TLS
 
 First, we explain the general setup and the specific parameters (which OS was used, the topology of the network, etc.) of our experiment in the [Experiment setup](#experiment-setup) chapter. 
 There is also a detailed explanation of a [problem](#considerations-regarding-nodejs--quic) we encountered during the project: The support for the nodejs-version we used run out because OpenSSL probably won't include QUIC-support until OpenSSL 3.1, which does not have an official release date yet.
-In the chapter [Analysis](#analysis), we inspect the behaviour of each protocol in detail, mainly based on the pcap-files that are captured during the measurements. 
-The behaviour is compared to the description in the QUIC-standard and the overhead for each protocol is calculated. 
+In the chapter [Analysis](#analysis), we inspect the behaviour of each protocol in detail, mainly based on the pcap-files that are captured during the measurements. The protocol behaviour is compared to the QUIC-standard and the overhead for each protocol is calculated. 
 The [Run setup](#run-setup)-section includes the prerequisites for recreating the experiments. 
 In the [Evaluation / Results](#evaluation--results) chapter, we show the results of our measurements in detail. We used different methods to display the results of QUIC and TCP+TLS experiments with nodejs: Two figures show the specific events in comparison, and a third figure type shows intervals, i.e. the handshake duration with artifical network delay added.
 Because our nodejs-results did not match the expectation that QUIC would outperform TCP+TLS at least when adding a huge amount of artificial network delay, we set up a [nginx server for comparison](#comparing-nodejs-to-nginx-/-another-QUIC-implementation) that also supports QUIC and TCP+TLS.
@@ -62,7 +61,7 @@ In this experiment, we implemented two different Server-Client setups: One for c
 Both implementations were installed into docker containers and uploaded to [dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs). Using docker has several advantages:
 
 * For reproducing the measurements, it is not necessary to download+compile nodejs in experimental mode.
-* The experiment can be easily used on different operation systems
+* The experiment can be easily used on different operating systems
 * Conducting the measurements is automated via docker-compose
 
 We conducted the experiments on two machines inside a local area network (LAN). It has the advantage that it comes closer to using the protocols in practice, as using TCP+TLS and QUIC only on localhost would give TCP an advantage because it runs in the kernel-space, not the user-space with lower priority like QUIC.
@@ -102,8 +101,8 @@ The QUIC documentation to our nodejs experimental version is available [here](ht
 > The OpenSSL OMC has not yet committed to landing the updated QUIC APIs and has indicated that they will not even look at it until OpenSSL 3.1. With OpenSSL 3.0 beta currently delayed with no clear idea of when it will actually land, the initial QUIC support landed in core has now just become a maintenance burden with
 > no clear idea of when we'd ever be capable of delivering it. This PR, therefore, removes the QUIC support and reverts the patched in modifications to openssl. I will be investigating a userland alternative that does not depend on the built-in openssl bindings.
 
-This happened unfortunately after we were nearly finished with our project. Switching to another QUIC Server/Client architecture and do everything again would not have been possible on such a short notice.
-As we built our own dockerimage with the nodejs version installed, it is still easily possible to run our project without having to get the now deprecated nodejs version from some archived nodejs repository.
+This happened unfortunately after we were nearly finished our project. Switching to another QUIC Server/Client architecture and do everything again would not have been possible on such a short notice.
+It is still possible to run our project without having to get the now deprecated nodejs version from some archived nodejs repository, because we built our own docker image with the nodejs version installed.
 
 
 ## Analysis
@@ -118,7 +117,7 @@ Notably, the payload of the transport layer protocols is structured different:
 * **QUIC:** The QUIC packet is included in the UDP payload. The encryption is also done via TLS, but the TLS CRYPTO frames are part of the QUIC payload. Traffic control is managed by QUIC. After exchanging encryption details via TLS, QUIC communication works with encrypted streams.
 
 This section is mainly based on the analysis of the packages captured on the network interface of the client during the testruns.
-The traffic on the interface is captured with [tshark](https://tshark.dev). The resulting [pcapng](https://wiki.wireshark.org/Development/PcapNg#PcapNg) (short for packet capture next generation dump file format ) files are the basis for analyzing the behaviour of the different protocols in detail.
+The traffic on the interface is captured with [tshark](https://tshark.dev). The resulting [pcapng](https://wiki.wireshark.org/Development/PcapNg#PcapNg) (packet capture next generation dump file format ) files are the basis for analyzing the behaviour of the different protocols in detail.
 
 All pcap-files can be viewed in [wireshark](https://www.wireshark.org/) for comparison, it is the GUI version of tshark.
 To be able to decrypt the pcap files, it is necessary to add the corresponding SSL-keys to wireshark:
@@ -215,7 +214,7 @@ The UDP protocol contains the following headerfields:
 | Checksum | 2 |
 | | Σ = 8 |
 
-The QUIC protocol uses two types of headers: Long Header for the handshake and Short Header after the connection is established.
+The QUIC protocol uses two types of headers: Long Headers for the handshake and Short Headers after the connection is established.
 In the QUIC flowchart, each packet of the handshake (depicted with <span style="color:#9673A6">purple</span> arrows) has a QUIC long header, after the connection is established, each packet has a QUIC short header.
 
 The Long Header contains the following headerfields:
@@ -257,13 +256,13 @@ There is an important difference with the usage of TLS between QUIC and TCP, as 
 > level.  For instance, an implementation might bundle a Handshake
 > message and an ACK for some Handshake data into the same packet.
 
-This can be seen at the QUIC flowchart:
+This can be seen at the QUIC-flowchart above, when inspecting the following packets:
 The second packet (20,103 ms) contains one QUIC frame including TLS Server Hello, and another QUIC frame including TLS encrypted extensions.
 The fifth packet (92,746 ms) contains one QUIC frame including TLS handshake finished, and another QUIC frame including a new connection ID.
 
 ### Comparison transmitted Bytes in summary
 
-The information of the given flowcharts + documentiation summarized:
+The information of the given flowcharts and documentiation summarized:
 
 | | TCP+TLS | QUIC |
 | ------------ | ------------ | ------------- |
@@ -315,11 +314,10 @@ pip3 install matplotlib
 pip3 install colored
 ```
 
-The following commands are required to start benchmarking on your machine.
 
 ### Run in docker container
 
-To run the setup in docker nodejs does not have to be installed. It is sufficient to use our docker-image, which is built from the [Dockerfile](Dockerfile) and is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
+Nodejs does not have to be installed to run the setup in docker . It is sufficient to use our docker-image, which is built from the [Dockerfile](Dockerfile) and is pulled from [Dockerhub](https://hub.docker.com/r/ws2018sacc/experimentalnodejs).
 
 #### Benchmark parameters
 
@@ -424,7 +422,7 @@ This following graph gives an overview of the timeline of **all** events for eac
 * QuicStream.**close:** Quic Stream is completely closed and the underlying resources have been freed
 * QuicSocket.**close:** Quic Socket has been destroyed and is no longer usable
 * QuicSocket.**error:** Quic Socket was destroyed with an error
-* QuicSession.**handshakeDuration:** length of time taken to complete the TLS handshake
+* QuicSession.**handshakeDuration:** Time taken to complete the TLS handshake
 
 #### TCP events
 
@@ -569,7 +567,7 @@ nginx-measurements
 
 ```
 
-The following graphs are the two example pcap-files out of the first run. Because QUIC outperformed TCP+TLS each time using nginx, we just show one example:
+The following flowcharts are generated out of example pcap-files. This can be done in wireshark by opening a pcap file and then selecting Statistics&#8594;FlowGraph. Because QUIC outperformed TCP+TLS each time using nginx, we just show one example:
   
 | NGINX HTTP/3 QUIC | NGINX HTTP/2 TCP |
 | :---------------- | :--------------- |
