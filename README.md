@@ -99,8 +99,8 @@ In conclusion, the expired [draft-27](https://tools.ietf.org/html/draft-ietf-qui
 The QUIC documentation to our nodejs experimental version is available [here](https://nodejs.org/docs/v15.6.0/api/quic.html).
 
 :red_circle: The experimental nodejs version we used is **no longer maintained**, as explained in this [commit](https://github.com/nodejs/node/pull/37067) in the official nodejs repository:
-> The OpenSSL OMC has not yet committed to landing the updated QUIC APIs and has indicated that they will not even look at it until OpenSSL 3.1. With OpenSSL 3.0 > beta currently delayed with no clear idea of when it will actually land, the initial QUIC support landed in core has now just become a maintenance burden with
-> no clear idea of when we'd ever be capable of delivering it. This PR, therefore, removes the QUIC support and reverts the patched in modifications to openssl. I > will be investigating a userland alternative that does not depend on the built-in openssl bindings.
+> The OpenSSL OMC has not yet committed to landing the updated QUIC APIs and has indicated that they will not even look at it until OpenSSL 3.1. With OpenSSL 3.0 beta currently delayed with no clear idea of when it will actually land, the initial QUIC support landed in core has now just become a maintenance burden with
+> no clear idea of when we'd ever be capable of delivering it. This PR, therefore, removes the QUIC support and reverts the patched in modifications to openssl. I will be investigating a userland alternative that does not depend on the built-in openssl bindings.
 
 This happened unfortunately after we were nearly finished with our project. Switching to another QUIC Server/Client architecture and do everything again would not have been possible on such a short notice.
 As we built our own dockerimage with the nodejs version installed, it is still easily possible to run our project without having to get the now deprecated nodejs version from some archived nodejs repository.
@@ -279,13 +279,13 @@ The information of the given flowcharts + documentiation summarized:
 In conclusion, QUIC is transmitting more data than TCP+TLS for transmitting the same application data - QUIC uses roughly 2x the overhead of TCP+TLS to transmit the 46 Byte mesage "I am the client sending you a message" from client to server.
 QUIC uses roughly 1/3 more data than TCP+TLS during the handshake. This difference is not because the long header is used: The padding in the first packet/Client initial that is embedded after the "TLS Client hello" has a size of **921 Bytes**, consisting of zeros. This is necessary due to technical and security reasons:
 
-IETF documentation: [Padding](https://tools.ietf.org/html/draft-ietf-quic-transport-27#page-111) states:
+IETF documentation [Padding](https://tools.ietf.org/html/draft-ietf-quic-transport-27#page-111) states:
 > The PADDING frame (type=0x00) has no semantic value.  PADDING frames
 > can be used to increase the size of a packet.  Padding can be used to
 > increase an initial client packet to the minimum required size, or to
 > provide protection against traffic analysis for protected packets.
 
-IETF documentation: [Packet Size](https://tools.ietf.org/html/draft-ietf-quic-transport-27#section-14)) states:
+IETF documentation [Packet Size](https://tools.ietf.org/html/draft-ietf-quic-transport-27#section-14) states:
 
 > **A client MUST expand the payload of all UDP datagrams carrying
 > Initial packets to at least 1200 bytes** by adding PADDING frames to
