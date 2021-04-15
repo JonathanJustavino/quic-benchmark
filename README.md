@@ -272,8 +272,8 @@ The information of the given flowcharts and documentiation summarized:
 | **Σ Bytes transmitted in total** | 2589 | 4141 |
 | **Established connection** | 2589 (Bytes in total) - 2068 (Handshake) = 521 | 4141 (Bytes in total) - (2947 (Handshake) + 78 (1.QUIC frame) - 110 (2.QUIC frame)) = 1162 |
 | **Encrypted Application data** | 207 | 126 |
-| **Raw Application data** | 46 | 46 |
-| **Overhead** (Σ Bytes transmitted in total) - (Raw Application data) | 2589 - 46 = 2543 | 4141 - 46 = 4095 |
+| **Raw Application data** | 39 | 39 |
+| **Overhead** (Σ Bytes transmitted in total) - (Raw Application data) | 2589 - 39 = 2550 | 4141 - 39 = 4102 |
 
 In conclusion, QUIC is transmitting more data than TCP+TLS for transmitting the same application data - QUIC uses roughly 2x the overhead of TCP+TLS to transmit the 46 Byte mesage "I am the client sending you a message" from client to server.
 QUIC uses roughly 1/3 more data than TCP+TLS during the handshake. This difference is not because the long header is used: The padding in the first packet/Client initial that is embedded after the "TLS Client hello" has a size of **921 Bytes**, consisting of zeros. This is necessary due to technical and security reasons:
