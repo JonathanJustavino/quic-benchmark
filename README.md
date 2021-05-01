@@ -109,7 +109,7 @@ It is still possible to run our project without having to get the now deprecated
 
 The general structure of QUIC and TCP+TLS communication, based on network protocol layers:
 
-![layers_comparison_QUIC_TCP](./documentation/layer_comparison_QUIC_TCP.png)
+![layers_comparison_QUIC_TCP](./documentation/layer_comparison_QUIC_TCP_highres.png)
 
 Both protocols work similar until they use TCP and UDP respectively in the transport layer.
 Notably, the payload of the transport layer protocols is structured different: 
