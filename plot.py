@@ -4,6 +4,7 @@ import statistics as stat
 import matplotlib.pyplot as plt
 from visualize_events.plot_timeplan import *
 from visualize_events.dataloader import load_results
+from utils.pcap_loader import get_avg_timestamp_duration
 
 
 def convert_to_ms(value):
@@ -11,10 +12,8 @@ def convert_to_ms(value):
 
 
 def samples_path(samples_folder='samples'):
-    folder_filter = 'quic-benchmark'
     dst_folder = os.getcwd()
-    dst_folder = re.sub(folder_filter, "", dst_folder)
-    return f"{dst_folder}{samples_folder}"
+    return f"{dst_folder}/samples/{samples_folder}"
 
 
 def get_avg_values(folder_name):
@@ -96,6 +95,8 @@ def plot_graphs(samples):
         quic_results, tcp_results = get_avg_values(sample)
         results.update({f"{quic_key}-{delay}": quic_results})
         results.update({f"{tcp_key}-{delay}": tcp_results})
+    pcap_results = [get_avg_timestamp_duration(), 0, 0, 0]
+    results.update({f"{tcp_key}-pcap": pcap_results})
 
     survey(results, category_names, multiple_graphs=multiple_graphs)
     title = "" if multiple_graphs else title
@@ -160,9 +161,9 @@ def get_stats():
 
 if __name__ == '__main__':
     samples = [
-        # "samples_threshold5_dev2_delay0",
+        "samples_threshold5_dev2_delay0",
         # "samples_threshold15_dev2_delay10",
-        "samples_threshold25_dev2_delay20",
+        # "samples_threshold25_dev2_delay20",
         # "samples_threshold55_dev2_delay50"
     ]
 
