@@ -8,8 +8,11 @@ timestamp_file = "mod_timestamps.csv"
 results = {}
 
 
-def add_timestamp_to_results(result, socket_type):
-    results.update({f"{socket_type}": [result]})
+def add_timestamp_to_results(result, label):
+    if "QUIC" in label :
+        results.update({f"{label}": [result, 0]})
+    else: 
+        results.update({f"{label}": [0, result]})
 
 
 def convert_s_to_ms(avg_duration):
@@ -40,18 +43,26 @@ def get_path(samples_folder, socket_type):
     path = Path(path_name)
     return path
 
-def gather_tcp_quic_timestamps(samples_folder):
-    tcp_path = get_path(samples_folder, "tcp")
+def gather_tcp_quic_timestamps(samples_folder, delay):
     quic_path = get_path(samples_folder, "quic")
-    tcp_timestamps = data_loader(tcp_path)
+    tcp_path = get_path(samples_folder, "tcp")
     quic_timestamps = data_loader(quic_path)
-    tcp_avg_duration = get_avg_duration(tcp_timestamps)
+    tcp_timestamps = data_loader(tcp_path)
     quic_avg_duration = get_avg_duration(quic_timestamps)
-    add_timestamp_to_results(convert_s_to_ms(tcp_avg_duration), "tcp")
-    add_timestamp_to_results(convert_s_to_ms(quic_avg_duration), "quic")
+    tcp_avg_duration = get_avg_duration(tcp_timestamps)
+    format_quic = "{:.2f}".format(convert_s_to_ms(quic_avg_duration))
+    format_tcp = "{:.2f}".format(convert_s_to_ms(tcp_avg_duration))
+    add_timestamp_to_results(float(format_quic), f"QUIC {delay}")
+    add_timestamp_to_results(float(format_tcp), f"TCP+TLS {delay}")
 
 
 def get_avg_timestamp_duration():
     samples_folder = "samples/samples_threshold5_dev2_delay0"
-    gather_tcp_quic_timestamps(samples_folder)
+    gather_tcp_quic_timestamps(samples_folder, "Delay 0")
+    samples_folder = "samples/samples_threshold15_dev2_delay10"
+    gather_tcp_quic_timestamps(samples_folder, "Delay 10")
+    samples_folder = "samples/samples_threshold25_dev2_delay20"
+    gather_tcp_quic_timestamps(samples_folder, "Delay 20")
+    samples_folder = "samples/samples_threshold55_dev2_delay50"
+    gather_tcp_quic_timestamps(samples_folder, "Delay 50")
     return results

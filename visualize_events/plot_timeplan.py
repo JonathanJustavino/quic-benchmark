@@ -11,6 +11,8 @@ def survey(results, category_names, multiple_graphs=False, split_threshold=20, p
     data = np.array(list(results.values()))
     data_cum = data.cumsum(axis=1)
     category_colors = ["#a95aa1","#85c0f9","#f5793a","#0f2080", "#ee442f"]
+    if pcap:
+        category_colors = ["lightcoral", "skyblue"]
 
     if should_split(data, split_threshold):
         length = 10
@@ -37,9 +39,9 @@ def survey(results, category_names, multiple_graphs=False, split_threshold=20, p
 
     figure, ax = plt.subplots(figsize=(9.2, 5))
     set_xaxis_labels(ax, 'Milliseconds', 'left', (0.42, -0.07))
-    ax.set_ylabel('Socket Type', loc='center', size=12)
     x_offset = -3.8
-    if pcap == False:
+    if not pcap:
+        ax.set_ylabel('Socket Type', loc='center', size=12)
         set_plot_labels(ax, ["QUIC", "TCP/TLS"])
         ax.text(x_offset, 0, "QUIC", ha='center', va='bottom')
         ax.text(x_offset, 1, "TCP/TLS", ha='center', va='bottom')
