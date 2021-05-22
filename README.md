@@ -2,31 +2,35 @@
 
 Comparing the performance of the QUIC protocol with a combination of the TCP and the TLS protocol.
 
-* [University project QUIC benchmarking](#university-project-quic-benchmarking)
-  * [Introduction](#introduction)
-  * [Experiment setup](#experiment-setup)
-    * [Hardware specifications](#hardware-specifications)
-    * [Network conditions](#network-conditions)
-    * [Considerations regarding nodejs + QUIC](#considerations-regarding-nodejs--quic)
-  * [Analysis](#analysis)
-    * [Flowchart TCP+TLS](#flowchart-tcptls)
-    * [Flowchart QUIC](#flowchart-quic)
-    * [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
-  * [Run setup](#run-setup)
-    * [Run in docker container](#run-in-docker-container)
-      * [Benchmark parameters](#benchmark-parameters)
-    * [Run locally on machine](#run-locally-on-machine)
-  * [Evaluation / Results](#evaluation--results)
-    * [Event comparisons](#event-comparisons)
-      * [QUIC events](#quic-events)
-      * [TCP events](#tcp-events)
-    * [Time comparison](#time-comparison)
-      * [Adding Delay](#adding-delay)
-      * [Delay: 10 ms](#delay-10-ms)
-      * [Delay: 20 ms](#delay-20-ms)
-      * [Delay: 50 ms](#delay-50-ms)
-    * [Comparing nodejs to nginx / another QUIC implementation](#comparing-nodejs-to-nginx--another-quic-implementation)
-  * [Future Work](#future-work)
+- [University project QUIC benchmarking](#university-project-quic-benchmarking)
+  - [Introduction](#introduction)
+  - [Experiment setup](#experiment-setup)
+    - [Hardware specifications](#hardware-specifications)
+    - [Network conditions](#network-conditions)
+    - [Considerations regarding nodejs + QUIC](#considerations-regarding-nodejs--quic)
+  - [Analysis](#analysis)
+    - [Flowchart TCP+TLS](#flowchart-tcptls)
+    - [Flowchart QUIC](#flowchart-quic)
+    - [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
+  - [Run setup](#run-setup)
+    - [Run in docker container](#run-in-docker-container)
+      - [Benchmark parameters](#benchmark-parameters)
+    - [Run locally on machine](#run-locally-on-machine)
+  - [Evaluation / Results](#evaluation--results)
+    - [Event comparisons](#event-comparisons)
+      - [QUIC events](#quic-events)
+      - [TCP events](#tcp-events)
+    - [Time comparison NodeJS events](#time-comparison-nodejs-events)
+      - [Adding Delay](#adding-delay)
+      - [Delay: 10 ms / nodeJS events](#delay-10-ms--nodejs-events)
+      - [Delay: 20 ms / nodesJS events](#delay-20-ms--nodesjs-events)
+      - [Delay: 50 ms / nodeJS events](#delay-50-ms--nodejs-events)
+      - [Conclusion nodeJS events](#conclusion-nodejs-events)
+    - [Time comparison nodeJS pcap-files](#time-comparison-nodejs-pcap-files)
+      - [Delay: 10, 20, 50 ms / pcap](#delay-10-20-50-ms--pcap)
+      - [Conclusion nodeJS pcap-files](#conclusion-nodejs-pcap-files)
+    - [Comparing nodejs to nginx / another QUIC implementation](#comparing-nodejs-to-nginx--another-quic-implementation)
+  - [Future Work](#future-work)
 
 
 
@@ -534,23 +538,27 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Standard deviation | 4.7 | 0.4 | 0.5 | 0.3 |
 
 #### Conclusion nodeJS events
-Warum diese nodejs Messungen mit Events "schlecht" sind -> delay wird von nodejs immer nur beim handshake "getracked", und danach nicht mehr -> bei quic schon, deshalb steht QUIC fälschlicherweise extrem schecht dar
--> Deshalb Entscheidun nochmal an pcap-files die performance zu vergleichen, siehe nächster Abschnitt. 
+
+Looking at our nodejs event measurements we noticed some inconsitencies. When adding the delay, the TCP+TLS Handshake duration increased, but not the data transfer. For QUIC both the Handshake duration and the data transfer increased according to the delay, which makes it look much slower than TCP+TLS. To see if our timestamps for the events match the communication, we will take a look at the network packets, that we captured in the following chapter.
 
 ### Time comparison nodeJS pcap-files
+
 The time comparison of TCP+TLS and QUIC in nodeJS based on events is generating a false impression, when taking a look at the graphs it seems like a huge difference between TCP+TLS and QUIC.
 We decided to use the pcap-files we generated during our measurements (see also section [Analysis](#analysis)) for a better comparison.
 
 #### Delay: 10, 20, 50 ms / pcap
+
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms, 20ms and 50ms on top of the existing network RTT. The following graph shows the average values based on the pcap-files:
--- Übersicht hier einfügen --
+![pcap-delays](./documentation/pcap_communication.png)
 
 #### Conclusion nodeJS pcap-files
+
 When comparing TCP+TLS with QUIC based on nodeJS pcap-files, TCP+TLS still outperforms QUIC for each added delay.
 Notably, the difference between both is not as huge as comparing the corresponding nodeJS events (see section [Adding Delay](#adding-delay)).
 We assumed QUIC would outperform TCP+TLS, especially with artificial delay added, this is not the case.
 
 ### Comparing nodejs to nginx / another QUIC implementation
+
 With QUIC always taking a longer amount of time longer for the content transfer (both for nodeJS events and pcap-files), we hypothesized that this may be due to the experimental implementation of QUIC in nodejs. To test this hypothesis, we compared it to the QUIC implementation for nginx.
 Following the guide [here](https://faun.pub/implementing-http3-quic-nginx-99094d3e39f), we used the Docker images:
 
@@ -598,7 +606,6 @@ Looking at the traffic flow, the complete communication for HTTP/3 took 17ms les
 Here in comparison is the nginx HTTP/3 implementation and the nodejs socket implementation.
 We can see that even though the nodejs communication does not include the application layer, it is still overall taking 24ms longer to complete.
 This supports our hypothesis that the implementation of nodejs for QUIC in its experimental state is not yet applicable and returns worse results than TCP/TLS.
-
 
 ## Future Work
 
