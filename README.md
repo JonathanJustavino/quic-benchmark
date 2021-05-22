@@ -485,7 +485,7 @@ With increased delay, we can see a linear increase for the duration of **Handsha
 QUIC has a steeper linear increase than TCP.
 Most noticeable and surprising is the spike in the duration of **Close socket** for QUIC. We assume this is caused by the specific QUIC implementation in nodejs, as it is still in experimental state.
 
-#### Delay: 10 ms
+#### Delay: 10 ms / nodeJS events
 
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms on top of the existing network RTT. The following graph shows the average values:
 
@@ -501,7 +501,7 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Average value / mean (ms) | 22.0 | 1.4 | 1.6 | 3.9 |
 | Standard deviation (ms) | 2.4 | 0.7 | 0.7 | 0.5 |
 
-#### Delay: 20 ms
+#### Delay: 20 ms / nodesJS events
 
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 20ms on top of the existing network RTT. The following graph shows the average values:
 
@@ -517,7 +517,7 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Average value / mean value (ms) | 35.3 | 2.2 | 2.1 | 5.4 |
 | Standard deviation (ms) | 2.8 | 0.4 | 0.3 | 0.5 |
 
-#### Delay: 50 ms
+#### Delay: 50 ms / nodeJS events
 
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 50ms on top of the existing network RTT. The following graph shows the average values:
 
@@ -545,8 +545,13 @@ We decided to use the pcap-files we generated during our measurements (see also 
 We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms, 20ms and 50ms on top of the existing network RTT. The following graph shows the average values based on the pcap-files:
 -- Übersicht hier einfügen --
 
+#### Conclusion nodeJS pcap-files
+When comparing TCP+TLS with QUIC based on nodeJS pcap-files, TCP+TLS still outperforms QUIC for each added delay.
+Notably, the difference between both is not as huge as comparing the corresponding nodeJS events (see section [Adding Delay](#adding-delay)).
+We assumed QUIC would outperform TCP+TLS, especially with artificial delay added, this is not the case.
+
 ### Comparing nodejs to nginx / another QUIC implementation
-With QUIC taking a significant amount of time longer for Handshake, Content Transfer and most noticeable Close socket, we hypothesized that this may be due to the experimental implementation of QUIC in nodejs. To test this hypothesis, we compared it to the QUIC implementation for nginx.
+With QUIC always taking a longer amount of time longer for the content transfer (both for nodeJS events and pcap-files), we hypothesized that this may be due to the experimental implementation of QUIC in nodejs. To test this hypothesis, we compared it to the QUIC implementation for nginx.
 Following the guide [here](https://faun.pub/implementing-http3-quic-nginx-99094d3e39f), we used the Docker images:
 
 - [ymuski/nginx-quic](https://hub.docker.com/r/ymuski/nginx-quic) for the server capable of HTTP/3 and HTTP/2
