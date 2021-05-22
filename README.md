@@ -443,7 +443,7 @@ The following graph shows the average value of the 5 **comparable events** (also
 
 ![setup parameters](./documentation/events_comparison.png)
 
-### Time comparison
+### Time comparison NodeJS events
 
 For further comparison, we defined specific durations for the communication using the events mentioned before.
 
@@ -533,8 +533,19 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 | Average value / mean value | 65.7 | 2.2 | 2.3 | 5.2 |
 | Standard deviation | 4.7 | 0.4 | 0.5 | 0.3 |
 
-### Comparing nodejs to nginx / another QUIC implementation
+#### Conclusion nodeJS events
+Warum diese nodejs Messungen mit Events "schlecht" sind -> delay wird von nodejs immer nur beim handshake "getracked", und danach nicht mehr -> bei quic schon, deshalb steht QUIC fälschlicherweise extrem schecht dar
+-> Deshalb Entscheidun nochmal an pcap-files die performance zu vergleichen, siehe nächster Abschnitt. 
 
+### Time comparison nodeJS pcap-files
+The time comparison of TCP+TLS and QUIC in nodeJS based on events is generating a false impression, when taking a look at the graphs it seems like a huge difference between TCP+TLS and QUIC.
+We decided to use the pcap-files we generated during our measurements (see also section [Analysis](#analysis)) for a better comparison.
+
+#### Delay: 10, 20, 50 ms / pcap
+We sent the application data 10 times with the QUIC and TCP+TLS implementation respectively and added a round trip time (RTT) delay of 10ms, 20ms and 50ms on top of the existing network RTT. The following graph shows the average values based on the pcap-files:
+-- Übersicht hier einfügen --
+
+### Comparing nodejs to nginx / another QUIC implementation
 With QUIC taking a significant amount of time longer for Handshake, Content Transfer and most noticeable Close socket, we hypothesized that this may be due to the experimental implementation of QUIC in nodejs. To test this hypothesis, we compared it to the QUIC implementation for nginx.
 Following the guide [here](https://faun.pub/implementing-http3-quic-nginx-99094d3e39f), we used the Docker images:
 
