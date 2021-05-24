@@ -2,36 +2,35 @@
 
 Comparing the performance of the QUIC protocol with a combination of the TCP and the TLS protocol.
 
-- [University project QUIC benchmarking](#university-project-quic-benchmarking)
-  - [Introduction](#introduction)
-  - [Experiment setup](#experiment-setup)
-    - [Hardware specifications](#hardware-specifications)
-    - [Network conditions](#network-conditions)
-    - [Considerations regarding nodejs + QUIC](#considerations-regarding-nodejs--quic)
-  - [Analysis](#analysis)
-    - [Flowchart TCP+TLS](#flowchart-tcptls)
-    - [Flowchart QUIC](#flowchart-quic)
-    - [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
-  - [Run setup](#run-setup)
-    - [Run in docker container](#run-in-docker-container)
-      - [Benchmark parameters](#benchmark-parameters)
-    - [Run locally on machine](#run-locally-on-machine)
-  - [Evaluation / Results](#evaluation--results)
-    - [Event comparisons](#event-comparisons)
-      - [QUIC events](#quic-events)
-      - [TCP events](#tcp-events)
-    - [Time comparison NodeJS events](#time-comparison-nodejs-events)
-      - [Adding Delay](#adding-delay)
-      - [Delay: 10 ms / nodeJS events](#delay-10-ms--nodejs-events)
-      - [Delay: 20 ms / nodesJS events](#delay-20-ms--nodesjs-events)
-      - [Delay: 50 ms / nodeJS events](#delay-50-ms--nodejs-events)
-      - [Conclusion nodeJS events](#conclusion-nodejs-events)
-    - [Time comparison nodeJS pcap-files](#time-comparison-nodejs-pcap-files)
-      - [Delay: 10, 20, 50 ms / pcap](#delay-10-20-50-ms--pcap)
-      - [Conclusion nodeJS pcap-files](#conclusion-nodejs-pcap-files)
-    - [Comparing nodejs to nginx / another QUIC implementation](#comparing-nodejs-to-nginx--another-quic-implementation)
-  - [Future Work](#future-work)
-
+* [University project QUIC benchmarking](#university-project-quic-benchmarking)
+  * [Introduction](#introduction)
+  * [Experiment setup](#experiment-setup)
+    * [Hardware specifications](#hardware-specifications)
+    * [Network conditions](#network-conditions)
+    * [Considerations regarding nodejs + QUIC](#considerations-regarding-nodejs--quic)
+  * [Analysis](#analysis)
+    * [Flowchart TCP+TLS](#flowchart-tcptls)
+    * [Flowchart QUIC](#flowchart-quic)
+    * [Comparison transmitted Bytes in summary](#comparison-transmitted-bytes-in-summary)
+  * [Run setup](#run-setup)
+    * [Run in docker container](#run-in-docker-container)
+      * [Benchmark parameters](#benchmark-parameters)
+    * [Run locally on machine](#run-locally-on-machine)
+  * [Evaluation / Results](#evaluation-/-results)
+    * [Event comparisons](#event-comparisons)
+      * [QUIC events](#quic-events)
+      * [TCP events](#tcp-events)
+    * [Time comparison NodeJS events](#time-comparison-nodejs-events)
+      * [Adding Delay](#adding-delay)
+      * [Delay: 10 ms / nodeJS events](#delay-10-ms--nodejs-events)
+      * [Delay: 20 ms / nodesJS events](#delay-20-ms--nodesjs-events)
+      * [Delay: 50 ms / nodeJS events](#delay-50-ms--nodejs-events)
+      * [Conclusion nodeJS events](#conclusion-nodejs-events)
+    * [Time comparison nodeJS pcap-files](#time-comparison-nodejs-pcap-files)
+      * [Delay: 10, 20, 50 ms / pcap](#delay:-10,-20,-50-ms-/-pcap)
+      * [Conclusion nodeJS pcap-files](#conclusion-nodejs-pcap-files)
+    * [Comparing nodejs to nginx / another QUIC implementation](#comparing-nodejs-to-nginx--another-quic-implementation)
+  * [Future Work](#future-work)
 
 
 ## Introduction
@@ -303,7 +302,7 @@ After establishing the connection, the QUIC headersize is similar to the TCP hea
 
 In summary, QUIC is transmitting more data, but is sending fewer packets than TCP. It is unfortunate that QUIC needs 921 Bytes in the handshake only for padding, but it is necessary due to technical and security reasons. Maybe it is possible to improve the QUIC protocol by filling the first packet more efficiently.
 Reusing the same connection to send more application data would at least reduce the handshake data for QUIC and probably improve the performance - this is also stated in [Future Work](#future-work).
-QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it is sending 2 packets less. This could be because QUIC is running in user-space instead of kernel-space, like TCP+TLS (see the summary of [Time Comparison](#time-comparison) for a detailed explanation).
+QUIC takes ~2x the time of TCP+TLS to transfer the application data, although it is sending 2 packets less. This could be because QUIC is running in user-space instead of kernel-space, like TCP+TLS (see the summary of [Time Comparison](#time-comparison-nodejs-events) for a detailed explanation).
 Moreover, the QUIC implementation in the nodejs version we are using is still experimental, so this could also be a limiting factor.
 
 ## Run setup
