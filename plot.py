@@ -11,10 +11,8 @@ def convert_to_ms(value):
 
 
 def samples_path(samples_folder='samples'):
-    folder_filter = 'quic-benchmark'
     dst_folder = os.getcwd()
-    dst_folder = re.sub(folder_filter, "", dst_folder)
-    return f"{dst_folder}{samples_folder}"
+    return f"{dst_folder}/samples/{samples_folder}"
 
 
 def get_avg_values(folder_name):
@@ -160,9 +158,9 @@ def get_stats():
 
 if __name__ == '__main__':
     samples = [
-        # "samples_threshold5_dev2_delay0",
+        "samples_threshold5_dev2_delay0",
         # "samples_threshold15_dev2_delay10",
-        "samples_threshold25_dev2_delay20",
+        # "samples_threshold25_dev2_delay20",
         # "samples_threshold55_dev2_delay50"
     ]
 
