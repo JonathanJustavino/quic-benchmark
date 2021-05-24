@@ -45,7 +45,7 @@ The main advantages of QUIC over TCP+TLS are:
 * Multiplexed connections without head-of-line-blocking: TCP can suffer head-of-line-blocking delays of all multiplexed streams if any of the TCP packets are delayed or lost. 
   When a multiplexed stream is lost in QUIC, the other streams are not paused/delayed.
 * QUIC uses encryption by default, while TCP needs to be used in combination with TLS to achieve encrypted communication. 
-  This saves time and packets at the begin of each connection, because it is not necessary to first set up TCP and afterwards negotiate the encryption via TLS
+  This saves time and packets at the beginning of each connection, because it is not necessary to first set up TCP and afterwards negotiate the encryption via TLS
 
 First, we explain the general setup and the specific parameters (which OS was used, the topology of the network, etc.) of our experiment in the [Experiment setup](#experiment-setup) chapter. 
 There is also a detailed explanation of a [problem](#considerations-regarding-nodejs--quic) we encountered during the project: The support for the nodejs-version we used run out because OpenSSL probably won't include QUIC-support until OpenSSL 3.1, which does not have an official release date yet.
@@ -53,8 +53,8 @@ In the chapter [Analysis](#analysis), we inspect the behaviour of each protocol 
 The [Run setup](#run-setup)-section includes the prerequisites for recreating the experiments. 
 In the [Evaluation / Results](#evaluation--results) chapter, we show the results of our measurements in detail. We used different methods to display the results of QUIC and TCP+TLS experiments with nodejs: Two figures show the specific events in comparison, and a third figure type shows intervals, i.e. the handshake duration with artifical network delay added.
 Because our nodejs-results did not match the expectation that QUIC would outperform TCP+TLS at least when adding a huge amount of artificial network delay, we set up a [nginx server for comparison](#comparing-nodejs-to-nginx-/-another-QUIC-implementation) that also supports QUIC and TCP+TLS.
-We measured nginx-QUIC and nginx-TCP+TLS each 10x with no artificial network delay added. Our results show that the nginx-QUIC-implemenation outperforms TCP+TLS for each measurement.
-This affirms our hypothesis that TCP+TLS in nodejs outperfoms nodejs-QUIC because of the implementation, as it is still experimental and also recieves no support at the moment.
+We measured nginx-QUIC and nginx-TCP+TLS each 10x with no artificial network delay added. Our results show that the nginx-QUIC-implementation outperforms TCP+TLS for each measurement.
+This affirms our hypothesis that TCP+TLS in nodejs outperforms nodejs-QUIC because of the implementation, as it is still experimental and also recieves no support at the moment.
 
 ## Experiment setup
 
@@ -266,7 +266,7 @@ The fifth packet (92,746 ms) contains one QUIC frame including TLS handshake fin
 
 ### Comparison transmitted Bytes in summary
 
-The information of the given flowcharts and documentiation summarized:
+The information of the given flowcharts and documentation summarized:
 
 | | TCP+TLS | QUIC |
 | ------------ | ------------ | ------------- |
@@ -279,7 +279,7 @@ The information of the given flowcharts and documentiation summarized:
 | **Raw Application data** | 39 | 39 |
 | **Overhead** (Σ Bytes transmitted in total) - (Raw Application data) | 2589 - 39 = 2550 | 4141 - 39 = 4102 |
 
-In conclusion, QUIC is transmitting more data than TCP+TLS for transmitting the same application data - QUIC uses roughly 2x the overhead of TCP+TLS to transmit the 46 Byte mesage "I am the client sending you a message" from client to server.
+In conclusion, QUIC is transmitting more data than TCP+TLS for transmitting the same application data - QUIC uses roughly 2x the overhead of TCP+TLS to transmit the 46 Byte message "I am the client sending you a message" from client to server.
 QUIC uses roughly 1/3 more data than TCP+TLS during the handshake. This difference is not because the long header is used: The padding in the first packet/Client initial that is embedded after the "TLS Client hello" has a size of **921 Bytes**, consisting of zeros. This is necessary due to technical and security reasons:
 
 IETF documentation [Padding](https://tools.ietf.org/html/draft-ietf-quic-transport-27#page-111) states:
@@ -329,7 +329,7 @@ Nodejs does not have to be installed to run the setup in docker . It is sufficie
 
 > Beware: If you wish to build the image using the Dockerfile, take note, that it takes a very long time (up to 30 min), because nodejs has to be rebuilt in experimental mode
 
-The script generates a json file with timestamps for every comparable event for TCP+TLS and QUIC, as well as a packet capture via tshark and a json file documenting the ping output run simultaniously.
+The script generates a json file with timestamps for every comparable event for TCP+TLS and QUIC, as well as a packet capture via tshark and a json file documenting the ping output run simultaneously.
 
 ### Run locally on machine
 
@@ -539,7 +539,7 @@ We sent the application data 10 times with the QUIC and TCP+TLS implementation r
 
 #### Conclusion nodeJS events
 
-Looking at our nodejs event measurements we noticed some inconsitencies. When adding the delay, the TCP+TLS Handshake duration increased, but not the data transfer. For QUIC both the Handshake duration and the data transfer increased according to the delay, which makes it look much slower than TCP+TLS. To see if our timestamps for the events match the communication, we will take a look at the network packets, that we captured in the following chapter.
+Looking at our nodejs event measurements we noticed some inconsistencies. When adding the delay, the TCP+TLS Handshake duration increased, but not the data transfer. For QUIC both the Handshake duration and the data transfer increased according to the delay, which makes it look much slower than TCP+TLS. To see if our timestamps for the events match the communication, we will take a look at the network packets, that we captured in the following chapter.
 
 ### Time comparison nodeJS pcap-files
 
