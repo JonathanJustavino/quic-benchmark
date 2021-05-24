@@ -83,7 +83,7 @@ Our Router only had the possibility to connect one LAN cable, because of this th
 For the comparison of each protocol, it is necessary to create the same network conditions during the testruns.
 To achieve this goal, we monitored the network workload with constantly using [ping](https://linux.die.net/man/8/ping) and calculating the mean and standard deviation of the ping response for each measurement.
 The ping statistics are saved in ping.json file and stored in the folder of the specific measurement. 
-For example for the QUIC measurement ``2021-03-08``&#160;``08-21-15.964770`` (folder name == timestamp of the measurement) inside the folder ``samples_threshold5_dev2_delay0`` (read: underlying network threshold <= 5ms, standard deviation of ping <= 2ms, artificial network delay = 0ms) the ping-statistic is saved [here](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/ping.json).
+For example for the QUIC measurement ``2021-03-08``&#160;``08-21-15.964770`` (folder name == timestamp of the measurement) inside the folder ``samples_threshold5_dev2_delay0`` (read: underlying network threshold <= 5ms, standard deviation of ping <= 2ms, artificial network delay = 0ms) the ping-statistic is saved [here](./samples/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/ping.json).
 
 The network-conditions for each measurement:
 * **Underlying network RTT <= 5ms**: Measured with multiple pings and averaging the RTT-result of each ping.
@@ -126,7 +126,7 @@ The traffic on the interface is captured with [tshark](https://tshark.dev). The 
 All pcap-files can be viewed in [wireshark](https://www.wireshark.org/) for comparison, it is the GUI version of tshark.
 To be able to decrypt the pcap files, it is necessary to add the corresponding SSL-keys to wireshark:
 The SSL-keys for each pcap-file can be found in the subfolder for each measurement.
-For example the SSL-key for [this QUIC pcap-file](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/quic.pcap) is located in the same folder [here](./measurements/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/ssl-keys.log).
+For example the SSL-key for [this QUIC pcap-file](./samples/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/quic.pcap) is located in the same folder [here](./samples/samples_threshold5_dev2_delay0/quic/remote/2021-03-08%2008-21-15.964770/ssl-keys.log).
 After opening a specific pcap-file in wireshark, go to Edit&#8594;Preferences&#8594;Protocols&#8594;TLS and add the path to the **corresponding** SSL-key.log to field "(Pre)-Master-Secret log filename".
 
 Based on these pcap-files, we generate flowcharts and compare the overhead for the transmitted payload where we depict the properties of each protocol.
@@ -157,7 +157,7 @@ Notably, from all 10 captured tcp-pcap files, there exist 2 pcaps that contain 1
 This is due to a missing __TCP Window update__ package in the 8 tcp-pcap files. This doesn't change important behaviour of the protocol (i.e. the handshake) in general. 
 Therefore, to create a consistent flowchart and calculate the average value of each sent packet, the 2 tcp-pcap files which contain 13 packets are omitted.
 
-The script [process_pcaps_tcp+tls.py](./measurements/process_pcaps_tcp+tls.py) uses the timestamps.csv of each tcp-pcap and filters out the ones where 13 packets instead of 14 are transmitted.
+The script [process_pcaps_tcp+tls.py](./samples/process_pcaps_tcp+tls.py) uses the timestamps.csv of each tcp-pcap and filters out the ones where 13 packets instead of 14 are transmitted.
 Then, the average of the timestamps of each connection is printed - these mean values are used as timestamps in the following flowchart.
 Moreover, important properties of each packet (i.e. the flags like ACK, FIN or the handshake messages) and the Bytes of the packet on wire are shown. 
 
@@ -202,7 +202,7 @@ For each connection with 11 packets, there is one more ACK-packet sent at the en
 The missing ACK-package doesn't seem to have an impact on the protocol behaviour.
 So we decided for the flowcharts to work only with the pcap-files with **10 tansmitted packets** to generate a consistent flowchart where we can calculate the average over each packet timestamp:
 
-The script [process_pcaps_quic.py](./measurements/process_pcaps_quic.py) uses the timestamps.csv of each quic-pcap and filters out the ones with 11 packets transmitted.
+The script [process_pcaps_quic.py](./samples/process_pcaps_quic.py) uses the timestamps.csv of each quic-pcap and filters out the ones with 11 packets transmitted.
 Then, the mean values of the timestamp of each connection is printed - these mean values are used as timestamps in the following flowchart.
 Moreover, important properties of each packet (i.e. the flags like ACK, FIN or the handshake messages) and the Bytes of the packet on wire are shown. 
 
