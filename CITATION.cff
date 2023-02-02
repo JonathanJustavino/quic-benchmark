@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: quic-benchmark
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Jeannine
+    family-names: Born
+    affiliation: Technical University of Dresden
+  - given-names: Jonathan
+    family-names: Justavino Lüderitz
+    affiliation: Technical University of Dresden
+  - given-names: Amelie
+    family-names: Wagner
+    affiliation: Technical University of Dresden
+repository-code: 'https://github.com/JonathanJustavino/quic-benchmark'
+abstract: >-
+  The purpose of this project is to analyze the behaviour
+  and measure the performance of the QUIC protocol and
+  compare it with the combination of the Transmission
+  Control Protocol (TCP) and the Transport Layer Security
+  (TLS) protocol.
+keywords:
+  - QUIC
